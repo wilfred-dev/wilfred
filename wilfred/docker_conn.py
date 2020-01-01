@@ -1,5 +1,5 @@
-# nerdlan
-# https://github.com/nerdlan/nerdlan
+# wilfred
+# https://github.com/wilfred-dev/wilfred
 # (c) Vilhelm Prytz 2020
 
 import docker
