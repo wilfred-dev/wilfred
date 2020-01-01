@@ -6,7 +6,7 @@ import sqlite3
 import click
 from appdirs import user_data_dir
 from os.path import isfile, isdir
-from os import mkdir
+from pathlib import Path
 from wilfred.message_handler import info, error
 
 
@@ -40,7 +40,7 @@ class Database(object):
         self.database_path = f"{self.data_dir}/wilfred.db"
 
         if not isdir(self.data_dir):
-            mkdir(self.data_dir)
+            Path(self.data_dir).mkdir(parents=True, exist_ok=True)
 
         # main sqlite3 database
         if not isfile(self.database_path):

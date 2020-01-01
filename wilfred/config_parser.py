@@ -3,15 +3,20 @@
 # (c) Vilhelm Prytz 2020
 
 import json
-import click
 from appdirs import user_config_dir
-from os.path import isfile
+from os.path import isfile, isdir
+from pathlib import Path
 from wilfred.message_handler import warning
 
 
 class Config(object):
     def __init__(self):
-        self.config_path = f"{user_config_dir()}/wilfred/config.json"
+        self.data_dir = f"{user_config_dir()}/wilfred"
+        self.config_path = f"{self.data_dir}/config.json"
+
+        if not isdir(self.data_dir):
+            Path(self.data_dir).mkdir(parents=True, exist_ok=True)
+
         self._read()
 
     def _read(self):
