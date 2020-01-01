@@ -2,6 +2,7 @@ __pycache__
 wilfred.egg-info
 build
 dist
+.eggs
 
 # IDE
 .vscode

@@ -4,10 +4,15 @@
 
 import click
 
-from docker_conn import docker_client
-from version import version
+from wilfred.docker_conn import docker_client
+from wilfred.version import version
+from wilfred.config_parser import Config
+from wilfred.database import Database
+from wilfred.message_handler import error
 
 client = docker_client()
+config = Config().configuration
+database = Database()
 
 
 def print_version(ctx, param, value):
@@ -29,8 +34,15 @@ def cli():
     """
     A CLI for managing game servers using Docker.
 
-    ⚠️  This is still experimental, features not be implementet yet or broken.
+    ⚠️  This is still experimental, features may not be implemented yet or broken.
     """
+
+    pass
+
+
+@cli.command()
+def setup():
+    """setup wilfred, create config"""
 
     pass
 
@@ -42,13 +54,10 @@ def servers():
     try:
         containers = client.containers.list()
     except Exception as e:
-        click.echo(
-            click.style("❌ ")
-            + click.style("unable to communicate with docker - ", bold=True)
-            + str(e),
-            err=True,
+        error(
+            click.style("unable to communicate with docker - ", bold=True) + str(e),
+            exit_code=1,
         )
-        exit(1)
 
     pass
 

@@ -1,0 +1,17 @@
+[[source]]
+name = "pypi"
+url = "https://pypi.org/simple"
+verify_ssl = true
+
+[dev-packages]
+flake8 = "*"
+black = "==19.10b0"
+
+[packages]
+docker = "*"
+click = "*"
+colorama = "*"
+appdirs = "*"
+
+[requires]
+python_version = "3.6"
