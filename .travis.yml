@@ -1,4 +1,3 @@
-sudo: required
 language: python
 services:
 - docker
@@ -19,5 +18,13 @@ deploy:
   provider: pypi
   user: "__token__"
   password: "Your PyPI API token, including the pypi- prefix"
+  on:
+    tags: true
+
+deploy:
+  provider: snap
+  snap: wilfred_*.snap
+  channel: edge
+  skip_cleanup: true
   on:
     tags: true
