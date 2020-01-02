@@ -1,4 +1,5 @@
 __pycache__
+*.pyc
 wilfred.egg-info
 build
 dist

@@ -30,3 +30,7 @@ class Config(object):
 
         with open(self.config_path) as f:
             self.configuration = json.loads(f.read())
+
+    def write(self, data_path):
+        with open(self.config_path, "w") as f:
+            f.write(json.dumps({"data_path": data_path}, indent=4))

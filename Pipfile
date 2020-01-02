@@ -12,6 +12,8 @@ docker = "*"
 click = "*"
 colorama = "*"
 appdirs = "*"
+requests = "*"
+tabulate = "*"
 
 [requires]
 python_version = "3.6"

@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 # wilfred
 # https://github.com/wilfred-dev/wilfred
 # (c) Vilhelm Prytz 2020
@@ -8,17 +10,19 @@ from wilfred.docker_conn import docker_client
 from wilfred.version import version
 from wilfred.config_parser import Config
 from wilfred.database import Database
-from wilfred.message_handler import error
+from wilfred.images import Images
+from wilfred.message_handler import error, warning
 
 client = docker_client()
-config = Config().configuration
+config = Config()
 database = Database()
+images = Images()
 
 
 def print_version(ctx, param, value):
     if not value or ctx.resilient_parsing:
         return
-    click.echo(f"✨ wilfred version {version}")
+    click.echo("✨ wilfred version {}".format(version))
     ctx.exit()
 
 
@@ -44,7 +48,15 @@ def cli():
 def setup():
     """setup wilfred, create config"""
 
-    pass
+    if config.configuration:
+        warning("A configuration file for Wilfred already exists.")
+        click.confirm("Are you sure you wan't to continue?", abort=True)
+
+    data_path = click.prompt(
+        "Path for storing server data", default="/srv/wilfred/servers"
+    )
+
+    config.write(data_path)
 
 
 @cli.command()
@@ -58,6 +70,15 @@ def servers():
             click.style("unable to communicate with docker - ", bold=True) + str(e),
             exit_code=1,
         )
+
+    pass
+
+
+@cli.command("images")
+def list_images():
+    """list available images"""
+
+    click.echo(images.pretty())
 
     pass
 
