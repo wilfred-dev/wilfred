@@ -15,14 +15,12 @@ jobs:
     - black --check .
 
 deploy:
-  provider: pypi
+  - provider: pypi
   user: "__token__"
   password: "Your PyPI API token, including the pypi- prefix"
   on:
     tags: true
-
-deploy:
-  provider: snap
+  - provider: snap
   snap: wilfred_*.snap
   channel: edge
   skip_cleanup: true
