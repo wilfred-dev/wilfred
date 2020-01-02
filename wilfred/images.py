@@ -3,7 +3,6 @@
 # (c) Vilhelm Prytz 2020
 
 import json
-import click
 
 from tabulate import tabulate
 from appdirs import user_config_dir
@@ -14,7 +13,9 @@ from requests import get
 from zipfile import ZipFile
 from shutil import move, rmtree
 
-from wilfred.message_handler import warning
+from wilfred.message_handler import warning, error
+
+API_VERSION = 0
 
 
 class Images(object):
@@ -58,7 +59,15 @@ class Images(object):
             for file in files:
                 if file.endswith(".json"):
                     with open(join(root, file)) as f:
-                        self.images.append(json.loads(f.read()))
+                        _image = json.loads(f.read())
+
+                        if _image["meta"]["version"] != API_VERSION:
+                            error(
+                                f"{file} image has API level {_image['meta']['version']}, Wilfreds API level is {API_VERSION}",
+                                exit_code=1,
+                            )
+
+                        self.images.append(_image)
 
     def pretty(self):
         _images = self.images
