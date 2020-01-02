@@ -24,7 +24,7 @@ class Config(object):
     def _read(self):
         if not isfile(self.config_path):
             warning(
-                "configuration file does not exist. Run `wilfred setup` to initiate the program."
+                "configuration file does not exist. Run `wilfred setup` to initiate the program.",
             )
             self.configuration = None
 

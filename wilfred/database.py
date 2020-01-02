@@ -9,8 +9,10 @@ from os.path import isfile, isdir
 from pathlib import Path
 from wilfred.message_handler import info, error
 
+API_VERSION = 0
 
-def _query(path, query):
+
+def _query(path, query, fetchone=False):
     """
     executes specified query on sqlite3 database located at specified path
 
@@ -18,20 +20,30 @@ def _query(path, query):
     :param str query: sql query to execute
     """
 
+    result = []
+
     try:
         conn = sqlite3.connect(path)
+        conn.row_factory = sqlite3.Row
 
         cur = conn.cursor()
         cur.execute(query)
 
+        if fetchone:
+            result = cur.fetchone()
+        else:
+            for r in cur.fetchone() if fetchone else cur.fetchall():
+                result.append(dict(r))
+
         conn.commit()
         conn.close()
     except sqlite3.OperationalError as e:
-        print(path)
         error(
             "could not communicate with database " + click.style(str(e), bold=True),
             exit_code=1,
         )
+
+    return result
 
 
 class Database(object):
@@ -46,12 +58,49 @@ class Database(object):
         if not isfile(self.database_path):
             info("local database not found, creating")
             self._create_tables()
+            self._insert_api_version()
+
+            return
+        if (
+            int(
+                self.query(
+                    f"SELECT value FROM constants WHERE name = 'api_version'",
+                    fetchone=True,
+                )["value"]
+            )
+            != API_VERSION
+        ):
+            error(f"database API level differs from Wilfreds", exit_code=1)
 
     def _create_tables(self):
-        _tables = ["CREATE TABLE contants (name VARCHAR NOT NULL, value VARCHAR)"]
+        _tables = [
+            """CREATE TABLE constants (
+                name VARCHAR NOT NULL UNIQUE,
+                value VARCHAR,
+                PRIMARY KEY (name)
+            );""",
+            """CREATE TABLE servers (
+                id VARCHAR NOT NULL,
+                name VARCHAR NOT NULL,
+                image_uuid VARCHAR NOT NULL,
+                memory INT NOT NULL,
+                port INT NOT NULL,
+                status VARCHAR NOT NULL,
+                PRIMARY KEY (id)
+            );""",
+        ]
 
         with click.progressbar(
             _tables, label="Creating tables", length=len(_tables)
         ) as tables:
             for table in tables:
                 _query(self.database_path, table)
+
+    def _insert_api_version(self):
+        _query(
+            self.database_path,
+            f"INSERT INTO constants (name, value) VALUES ('api_version', '{API_VERSION}')",
+        )
+
+    def query(self, query, *args, **kwargs):
+        return _query(self.database_path, query, *args, **kwargs)

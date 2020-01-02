@@ -10,13 +10,14 @@ from wilfred.docker_conn import docker_client
 from wilfred.version import version
 from wilfred.config_parser import Config
 from wilfred.database import Database
+from wilfred.servers import Servers
 from wilfred.images import Images
-from wilfred.message_handler import error, warning
+from wilfred.message_handler import warning, error
 
-client = docker_client()
 config = Config()
 database = Database()
 images = Images()
+servers = Servers(database, docker_client(), config.configuration, images)
 
 
 def print_version(ctx, param, value):
@@ -59,17 +60,11 @@ def setup():
     config.write(data_path)
 
 
-@cli.command()
-def servers():
+@cli.command("servers")
+def servers_list():
     """list of all servers"""
 
-    try:
-        containers = client.containers.list()
-    except Exception as e:
-        error(
-            click.style("unable to communicate with docker - ", bold=True) + str(e),
-            exit_code=1,
-        )
+    click.echo(servers.pretty())
 
     pass
 
@@ -87,12 +82,51 @@ def list_images():
 def create():
     """create a new server"""
 
+    if not config.configuration:
+        error("Wilfred has not been configured", exit_code=1)
+
+    click.secho("Available Images", bold=True)
+    click.echo(images.pretty())
+
+    name = click.prompt("Name")
+    image_uuid = click.prompt("Image UUID", default="default-vanilla-minecraft")
+    port = click.prompt("Port", default=25565)
+    memory = click.prompt("Memory", default=1024)
+
+    servers.create(name, image_uuid, memory, port)
+
     pass
+
+
+@cli.command("sync")
+def sync_cmd():
+    """
+    sync all servers on file with Docker (start/stop/create)
+    """
+
+    if not config.configuration:
+        error("Wilfred has not been configured", exit_code=1)
+
+    servers.sync()
+
+
+@cli.command()
+@click.argument("name")
+def start(name):
+    """
+    start existing server
+    """
+
+    servers.set_status(servers.get_by_name(name)[0], "running")
+    servers.sync()
 
 
 @cli.command()
 def delete():
     """delete existing server"""
+
+    if not config.configuration:
+        error("Wilfred has not been configured", exit_code=1)
 
     pass
 

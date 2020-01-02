@@ -13,19 +13,19 @@ def _message(prefix, msg):
 def error(message, exit_code=None):
     _message(prefix=click.style("🔴 Error", fg="red"), msg=message)
 
-    if exit_code:
+    if exit_code is not None:
         sys.exit(exit_code)
 
 
 def warning(message, exit_code=None):
     _message(prefix=click.style("⚠️  Warning ", fg="yellow"), msg=message)
 
-    if exit_code:
+    if exit_code is not None:
         sys.exit(exit_code)
 
 
 def info(message, exit_code=None):
     _message(prefix=click.style("🔵 Info", fg="blue"), msg=message)
 
-    if exit_code:
+    if exit_code is not None:
         sys.exit(exit_code)

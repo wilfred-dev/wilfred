@@ -77,6 +77,7 @@ class Images(object):
             del d["installation"]
             del d["docker_image"]
             del d["command"]
+            del d["shell"]
 
         headers = {
             "uuid": "UUID",
@@ -88,4 +89,6 @@ class Images(object):
         return tabulate(_images, headers=headers, tablefmt="fancy_grid")
 
     def get_image(self, uuid):
+        self._read_images()
+
         return list(filter(lambda img: img["uuid"] == uuid, self.images))
