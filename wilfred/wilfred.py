@@ -6,7 +6,6 @@
 
 import click
 import codecs
-import subprocess
 import locale
 import os
 import sys
@@ -35,22 +34,13 @@ def print_version(ctx, param, value):
 
 
 def main():
-    # If the locale ends up being ascii, Click will barf. Let's try to prevent that
-    # here by using C.UTF-8 as a last-resort fallback. This mostly happens in CI,
-    # using LXD or Docker. This is the same logic used by Click to error out.
+    # snap packages raise some weird ASCII codec errors, so we just force C.UTF-8
     if (
         codecs.lookup(locale.getpreferredencoding()).name == "ascii"
         and os.name == "posix"
     ):
-        output = subprocess.check_output(["locale", "-a"]).decode("ascii", "replace")
-
-        for line in output.splitlines():
-            this_locale = line.strip()
-            if this_locale.lower() in ("c.utf8", "c.utf-8"):
-                warning("Locale not set! Wilfred will temporarily use C.UTF-8")
-                os.environ["LC_ALL"] = "C.UTF-8"
-                os.environ["LANG"] = "C.UTF-8"
-                break
+        os.environ["LC_ALL"] = "C.UTF-8"
+        os.environ["LANG"] = "C.UTF-8"
 
     cli()
 
