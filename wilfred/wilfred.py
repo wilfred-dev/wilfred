@@ -117,7 +117,7 @@ def create(ctx, console):
     if " " in name:
         error("space not allowed in name", exit_code=1)
 
-    image_uuid = click.prompt("Image UUID", default="default-vanilla-minecraft")
+    image_uuid = click.prompt("Image UUID", default="minecraft-vanilla")
 
     if " " in image_uuid:
         error("space not allowed in image_uuid", exit_code=1)
