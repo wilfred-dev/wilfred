@@ -61,36 +61,26 @@ class Servers(object):
         self._get_db_servers()
 
     def sync(self):
-        for server in self._servers:
-            exists = True
-            start = False
+        with click.progressbar(
+            self._servers, label="Syncing servers", length=len(self._servers)
+        ) as servers:
+            for server in servers:
+                start = False
+                if server["status"] == "created":
+                    self._install(server)
+                    self.set_status(server, "running")
+                    start = True
 
-            # install
-            if server["status"] == "created":
-                self._install(server)
-                self.set_status(server, "running")
-                start = True
+                # stopped
+                if server["status"] == "stopped":
+                    self._stop(server)
 
-            # see if container already exists
-            try:
-                container = self._docker_client.containers.get(server["id"])
-
-                if container.status != "running":
+                # start
+                if server["status"] == "running" or start:
                     try:
-                        container.rm()
-                    except Exception:
-                        pass
-            except docker.errors.NotFound:
-                exists = False
-
-            # stopped
-            if server["status"] == "stopped":
-                self._stop(server)
-
-            # start
-            if server["status"] == "running" or start:
-                if not exists:
-                    self._start(server)
+                        self._docker_client.containers.get(server["id"])
+                    except docker.errors.NotFound:
+                        self._start(server)
 
     def get_by_name(self, name):
         self._get_db_servers()

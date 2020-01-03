@@ -84,7 +84,7 @@ class Database(object):
                 name VARCHAR NOT NULL,
                 image_uuid VARCHAR NOT NULL,
                 memory INT NOT NULL,
-                port INT NOT NULL,
+                port INT NOT NULL UNIQUE,
                 status VARCHAR NOT NULL,
                 PRIMARY KEY (id)
             );""",
