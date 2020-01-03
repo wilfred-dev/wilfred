@@ -19,11 +19,11 @@ deploy:
     user: __token__
     password:
       secure: Cud1CEGJO/HW5bhceLt78DLeBGV6cdK28fLSD7Td5XWe3PVuYvvDBNkNRxtYvzGUqg1zi/768Rl5rSX9y3wuC4/5qZVE9JJrF0F0RVGnSzkemYnq2JZVcdQYKKXEagRH42jy13mu19HCpGy1861+8GSmIrq4TdEWGFvHMQQKBLeYf6A3Zf/rRqLBbPIpXvfs8YnNXdzZYt1kOhf09WpH0yQOK4Hb/UiKzYFToJhGhklmhRjsq/tcMIdVY9Cbd0qKU7VDB48itY1ARvjGZB6+Z4BK+AHPGBQX5zB8Eqzd/R4d1fFnNk3eHCdIuwDllWJFu03U2UnH4+ie8lwEUV4VqkLZ9quvWRaJDKdGjKX9iRkitVMvIW2y7CMbQE42JP6PssJLiYdvcX3GeiLR8q8uqLHhwHvffOcM5LLnFy8duE7nQkzIlQGz3ni2jMbZqDfriJqCYmaGRaThqcgU6eDuWvKzu57pqlf9n1UX6m1fM4ITQtTtOk6mi8gRBkt4tW2jCw+6ovdrjgnfzGNwnoZABiZKIQibC0PxBByhAjbO3E2M1/TTyuqTx2MzmK4QiLHs0pikFH4samOYEjCvVsVyn3oKRThjNCPikqXESQULwd1qzTMUC14tf//ZJZATlXNKQmiQ+o95gz0uQe6912MLz0XKKNyGl5ILgEUBvsLYM+Y=
-    #on:
-      #tags: true
-  - provider: snap
-    snap: wilfred_*.snap
-    channel: edge
-    skip_cleanup: true
+    on:
+      tags: true
+  #- provider: snap
+    #snap: wilfred_*.snap
+    #channel: edge
+    #skip_cleanup: true
     #on:
       #tags: true

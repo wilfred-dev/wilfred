@@ -2,6 +2,7 @@
 
 [![Build Status](https://travis-ci.com/wilfred-dev/wilfred.svg?branch=master)](https://travis-ci.com/wilfred-dev/wilfred)
 [![pypi](https://img.shields.io/pypi/v/wilfred)](https://pypi.org/project/wilfred)
+[![wilfred](https://snapcraft.io//wilfred/badge.svg)](https://snapcraft.io/wilfred)
 [![Documentation Status](https://readthedocs.org/projects/wilfred/badge/?version=latest)](https://wilfred.readthedocs.io/en/latest/?badge=latest)
 [![Python Versions](https://img.shields.io/pypi/pyversions/wilfred)](https://pypi.org/project/wilfred)
 [![Language grade: Python](https://img.shields.io/lgtm/grade/python/g/wilfred-dev/wilfred.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/wilfred-dev/wilfred/context:python)
