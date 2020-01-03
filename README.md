@@ -9,9 +9,9 @@
 [![Total alerts](https://img.shields.io/lgtm/alerts/g/wilfred-dev/wilfred.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/wilfred-dev/wilfred/alerts/)
 [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
 
-A CLI for managing game servers using Docker.
+Wilfred is a command-line interface for running game servers locally. It uses Docker to run game servers in containers, which means they are completely separated. Wilfred can run any game that can run in Docker.
 
-⚠️ Wilfred is still under development.
+⚠️ Wilfred is currently under development and should not be considered stable. Features may brake or may not be implemented yet. Use with caution.
 
 ## Installation
 

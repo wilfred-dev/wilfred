@@ -4,8 +4,6 @@
 
 import click
 import docker
-import os
-import pwd
 
 from tabulate import tabulate
 from pathlib import Path
@@ -29,7 +27,13 @@ class Servers(object):
 
     def create(self, name, image_uuid, memory, port):
         self._database.query(
-            f"INSERT INTO servers (id, name, image_uuid, memory, port, status) VALUES ('{random_string()}', '{name}', '{image_uuid}', '{memory}', '{port}', 'created')"
+            " ".join(
+                (
+                    "INSERT INTO servers",
+                    "(id, name, image_uuid, memory, port, status)"
+                    f"VALUES ('{random_string()}', '{name}', '{image_uuid}', '{memory}', '{port}', 'created')",
+                )
+            )
         )
 
         self._get_db_servers()
@@ -147,7 +151,7 @@ class Servers(object):
         )
 
     def _stop(self, server):
-        image = self._images.get_image(server["image_uuid"])[0]
+        # image = self._images.get_image(server["image_uuid"])[0]
 
         try:
             container = self._docker_client.containers.get(server["id"])
