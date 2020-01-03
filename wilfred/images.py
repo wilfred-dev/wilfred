@@ -35,6 +35,8 @@ class Images(object):
         self._read_images()
 
     def download_default(self):
+        rmtree(f"{self.image_dir}/default", ignore_errors=True)
+
         with open(f"{self.config_dir}/img.zip", "wb") as f:
             response = get(
                 "https://github.com/wilfred-dev/images/archive/master.zip", stream=True

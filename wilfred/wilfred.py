@@ -83,8 +83,15 @@ def servers_list():
 
 
 @cli.command("images")
-def list_images():
+@click.option("--refresh", help="Download the default images from GitHub", is_flag=True)
+def list_images(refresh):
     """list available images"""
+
+    if refresh:
+        with yaspin(text="Refreshing images", color="yellow") as spinner:
+            images.download_default()
+
+            spinner.ok("✅")
 
     click.echo(images.pretty())
 
@@ -106,18 +113,20 @@ def create(ctx, console):
     click.echo(images.pretty())
 
     name = click.prompt("Name").lower()
-    image_uuid = click.prompt("Image UUID", default="default-vanilla-minecraft")
-    port = click.prompt("Port", default=25565)
-    memory = click.prompt("Memory", default=1024)
 
     if " " in name:
         error("space not allowed in name", exit_code=1)
+
+    image_uuid = click.prompt("Image UUID", default="default-vanilla-minecraft")
 
     if " " in image_uuid:
         error("space not allowed in image_uuid", exit_code=1)
 
     if not images.get_image(image_uuid):
         error("image does not exist", exit_code=1)
+
+    port = click.prompt("Port", default=25565)
+    memory = click.prompt("Memory", default=1024)
 
     with yaspin(text="Creating server", color="yellow") as spinner:
         servers.create(name, image_uuid, memory, port)
