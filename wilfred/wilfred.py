@@ -61,9 +61,10 @@ def main():
 )
 def cli():
     """
-    A CLI for managing game servers using Docker.
+    🐿️  A CLI for managing game servers using Docker.
 
-    ⚠️  This is still experimental, features may not be implemented yet or broken.
+    ⚠️  Wilfred is currently under development and should not be considered stable.
+    Features may brake or may not beimplemented yet. Use with caution.
     """
 
     pass
@@ -99,7 +100,13 @@ def list_images():
 
 
 @cli.command()
-def create():
+@click.option(
+    "--console",
+    help="Attach to server console immediately after creation.",
+    is_flag=True,
+)
+@click.pass_context
+def create(ctx, console):
     """create a new server"""
 
     if not config.configuration:
@@ -113,16 +120,28 @@ def create():
     port = click.prompt("Port", default=25565)
     memory = click.prompt("Memory", default=1024)
 
+    if " " in name:
+        error("space not allowed in name", exit_code=1)
+
+    if " " in image_uuid:
+        error("space not allowed in image_uuid", exit_code=1)
+
+    if not images.get_image(image_uuid):
+        error("image does not exist", exit_code=1)
+
     with yaspin(text="Creating server", color="yellow") as spinner:
         servers.create(name, image_uuid, memory, port)
 
         spinner.ok("✅ ")
 
+    if console:
+        ctx.invoke(server_console, name=name)
+
 
 @cli.command("sync")
 def sync_cmd():
     """
-    sync all servers on file with Docker (start/stop/create)
+    sync all servers on file with Docker (start/kill/create)
     """
 
     with yaspin(text="Docker sync", color="yellow") as spinner:
@@ -136,7 +155,11 @@ def sync_cmd():
 
 @cli.command()
 @click.argument("name")
-def start(name):
+@click.option(
+    "--console", help="Attach to server console immediately after start.", is_flag=True
+)
+@click.pass_context
+def start(ctx, name, console):
     """
     start existing server
     """
@@ -157,15 +180,18 @@ def start(name):
 
         spinner.ok("✅ ")
 
+        if console:
+            ctx.invoke(server_console, name=name)
+
 
 @cli.command()
 @click.argument("name")
-def stop(name):
+def kill(name):
     """
-    stop existing server
+    kill running server
     """
 
-    with yaspin(text="Server stop", color="yellow") as spinner:
+    with yaspin(text="Killing server", color="yellow") as spinner:
         if not config.configuration:
             spinner.fail("💥 Wilfred has not been configured")
             sys.exit(1)
@@ -203,6 +229,22 @@ def delete(name):
 
             servers.remove(server[0])
             spinner.ok("✅ ")
+
+
+@cli.command("console")
+@click.argument("name")
+def server_console(name):
+    """view log and run commands"""
+
+    if not config.configuration:
+        error("Wilfred has not been configured", exit_code=1)
+
+    server = servers.get_by_name(name.lower())
+
+    if not server:
+        error("Server does not exit", exit_code=1)
+
+    servers.console(server[0])
 
 
 if __name__ == "__main__":

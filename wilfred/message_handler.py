@@ -11,7 +11,7 @@ def _message(prefix, msg):
 
 
 def error(message, exit_code=None):
-    _message(prefix=click.style("🔴 Error", fg="red"), msg=message)
+    _message(prefix=click.style("💥 Error", fg="red"), msg=message)
 
     if exit_code is not None:
         sys.exit(exit_code)

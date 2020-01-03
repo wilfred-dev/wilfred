@@ -8,6 +8,7 @@ import docker
 from tabulate import tabulate
 from pathlib import Path
 from shutil import rmtree
+from subprocess import call
 
 from wilfred.core import random_string
 from wilfred.message_handler import error
@@ -56,6 +57,7 @@ class Servers(object):
             "name": "Name",
             "image_uuid": "Image UUID",
             "memory": "Memory (RAM)",
+            "port": "Port",
             "status": "Status",
         }
 
@@ -80,7 +82,7 @@ class Servers(object):
 
                 # stopped
                 if server["status"] == "stopped":
-                    self._stop(server)
+                    self._kill(server)
 
                 # start
                 if server["status"] == "running" or start:
@@ -101,11 +103,26 @@ class Servers(object):
 
         try:
             container = self._docker_client.containers.get(server["id"])
-            container.rm()
+            container.stop()
         except docker.errors.NotFound:
             pass
 
         rmtree(path, ignore_errors=True)
+
+    def console(self, server):
+        try:
+            container = self._docker_client.containers.get(server["id"])
+        except docker.errors.NotFound:
+            error("server is not running", exit_code=1)
+
+        click.echo(container.logs())
+        call(["docker", "attach", server["id"], "--detach-keys", "ctrl-c"])
+
+    def command(self, server, command):
+        try:
+            self._docker_client.containers.get(server["id"])
+        except docker.errors.NotFound:
+            error("server is not running", exit_code=1)
 
     def _parse_cmd(self, cmd, server):
         return cmd.replace("{{SERVER_MEMORY}}", f"{server['memory']}").replace(
@@ -141,24 +158,22 @@ class Servers(object):
 
         self._docker_client.containers.run(
             image["docker_image"],
-            f"{image['shell']} -c '{self._parse_cmd(image['command'], server)}'",
+            f"{self._parse_cmd(image['command'], server)}",
             volumes={path: {"bind": "/server", "mode": "rw"}},
             name=server["id"],
             remove=True,
             ports={f"{server['port']}/tcp": server["port"]},
             detach=True,
             working_dir="/server",
+            mem_limit=f"{server['memory']}m",
+            oom_kill_disable=True,
+            stdin_open=True,
         )
 
-    def _stop(self, server):
-        # image = self._images.get_image(server["image_uuid"])[0]
-
+    def _kill(self, server):
         try:
             container = self._docker_client.containers.get(server["id"])
         except docker.errors.NotFound:
             return
 
-        # this doesn't exit the container nicely, will rewrite
-        click.echo(container.logs())
         container.stop()
-        # click.echo(container.exec_run(image["stop_command"], stdout=False, stderr=False))
