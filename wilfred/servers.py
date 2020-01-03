@@ -130,4 +130,14 @@ class Servers(object):
         )
 
     def _stop(self, server):
-        pass
+        image = self._images.get_image(server["image_uuid"])[0]
+
+        try:
+            container = self._docker_client.containers.get(server["id"])
+        except docker.errors.NotFound:
+            return
+
+        # this doesn't exit the container nicely, will rewrite
+        click.echo(container.logs())
+        container.stop()
+        # click.echo(container.exec_run(image["stop_command"], stdout=False, stderr=False))

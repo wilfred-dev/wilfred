@@ -87,16 +87,12 @@ def servers_list():
 
     click.echo(servers.pretty())
 
-    pass
-
 
 @cli.command("images")
 def list_images():
     """list available images"""
 
     click.echo(images.pretty())
-
-    pass
 
 
 @cli.command()
@@ -109,14 +105,12 @@ def create():
     click.secho("Available Images", bold=True)
     click.echo(images.pretty())
 
-    name = click.prompt("Name")
+    name = click.prompt("Name").lower()
     image_uuid = click.prompt("Image UUID", default="default-vanilla-minecraft")
     port = click.prompt("Port", default=25565)
     memory = click.prompt("Memory", default=1024)
 
     servers.create(name, image_uuid, memory, port)
-
-    pass
 
 
 @cli.command("sync")
@@ -138,7 +132,28 @@ def start(name):
     start existing server
     """
 
-    servers.set_status(servers.get_by_name(name)[0], "running")
+    server = servers.get_by_name(name.lower())
+
+    if not server:
+        error("Server does not exist", exit_code=1)
+
+    servers.set_status(server[0], "running")
+    servers.sync()
+
+
+@cli.command()
+@click.argument("name")
+def stop(name):
+    """
+    stop existing server
+    """
+
+    server = servers.get_by_name(name.lower())
+
+    if not server:
+        error("Server does not exist", exit_code=1)
+
+    servers.set_status(server[0], "stopped")
     servers.sync()
 
 
