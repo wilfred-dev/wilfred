@@ -4,9 +4,12 @@
 
 import click
 import docker
+import os
+import pwd
 
 from tabulate import tabulate
 from pathlib import Path
+from shutil import rmtree
 
 from wilfred.core import random_string
 from wilfred.message_handler import error
@@ -87,6 +90,19 @@ class Servers(object):
 
         return list(filter(lambda x: x["name"] == name, self._servers))
 
+    def remove(self, server):
+        path = f"{self._configuration['data_path']}/{server['id']}"
+
+        self._database.query(f"DELETE FROM servers WHERE id='{server['id']}'")
+
+        try:
+            container = self._docker_client.containers.get(server["id"])
+            container.rm()
+        except docker.errors.NotFound:
+            pass
+
+        rmtree(path, ignore_errors=True)
+
     def _parse_cmd(self, cmd, server):
         return cmd.replace("{{SERVER_MEMORY}}", f"{server['memory']}").replace(
             "{{SERVER_PORT}}", f"{server['port']}"
@@ -121,12 +137,13 @@ class Servers(object):
 
         self._docker_client.containers.run(
             image["docker_image"],
-            f"{image['shell']} -c 'cd /server; {self._parse_cmd(image['command'], server)}'",
+            f"{image['shell']} -c '{self._parse_cmd(image['command'], server)}'",
             volumes={path: {"bind": "/server", "mode": "rw"}},
             name=server["id"],
             remove=True,
             ports={f"{server['port']}/tcp": server["port"]},
             detach=True,
+            working_dir="/server",
         )
 
     def _stop(self, server):

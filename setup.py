@@ -27,6 +27,14 @@ setup(
         "Operating System :: Unix",
     ],
     python_requires=">=3.6",
-    install_requires=["docker", "click", "colorama", "appdirs", "requests", "tabulate"],
+    install_requires=[
+        "docker",
+        "click",
+        "colorama",
+        "appdirs",
+        "requests",
+        "tabulate",
+        "yaspin",
+    ],
     entry_points={"console_scripts": ["wilfred=wilfred.wilfred:main"]},
 )

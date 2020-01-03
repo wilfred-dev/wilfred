@@ -9,6 +9,9 @@ import codecs
 import subprocess
 import locale
 import os
+import sys
+
+from yaspin import yaspin
 
 from wilfred.docker_conn import docker_client
 from wilfred.version import version
@@ -110,7 +113,10 @@ def create():
     port = click.prompt("Port", default=25565)
     memory = click.prompt("Memory", default=1024)
 
-    servers.create(name, image_uuid, memory, port)
+    with yaspin(text="Creating server", color="yellow") as spinner:
+        servers.create(name, image_uuid, memory, port)
+
+        spinner.ok("✅ ")
 
 
 @cli.command("sync")
@@ -119,10 +125,13 @@ def sync_cmd():
     sync all servers on file with Docker (start/stop/create)
     """
 
-    if not config.configuration:
-        error("Wilfred has not been configured", exit_code=1)
+    with yaspin(text="Docker sync", color="yellow") as spinner:
+        if not config.configuration:
+            spinner.fail("💥 Wilfred has not been configured")
 
-    servers.sync()
+        servers.sync()
+
+        spinner.ok("✅ ")
 
 
 @cli.command()
@@ -132,13 +141,21 @@ def start(name):
     start existing server
     """
 
-    server = servers.get_by_name(name.lower())
+    with yaspin(text="Server start", color="yellow") as spinner:
+        if not config.configuration:
+            spinner.fail("💥 Wilfred has not been configured")
+            sys.exit(1)
 
-    if not server:
-        error("Server does not exist", exit_code=1)
+        server = servers.get_by_name(name.lower())
 
-    servers.set_status(server[0], "running")
-    servers.sync()
+        if not server:
+            spinner.fail("💥 Server does not exit")
+            sys.exit(1)
+
+        servers.set_status(server[0], "running")
+        servers.sync()
+
+        spinner.ok("✅ ")
 
 
 @cli.command()
@@ -148,23 +165,44 @@ def stop(name):
     stop existing server
     """
 
-    server = servers.get_by_name(name.lower())
+    with yaspin(text="Server stop", color="yellow") as spinner:
+        if not config.configuration:
+            spinner.fail("💥 Wilfred has not been configured")
+            sys.exit(1)
 
-    if not server:
-        error("Server does not exist", exit_code=1)
+        server = servers.get_by_name(name.lower())
 
-    servers.set_status(server[0], "stopped")
-    servers.sync()
+        if not server:
+            spinner.fail("💥 Server does not exit")
+            sys.exit(1)
+
+        servers.set_status(server[0], "stopped")
+        servers.sync()
+
+        spinner.ok("✅ ")
 
 
 @cli.command()
-def delete():
+@click.argument("name")
+def delete(name):
     """delete existing server"""
 
-    if not config.configuration:
-        error("Wilfred has not been configured", exit_code=1)
+    if click.confirm(
+        "Are you sure you want to do this? All data will be permanently deleted."
+    ):
+        with yaspin(text="Deleting server", color="yellow") as spinner:
+            if not config.configuration:
+                spinner.fail("💥 Wilfred has not been configured")
+                sys.exit(1)
 
-    pass
+            server = servers.get_by_name(name.lower())
+
+            if not server:
+                spinner.fail("💥 Server does not exit")
+                sys.exit(1)
+
+            servers.remove(server[0])
+            spinner.ok("✅ ")
 
 
 if __name__ == "__main__":

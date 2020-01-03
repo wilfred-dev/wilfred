@@ -4,9 +4,11 @@
 
 import sqlite3
 import click
+
 from appdirs import user_data_dir
 from os.path import isfile, isdir
 from pathlib import Path
+
 from wilfred.message_handler import info, error
 
 API_VERSION = 0
@@ -42,6 +44,8 @@ def _query(path, query, fetchone=False):
             "could not communicate with database " + click.style(str(e), bold=True),
             exit_code=1,
         )
+    except sqlite3.IntegrityError as e:
+        error("invalid input " + click.style(str(e), bold=True), exit_code=1)
 
     return result
 
@@ -81,7 +85,7 @@ class Database(object):
             );""",
             """CREATE TABLE servers (
                 id VARCHAR NOT NULL,
-                name VARCHAR NOT NULL,
+                name VARCHAR NOT NULL UNIQUE,
                 image_uuid VARCHAR NOT NULL,
                 memory INT NOT NULL,
                 port INT NOT NULL UNIQUE,

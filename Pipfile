@@ -14,6 +14,7 @@ colorama = "*"
 appdirs = "*"
 requests = "*"
 tabulate = "*"
+yaspin = "*"
 
 [requires]
 python_version = "3.6"
