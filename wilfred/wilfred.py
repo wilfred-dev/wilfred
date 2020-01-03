@@ -5,6 +5,10 @@
 # (c) Vilhelm Prytz 2020
 
 import click
+import codecs
+import subprocess
+import locale
+import os
 
 from wilfred.docker_conn import docker_client
 from wilfred.version import version
@@ -28,6 +32,23 @@ def print_version(ctx, param, value):
 
 
 def main():
+    # If the locale ends up being ascii, Click will barf. Let's try to prevent that
+    # here by using C.UTF-8 as a last-resort fallback. This mostly happens in CI,
+    # using LXD or Docker. This is the same logic used by Click to error out.
+    if (
+        codecs.lookup(locale.getpreferredencoding()).name == "ascii"
+        and os.name == "posix"
+    ):
+        output = subprocess.check_output(["locale", "-a"]).decode("ascii", "replace")
+
+        for line in output.splitlines():
+            this_locale = line.strip()
+            if this_locale.lower() in ("c.utf8", "c.utf-8"):
+                warning("Locale not set! Wilfred will temporarily use C.UTF-8")
+                os.environ["LC_ALL"] = "C.UTF-8"
+                os.environ["LANG"] = "C.UTF-8"
+                break
+
     cli()
 
 
