@@ -24,3 +24,5 @@ parts:
 apps:
   wilfred:
     command: bin/wilfred
+    environment:
+      PYTHONIOENCODING: utf-8
