@@ -38,7 +38,7 @@ class Servers(object):
         self._get_db_servers()
         self.sync()
 
-    def pretty(self):
+    def pretty(self, server=None):
         self._running_docker_sync()
 
         headers = {
@@ -50,7 +50,11 @@ class Servers(object):
             "status": "Status",
         }
 
-        return tabulate(self._servers, headers=headers, tablefmt="fancy_grid")
+        return tabulate(
+            [server] if server else self._servers,
+            headers=headers,
+            tablefmt="fancy_grid",
+        )
 
     def set_status(self, server, status):
         self._database.query(

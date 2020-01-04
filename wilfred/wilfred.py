@@ -19,6 +19,7 @@ from wilfred.database import Database
 from wilfred.servers import Servers
 from wilfred.images import Images
 from wilfred.message_handler import warning, error
+from wilfred.core import is_integer
 
 config = Config()
 database = Database()
@@ -285,6 +286,61 @@ def server_console(name):
     click.secho(f"Viewing server console of {name} (id {server[0]['id']})", bold=True)
 
     servers.console(server[0])
+
+
+@cli.command()
+@click.argument("name")
+def edit(name):
+    """
+    Edit server information (name, memory, port)
+    """
+
+    if not config.configuration:
+        error("Wilfred has not been configured", exit_code=1)
+
+    server = servers.get_by_name(name.lower())
+
+    if not server:
+        error("Server does not exist", exit_code=1)
+
+    click.echo(servers.pretty(server=server[0]))
+
+    server = servers.get_by_name(name.lower())
+
+    if server[0]["status"] != "stopped":
+        error("server is running, can only edit stopped servers", exit_code=1)
+
+    click.echo("Leave values empty to use existing value")
+
+    name = click.prompt("Name", default="").lower()
+
+    if " " in name:
+        error("space not allowed in name", exit_code=1)
+
+    port = click.prompt("Port", default="")
+    memory = click.prompt("Memory", default="")
+
+    if name:
+        database.query(
+            f"UPDATE servers SET name = '{name}' WHERE id='{server[0]['id']}'"
+        )
+
+    if port:
+        if not is_integer(port):
+            error("port must be integer", exit_code=1)
+
+        database.query(f"UPDATE servers SET port = {port} WHERE id='{server[0]['id']}'")
+
+    if memory:
+        if not is_integer(memory):
+            error("memory must be integer", exit_code=1)
+
+        database.query(
+            f"UPDATE servers SET memory = {memory} WHERE id='{server[0]['id']}'"
+        )
+
+    if name or port or memory:
+        click.echo("✅ Server information updated")
 
 
 if __name__ == "__main__":

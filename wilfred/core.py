@@ -14,3 +14,12 @@ def random_string(length=8):
     """
 
     return "".join(choice(ascii_lowercase + digits) for i in range(length))
+
+
+def is_integer(variable):
+    try:
+        int(variable)
+    except Exception:
+        return False
+
+    return True
