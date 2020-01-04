@@ -13,6 +13,16 @@ Wilfred is a command-line interface for running game servers locally. It uses Do
 
 ⚠️ Wilfred is currently under development and should not be considered stable. Features may brake or may not be implemented yet. Use with caution.
 
+## Supported games
+
+As long as your server can run in Docker, it can probably run using Wilfred (after some tinkering). These are the games supported by default. You can submit new games to [wilfred-dev/images](https://github.com/wilfred-dev/images).
+
+- Minecraft
+  - Vanilla Minecraft
+  - BungeeCord
+  - Paper
+  - Waterfall
+
 ## Installation
 
 Please refer to the [official documentation](https://wilfred.readthedocs.io/en/latest/?badge=latest) for installation instructions and documentation.
