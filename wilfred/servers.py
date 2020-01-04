@@ -104,7 +104,14 @@ class Servers(object):
             error("server is not running", exit_code=1)
 
         click.echo(container.logs())
-        call(["docker", "attach", server["id"], "--detach-keys", "ctrl-c"])
+
+        try:
+            call(["docker", "attach", server["id"], "--detach-keys", "ctrl-c"])
+        except Exception as e:
+            error(
+                f"unable to attach to console {click.style(str(e), bold=True)}",
+                exit_code=1,
+            )
 
     def command(self, server, command):
         try:
@@ -144,31 +151,44 @@ class Servers(object):
         with open(f"{path}/install.sh", "w") as f:
             f.write("cd /server\n" + "\n".join(image["installation"]["script"]))
 
-        self._docker_client.containers.run(
-            image["installation"]["docker_image"],
-            f"{image['installation']['shell']} /server/install.sh",
-            volumes={path: {"bind": "/server", "mode": "rw"}},
-            name=server["id"],
-            remove=True,
-        )
+        try:
+            self._docker_client.containers.run(
+                image["installation"]["docker_image"],
+                f"{image['installation']['shell']} /server/install.sh",
+                volumes={path: {"bind": "/server", "mode": "rw"}},
+                name=server["id"],
+                remove=True,
+            )
+        except Exception as e:
+            self._database.query(f"DELETE FROM servers WHERE id='{server['id']}'")
+            error(
+                f"unable to create installation Docker container, server removed {click.style(str(e), bold=True)}",
+                exit_code=1,
+            )
 
     def _start(self, server):
         path = f"{self._configuration['data_path']}/{server['id']}"
         image = self._images.get_image(server["image_uuid"])[0]
 
-        self._docker_client.containers.run(
-            image["docker_image"],
-            f"{self._parse_cmd(image['command'], server)}",
-            volumes={path: {"bind": "/server", "mode": "rw"}},
-            name=server["id"],
-            remove=True,
-            ports={f"{server['port']}/tcp": server["port"]},
-            detach=True,
-            working_dir="/server",
-            mem_limit=f"{server['memory']}m",
-            oom_kill_disable=True,
-            stdin_open=True,
-        )
+        try:
+            self._docker_client.containers.run(
+                image["docker_image"],
+                f"{self._parse_cmd(image['command'], server)}",
+                volumes={path: {"bind": "/server", "mode": "rw"}},
+                name=server["id"],
+                remove=True,
+                ports={f"{server['port']}/tcp": server["port"]},
+                detach=True,
+                working_dir="/server",
+                mem_limit=f"{server['memory']}m",
+                oom_kill_disable=True,
+                stdin_open=True,
+            )
+        except Exception as e:
+            error(
+                f"unable to start Docker container {click.style(str(e), bold=True)}",
+                exit_code=1,
+            )
 
     def _kill(self, server):
         try:
