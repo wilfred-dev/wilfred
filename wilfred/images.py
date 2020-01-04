@@ -64,6 +64,7 @@ class Images(object):
             del d["installation"]
             del d["docker_image"]
             del d["command"]
+            del d["stop_command"]
 
         headers = {
             "uuid": "UUID",

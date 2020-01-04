@@ -8,9 +8,11 @@ import docker
 from tabulate import tabulate
 from pathlib import Path
 from shutil import rmtree
+from os import remove as remove_file
 
 from wilfred.core import random_string
 from wilfred.message_handler import error
+from wilfred.keyboard import KeyboardThread
 
 
 class Servers(object):
@@ -102,8 +104,13 @@ class Servers(object):
         except docker.errors.NotFound:
             error("server is not running", exit_code=1)
 
-        for line in container.logs(stream=True):
+        KeyboardThread(self._console_input_callback, params=server)
+
+        for line in container.logs(stream=True, tail=200):
             click.echo(line.strip())
+
+    def _console_input_callback(self, payload, server):
+        self._command(server, payload)
 
     def _command(self, server, command):
         try:
@@ -167,6 +174,8 @@ class Servers(object):
                 f"unable to create installation Docker container, server removed {click.style(str(e), bold=True)}",
                 exit_code=1,
             )
+
+        remove_file(f"{path}/install.sh")
 
     def _start(self, server):
         path = f"{self._configuration['data_path']}/{server['id']}"

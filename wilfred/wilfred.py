@@ -55,6 +55,8 @@ def main():
 )
 def cli():
     """
+    Wilfred
+
     🐿️  A CLI for managing game servers using Docker.
 
     ⚠️  Wilfred is currently under development and should not be considered stable.
