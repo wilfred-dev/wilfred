@@ -23,9 +23,6 @@ class Servers(object):
 
         self._get_db_servers()
 
-    def _get_db_servers(self):
-        self._servers = self._database.query("SELECT * FROM servers")
-
     def create(self, name, image_uuid, memory, port):
         self._database.query(
             " ".join(
@@ -39,15 +36,6 @@ class Servers(object):
 
         self._get_db_servers()
         self.sync()
-
-    def _running_docker_sync(self):
-        for server in self._servers:
-            try:
-                self._docker_client.containers.get(server["id"])
-            except docker.errors.NotFound:
-                self.set_status(server, "stopped")
-
-        self._get_db_servers()
 
     def pretty(self):
         self._running_docker_sync()
@@ -123,6 +111,18 @@ class Servers(object):
             self._docker_client.containers.get(server["id"])
         except docker.errors.NotFound:
             error("server is not running", exit_code=1)
+
+    def _get_db_servers(self):
+        self._servers = self._database.query("SELECT * FROM servers")
+
+    def _running_docker_sync(self):
+        for server in self._servers:
+            try:
+                self._docker_client.containers.get(server["id"])
+            except docker.errors.NotFound:
+                self.set_status(server, "stopped")
+
+        self._get_db_servers()
 
     def _parse_cmd(self, cmd, server):
         return cmd.replace("{{SERVER_MEMORY}}", f"{server['memory']}").replace(

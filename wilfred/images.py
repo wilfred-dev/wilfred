@@ -54,22 +54,7 @@ class Images(object):
         remove(f"{self.config_dir}/img.zip")
         rmtree(f"{self.config_dir}/temp_images")
 
-    def _read_images(self):
-        self.images = []
-
-        for root, dirs, files in walk(self.image_dir):
-            for file in files:
-                if file.endswith(".json"):
-                    with open(join(root, file)) as f:
-                        _image = json.loads(f.read())
-
-                        if _image["meta"]["version"] != API_VERSION:
-                            error(
-                                f"{file} image has API level {_image['meta']['version']}, Wilfreds API level is {API_VERSION}",
-                                exit_code=1,
-                            )
-
-                        self.images.append(_image)
+        self._read_images()
 
     def pretty(self):
         _images = self.images
@@ -93,3 +78,20 @@ class Images(object):
         self._read_images()
 
         return list(filter(lambda img: img["uuid"] == uuid, self.images))
+
+    def _read_images(self):
+        self.images = []
+
+        for root, dirs, files in walk(self.image_dir):
+            for file in files:
+                if file.endswith(".json"):
+                    with open(join(root, file)) as f:
+                        _image = json.loads(f.read())
+
+                        if _image["meta"]["version"] != API_VERSION:
+                            error(
+                                f"{file} image has API level {_image['meta']['version']}, Wilfreds API level is {API_VERSION}",
+                                exit_code=1,
+                            )
+
+                        self.images.append(_image)

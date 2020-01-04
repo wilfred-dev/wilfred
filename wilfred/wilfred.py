@@ -29,7 +29,11 @@ servers = Servers(database, docker_client(), config.configuration, images)
 def print_version(ctx, param, value):
     if not value or ctx.resilient_parsing:
         return
-    click.echo("✨ wilfred version {}".format(version))
+    click.echo(
+        "✨ wilfred version {}".format(
+            "development (0.0.0.dev0)" if version == "0.0.0.dev0" else version
+        )
+    )
     ctx.exit()
 
 
@@ -62,7 +66,7 @@ def cli():
 
 @cli.command()
 def setup():
-    """setup wilfred, create config"""
+    """Setup wilfred, create configuration."""
 
     if config.configuration:
         warning("A configuration file for Wilfred already exists.")
@@ -77,7 +81,7 @@ def setup():
 
 @cli.command("servers")
 def servers_list():
-    """list of all servers"""
+    """List all existing servers."""
 
     click.echo(servers.pretty())
 
@@ -85,7 +89,7 @@ def servers_list():
 @cli.command("images")
 @click.option("--refresh", help="Download the default images from GitHub", is_flag=True)
 def list_images(refresh):
-    """list available images"""
+    """List images available on file."""
 
     if refresh:
         with yaspin(text="Refreshing images", color="yellow") as spinner:
@@ -104,7 +108,7 @@ def list_images(refresh):
 )
 @click.pass_context
 def create(ctx, console):
-    """create a new server"""
+    """Create a new server."""
 
     if not config.configuration:
         error("Wilfred has not been configured", exit_code=1)
@@ -140,7 +144,7 @@ def create(ctx, console):
 @cli.command("sync")
 def sync_cmd():
     """
-    sync all servers on file with Docker (start/kill/create)
+    Sync all servers on file with Docker (start/kill/create).
     """
 
     with yaspin(text="Docker sync", color="yellow") as spinner:
@@ -160,7 +164,8 @@ def sync_cmd():
 @click.pass_context
 def start(ctx, name, console):
     """
-    start existing server
+    Start server by specifiying the
+    name of the server as argument.
     """
 
     with yaspin(text="Server start", color="yellow") as spinner:
@@ -187,7 +192,7 @@ def start(ctx, name, console):
 @click.argument("name")
 def kill(name):
     """
-    kill running server
+    Forcefully kill running server.
     """
 
     with yaspin(text="Killing server", color="yellow") as spinner:
@@ -210,7 +215,9 @@ def kill(name):
 @cli.command()
 @click.argument("name")
 def delete(name):
-    """delete existing server"""
+    """
+    Delete existing server.
+    """
 
     if click.confirm(
         "Are you sure you want to do this? All data will be permanently deleted."
@@ -233,7 +240,9 @@ def delete(name):
 @cli.command("console")
 @click.argument("name")
 def server_console(name):
-    """view log and run commands"""
+    """
+    Attach to server console, view log and run commands.
+    """
 
     if not config.configuration:
         error("Wilfred has not been configured", exit_code=1)
@@ -242,6 +251,8 @@ def server_console(name):
 
     if not server:
         error("Server does not exit", exit_code=1)
+
+    click.secho(f"Viewing server console of {name} (id {server[0]['id']})", bold=True)
 
     servers.console(server[0])
 
