@@ -144,7 +144,7 @@ def create(ctx, console):
 @cli.command("sync")
 def sync_cmd():
     """
-    Sync all servers on file with Docker (start/kill/create).
+    Sync all servers on file with Docker (start/stop/kill/create).
     """
 
     with yaspin(text="Docker sync", color="yellow") as spinner:
@@ -195,7 +195,35 @@ def kill(name):
     Forcefully kill running server.
     """
 
-    with yaspin(text="Killing server", color="yellow") as spinner:
+    if click.confirm(
+        "Are you sure you want to do this? This will kill the running container without saving data."
+    ):
+        with yaspin(text="Killing server", color="yellow") as spinner:
+            if not config.configuration:
+                spinner.fail("💥 Wilfred has not been configured")
+                sys.exit(1)
+
+            server = servers.get_by_name(name.lower())
+
+            if not server:
+                spinner.fail("💥 Server does not exit")
+                sys.exit(1)
+
+            servers.kill(server[0])
+            servers.set_status(server[0], "stopped")
+            servers.sync()
+
+            spinner.ok("✅ ")
+
+
+@cli.command()
+@click.argument("name")
+def stop(name):
+    """
+    Stop server.
+    """
+
+    with yaspin(text="Stopping server", color="yellow") as spinner:
         if not config.configuration:
             spinner.fail("💥 Wilfred has not been configured")
             sys.exit(1)

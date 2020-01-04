@@ -8,7 +8,6 @@ import docker
 from tabulate import tabulate
 from pathlib import Path
 from shutil import rmtree
-from subprocess import call
 
 from wilfred.core import random_string
 from wilfred.message_handler import error
@@ -70,7 +69,7 @@ class Servers(object):
 
                 # stopped
                 if server["status"] == "stopped":
-                    self._kill(server)
+                    self._stop(server)
 
                 # start
                 if server["status"] == "running" or start:
@@ -103,21 +102,24 @@ class Servers(object):
         except docker.errors.NotFound:
             error("server is not running", exit_code=1)
 
-        click.echo(container.logs())
+        for line in container.logs(stream=True):
+            click.echo(line.strip())
 
+    def _command(self, server, command):
         try:
-            call(["docker", "attach", server["id"], "--detach-keys", "ctrl-c"])
-        except Exception as e:
-            error(
-                f"unable to attach to console {click.style(str(e), bold=True)}",
-                exit_code=1,
-            )
-
-    def command(self, server, command):
-        try:
-            self._docker_client.containers.get(server["id"])
+            container = self._docker_client.containers.get(server["id"])
         except docker.errors.NotFound:
             error("server is not running", exit_code=1)
+
+        try:
+            s = container.attach_socket(params={"stdin": 1, "stream": 1})
+            s._sock.send(f"{command}\n".encode("utf-8"))
+            s.close()
+        except Exception as e:
+            error(
+                f"unable to send command '{command}' on server {server['id']}, err {click.style(str(e), bold=True)}",
+                exit_code=1,
+            )
 
     def _get_db_servers(self):
         self._servers = self._database.query("SELECT * FROM servers")
@@ -190,10 +192,28 @@ class Servers(object):
                 exit_code=1,
             )
 
-    def _kill(self, server):
+    def kill(self, server):
         try:
             container = self._docker_client.containers.get(server["id"])
         except docker.errors.NotFound:
             return
 
         container.stop()
+
+    def _stop(self, server):
+        image = self._images.get_image(server["image_uuid"])
+
+        try:
+            self._docker_client.containers.get(server["id"])
+        except docker.errors.NotFound:
+            return
+
+        self._command(server, image[0]["stop_command"])
+
+        stopped = False
+
+        while not stopped:
+            try:
+                self._docker_client.containers.get(server["id"])
+            except docker.errors.NotFound:
+                stopped = True
