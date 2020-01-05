@@ -10,9 +10,9 @@ from pathlib import Path
 from shutil import rmtree
 from os import remove as remove_file
 
-from wilfred.core import random_string
 from wilfred.message_handler import error
 from wilfred.keyboard import KeyboardThread
+from wilfred.container_variables import ContainerVariables
 
 
 class Servers(object):
@@ -23,20 +23,6 @@ class Servers(object):
         self._docker_client = docker_client
 
         self._get_db_servers()
-
-    def create(self, name, image_uuid, memory, port):
-        self._database.query(
-            " ".join(
-                (
-                    "INSERT INTO servers",
-                    "(id, name, image_uuid, memory, port, status)"
-                    f"VALUES ('{random_string()}', '{name}', '{image_uuid}', '{memory}', '{port}', 'created')",
-                )
-            )
-        )
-
-        self._get_db_servers()
-        self.sync()
 
     def pretty(self, server=None):
         self._running_docker_sync()
@@ -62,7 +48,10 @@ class Servers(object):
         )
         self._get_db_servers()
 
-    def sync(self):
+    def sync(self, db_update=False):
+        if db_update:
+            self._get_db_servers()
+
         with click.progressbar(
             self._servers, label="Syncing servers", length=len(self._servers)
         ) as servers:
@@ -146,7 +135,7 @@ class Servers(object):
 
         self._get_db_servers()
 
-    def _parse_cmd(self, cmd, server):
+    def _parse_startup_command(self, cmd, server):
         return cmd.replace("{{SERVER_MEMORY}}", f"{server['memory']}").replace(
             "{{SERVER_PORT}}", f"{server['port']}"
         )
@@ -172,6 +161,9 @@ class Servers(object):
                 f"{image['installation']['shell']} /server/install.sh",
                 volumes={path: {"bind": "/server", "mode": "rw"}},
                 name=f"wilfred_{server['id']}",
+                environment=ContainerVariables(
+                    server, image, self._database, install=True
+                ).get_env_vars(),
                 remove=True,
             )
         except Exception as e:
@@ -190,7 +182,7 @@ class Servers(object):
         try:
             self._docker_client.containers.run(
                 image["docker_image"],
-                f"{self._parse_cmd(image['command'], server)}",
+                f"{self._parse_startup_command(image['command'], server)}",
                 volumes={path: {"bind": "/server", "mode": "rw"}},
                 name=f"wilfred_{server['id']}",
                 remove=True,
@@ -200,6 +192,9 @@ class Servers(object):
                 mem_limit=f"{server['memory']}m",
                 oom_kill_disable=True,
                 stdin_open=True,
+                environment=ContainerVariables(
+                    server, image, self._database
+                ).get_env_vars(),
             )
         except Exception as e:
             error(

@@ -40,6 +40,7 @@ def _query(path, query, fetchone=False):
         conn.commit()
         conn.close()
     except sqlite3.OperationalError as e:
+        print(query)
         error(
             "could not communicate with database " + click.style(str(e), bold=True),
             exit_code=1,
@@ -84,7 +85,7 @@ class Database(object):
                 PRIMARY KEY (name)
             );""",
             """CREATE TABLE servers (
-                id VARCHAR NOT NULL,
+                id VARCHAR NOT NULL UNIQUE,
                 name VARCHAR NOT NULL UNIQUE,
                 image_uuid VARCHAR NOT NULL,
                 memory INT NOT NULL,
@@ -92,6 +93,11 @@ class Database(object):
                 status VARCHAR NOT NULL,
                 PRIMARY KEY (id)
             );""",
+            """CREATE TABLE variables (
+                server_id VARCHAR NOT NULL,
+                variable VARCHAR NOT NULL,
+                value VARCHAR NOT NULL
+            )""",
         ]
 
         with click.progressbar(

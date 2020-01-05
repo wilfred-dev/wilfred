@@ -60,11 +60,15 @@ class Images(object):
         _images = self.images
 
         for d in _images:
-            del d["meta"]
-            del d["installation"]
-            del d["docker_image"]
-            del d["command"]
-            del d["stop_command"]
+            try:
+                del d["meta"]
+                del d["installation"]
+                del d["docker_image"]
+                del d["command"]
+                del d["stop_command"]
+                del d["variables"]
+            except Exception:
+                pass
 
         headers = {
             "uuid": "UUID",

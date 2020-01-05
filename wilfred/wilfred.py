@@ -19,7 +19,7 @@ from wilfred.database import Database
 from wilfred.servers import Servers
 from wilfred.images import Images
 from wilfred.message_handler import warning, error
-from wilfred.core import is_integer
+from wilfred.core import is_integer, random_string
 
 config = Config()
 database = Database()
@@ -135,8 +135,33 @@ def create(ctx, console):
     port = click.prompt("Port", default=25565)
     memory = click.prompt("Memory", default=1024)
 
+    click.secho("Environment Variables", bold=True)
+
+    # create
+    database.query(
+        " ".join(
+            (
+                "INSERT INTO servers",
+                "(id, name, image_uuid, memory, port, status)"
+                f"VALUES ('{random_string()}', '{name}', '{image_uuid}', '{memory}', '{port}', 'created')",
+            )
+        )
+    )
+
+    server_id = database.query(
+        f"SELECT id FROM servers WHERE name = '{name}'", fetchone=True
+    )["id"]
+
+    # environment variables available for the container
+    for v in images.get_image(image_uuid)["variables"]:
+        value = click.prompt(v["prompt"], default=v["default"])
+
+        database.query(
+            f"INSERT INTO variables (server_id, variable, value) VALUES ('{server_id}', '{v['variable']}', '{value}')"
+        )
+
     with yaspin(text="Creating server", color="yellow") as spinner:
-        servers.create(name, image_uuid, memory, port)
+        servers.sync(db_update=True)
 
         spinner.ok("✅ ")
 
