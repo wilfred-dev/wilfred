@@ -10,6 +10,12 @@ class ContainerVariables(object):
         self._database = database
         self._install = install
 
+    def parse_startup_command(self, cmd):
+        for k, v in self.get_env_vars().items():
+            cmd = cmd.replace("{{image.env." + k + "}}", v)
+
+        return cmd
+
     def get_env_vars(self):
         environment = {}
 

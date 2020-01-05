@@ -135,9 +135,11 @@ class Servers(object):
 
         self._get_db_servers()
 
-    def _parse_startup_command(self, cmd, server):
-        return cmd.replace("{{SERVER_MEMORY}}", f"{server['memory']}").replace(
-            "{{SERVER_PORT}}", f"{server['port']}"
+    def _parse_startup_command(self, cmd, server, image):
+        return ContainerVariables(server, image, self._database).parse_startup_command(
+            cmd.replace("{{SERVER_MEMORY}}", f"{server['memory']}").replace(
+                "{{SERVER_PORT}}", f"{server['port']}"
+            )
         )
 
     def _install(self, server):
@@ -182,7 +184,7 @@ class Servers(object):
         try:
             self._docker_client.containers.run(
                 image["docker_image"],
-                f"{self._parse_startup_command(image['command'], server)}",
+                f"{self._parse_startup_command(image['command'], server, image)}",
                 volumes={path: {"bind": "/server", "mode": "rw"}},
                 name=f"wilfred_{server['id']}",
                 remove=True,
