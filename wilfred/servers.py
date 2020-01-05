@@ -80,14 +80,16 @@ class Servers(object):
                 # start
                 if server["status"] == "running" or start:
                     try:
-                        self._docker_client.containers.get(server["id"])
+                        self._docker_client.containers.get(f"wilfred_{server['id']}")
                     except docker.errors.NotFound:
                         self._start(server)
 
     def get_by_name(self, name):
         self._get_db_servers()
 
-        return list(filter(lambda x: x["name"] == name, self._servers))
+        server = list(filter(lambda x: x["name"] == name, self._servers))
+
+        return server[0] if server else None
 
     def remove(self, server):
         path = f"{self._configuration['data_path']}/{server['id']}"
@@ -95,7 +97,7 @@ class Servers(object):
         self._database.query(f"DELETE FROM servers WHERE id='{server['id']}'")
 
         try:
-            container = self._docker_client.containers.get(server["id"])
+            container = self._docker_client.containers.get(f"wilfred_{server['id']}")
             container.stop()
         except docker.errors.NotFound:
             pass
@@ -104,7 +106,7 @@ class Servers(object):
 
     def console(self, server):
         try:
-            container = self._docker_client.containers.get(server["id"])
+            container = self._docker_client.containers.get(f"wilfred_{server['id']}")
         except docker.errors.NotFound:
             error("server is not running", exit_code=1)
 
@@ -118,7 +120,7 @@ class Servers(object):
 
     def _command(self, server, command):
         try:
-            container = self._docker_client.containers.get(server["id"])
+            container = self._docker_client.containers.get(f"wilfred_{server['id']}")
         except docker.errors.NotFound:
             error("server is not running", exit_code=1)
 
@@ -138,7 +140,7 @@ class Servers(object):
     def _running_docker_sync(self):
         for server in self._servers:
             try:
-                self._docker_client.containers.get(server["id"])
+                self._docker_client.containers.get(f"wilfred_{server['id']}")
             except docker.errors.NotFound:
                 self.set_status(server, "stopped")
 
@@ -151,7 +153,7 @@ class Servers(object):
 
     def _install(self, server):
         path = f"{self._configuration['data_path']}/{server['id']}"
-        image = self._images.get_image(server["image_uuid"])[0]
+        image = self._images.get_image(server["image_uuid"])
 
         try:
             Path(path).mkdir(parents=True, exist_ok=True)
@@ -169,7 +171,7 @@ class Servers(object):
                 image["installation"]["docker_image"],
                 f"{image['installation']['shell']} /server/install.sh",
                 volumes={path: {"bind": "/server", "mode": "rw"}},
-                name=server["id"],
+                name=f"wilfred_{server['id']}",
                 remove=True,
             )
         except Exception as e:
@@ -183,14 +185,14 @@ class Servers(object):
 
     def _start(self, server):
         path = f"{self._configuration['data_path']}/{server['id']}"
-        image = self._images.get_image(server["image_uuid"])[0]
+        image = self._images.get_image(server["image_uuid"])
 
         try:
             self._docker_client.containers.run(
                 image["docker_image"],
                 f"{self._parse_cmd(image['command'], server)}",
                 volumes={path: {"bind": "/server", "mode": "rw"}},
-                name=server["id"],
+                name=f"wilfred_{server['id']}",
                 remove=True,
                 ports={f"{server['port']}/tcp": server["port"]},
                 detach=True,
@@ -207,7 +209,7 @@ class Servers(object):
 
     def kill(self, server):
         try:
-            container = self._docker_client.containers.get(server["id"])
+            container = self._docker_client.containers.get(f"wilfred_{server['id']}")
         except docker.errors.NotFound:
             return
 
@@ -217,16 +219,16 @@ class Servers(object):
         image = self._images.get_image(server["image_uuid"])
 
         try:
-            self._docker_client.containers.get(server["id"])
+            self._docker_client.containers.get(f"wilfred_{server['id']}")
         except docker.errors.NotFound:
             return
 
-        self._command(server, image[0]["stop_command"])
+        self._command(server, image["stop_command"])
 
         stopped = False
 
         while not stopped:
             try:
-                self._docker_client.containers.get(server["id"])
+                self._docker_client.containers.get(f"wilfred_{server['id']}")
             except docker.errors.NotFound:
                 stopped = True

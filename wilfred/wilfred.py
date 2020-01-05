@@ -182,7 +182,7 @@ def start(ctx, name, console):
             spinner.fail("💥 Server does not exit")
             sys.exit(1)
 
-        servers.set_status(server[0], "running")
+        servers.set_status(server, "running")
         servers.sync()
 
         spinner.ok("✅ ")
@@ -212,8 +212,8 @@ def kill(name):
                 spinner.fail("💥 Server does not exit")
                 sys.exit(1)
 
-            servers.kill(server[0])
-            servers.set_status(server[0], "stopped")
+            servers.kill(server)
+            servers.set_status(server, "stopped")
             servers.sync()
 
             spinner.ok("✅ ")
@@ -237,7 +237,7 @@ def stop(name):
             spinner.fail("💥 Server does not exit")
             sys.exit(1)
 
-        servers.set_status(server[0], "stopped")
+        servers.set_status(server, "stopped")
         servers.sync()
 
         spinner.ok("✅ ")
@@ -264,7 +264,7 @@ def delete(name):
                 spinner.fail("💥 Server does not exit")
                 sys.exit(1)
 
-            servers.remove(server[0])
+            servers.remove(server)
             spinner.ok("✅ ")
 
 
@@ -283,9 +283,9 @@ def server_console(name):
     if not server:
         error("Server does not exit", exit_code=1)
 
-    click.secho(f"Viewing server console of {name} (id {server[0]['id']})", bold=True)
+    click.secho(f"Viewing server console of {name} (id {server['id']})", bold=True)
 
-    servers.console(server[0])
+    servers.console(server)
 
 
 @cli.command()
@@ -303,13 +303,7 @@ def edit(name):
     if not server:
         error("Server does not exist", exit_code=1)
 
-    click.echo(servers.pretty(server=server[0]))
-
-    server = servers.get_by_name(name.lower())
-
-    if server[0]["status"] != "stopped":
-        error("server is running, can only edit stopped servers", exit_code=1)
-
+    click.echo(servers.pretty(server=server))
     click.echo("Leave values empty to use existing value")
 
     name = click.prompt("Name", default="").lower()
@@ -321,26 +315,26 @@ def edit(name):
     memory = click.prompt("Memory", default="")
 
     if name:
-        database.query(
-            f"UPDATE servers SET name = '{name}' WHERE id='{server[0]['id']}'"
-        )
+        database.query(f"UPDATE servers SET name = '{name}' WHERE id='{server['id']}'")
 
     if port:
         if not is_integer(port):
             error("port must be integer", exit_code=1)
 
-        database.query(f"UPDATE servers SET port = {port} WHERE id='{server[0]['id']}'")
+        database.query(f"UPDATE servers SET port = {port} WHERE id='{server['id']}'")
 
     if memory:
         if not is_integer(memory):
             error("memory must be integer", exit_code=1)
 
         database.query(
-            f"UPDATE servers SET memory = {memory} WHERE id='{server[0]['id']}'"
+            f"UPDATE servers SET memory = {memory} WHERE id='{server['id']}'"
         )
 
     if name or port or memory:
-        click.echo("✅ Server information updated")
+        click.echo(
+            "✅ Server information updated, restart server for changes to take effect"
+        )
 
 
 if __name__ == "__main__":

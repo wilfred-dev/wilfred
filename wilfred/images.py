@@ -78,7 +78,9 @@ class Images(object):
     def get_image(self, uuid):
         self._read_images()
 
-        return list(filter(lambda img: img["uuid"] == uuid, self.images))
+        image = list(filter(lambda img: img["uuid"] == uuid, self.images))
+
+        return image[0] if image else None
 
     def _read_images(self):
         self.images = []
