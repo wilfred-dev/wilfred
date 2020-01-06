@@ -13,7 +13,7 @@ confinement: strict
 parts:
   wilfred:
     plugin: python
-    source: https://github.com/wilfred-dev/wilfred.git
+    source: .
     build-packages:
       - python3-distutils
       - build-essential

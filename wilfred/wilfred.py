@@ -13,6 +13,7 @@ import os
 import sys
 
 from yaspin import yaspin
+from pathlib import Path
 
 from wilfred.docker_conn import docker_client
 from wilfred.version import version
@@ -77,8 +78,12 @@ def setup():
         warning("A configuration file for Wilfred already exists.")
         click.confirm("Are you sure you wan't to continue?", abort=True)
 
+    click.echo(
+        "❗ If you installed Wilfred via snap, you cannot use a directory outside the snap confinement (use the default one)."
+    )
+
     data_path = click.prompt(
-        "Path for storing server data", default="/srv/wilfred/servers"
+        "Path for storing server data", default=f"{str(Path.home())}/wilfred/servers"
     )
 
     config.write(data_path)

@@ -5,9 +5,12 @@
 # https://github.com/wilfred-dev/wilfred
 
 import json
+import click
+
 from appdirs import user_config_dir
 from os.path import isfile, isdir
 from pathlib import Path
+
 from wilfred.message_handler import warning, error
 
 API_VERSION = 0
@@ -42,6 +45,14 @@ class Config(object):
             )
 
     def write(self, data_path):
+        try:
+            Path(data_path).mkdir(parents=True, exist_ok=True)
+        except Exception as e:
+            error(
+                f"unable to access specified path {click.style(str(e), bold=True)}",
+                exit_code=1,
+            )
+
         with open(self.config_path, "w") as f:
             f.write(
                 json.dumps(
