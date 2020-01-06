@@ -212,14 +212,25 @@ class Servers(object):
         except docker.errors.NotFound:
             return
 
-        container.stop()
+        container.kill()
 
     def _stop(self, server):
         image = self._images.get_image(server["image_uid"])
 
         try:
-            self._docker_client.containers.get(f"wilfred_{server['id']}")
+            container = self._docker_client.containers.get(f"wilfred_{server['id']}")
         except docker.errors.NotFound:
+            return
+
+        if not image["stop_command"]:
+            try:
+                container.stop()
+            except Exception as e:
+                exit(
+                    f"could not stop container {click.style(str(e), bold=True)}",
+                    exit_code=1,
+                )
+
             return
 
         self._command(server, image["stop_command"])
