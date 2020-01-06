@@ -124,12 +124,12 @@ def create(ctx, console):
     if " " in name:
         error("space not allowed in name", exit_code=1)
 
-    image_uuid = click.prompt("Image UUID", default="minecraft-vanilla")
+    image_uid = click.prompt("Image UID", default="minecraft-vanilla")
 
-    if " " in image_uuid:
-        error("space not allowed in image_uuid", exit_code=1)
+    if " " in image_uid:
+        error("space not allowed in image_uid", exit_code=1)
 
-    if not images.get_image(image_uuid):
+    if not images.get_image(image_uid):
         error("image does not exist", exit_code=1)
 
     port = click.prompt("Port", default=25565)
@@ -142,8 +142,8 @@ def create(ctx, console):
         " ".join(
             (
                 "INSERT INTO servers",
-                "(id, name, image_uuid, memory, port, status)"
-                f"VALUES ('{random_string()}', '{name}', '{image_uuid}', '{memory}', '{port}', 'created')",
+                "(id, name, image_uid, memory, port, status)"
+                f"VALUES ('{random_string()}', '{name}', '{image_uid}', '{memory}', '{port}', 'created')",
             )
         )
     )
@@ -153,7 +153,7 @@ def create(ctx, console):
     )["id"]
 
     # environment variables available for the container
-    for v in images.get_image(image_uuid)["variables"]:
+    for v in images.get_image(image_uid)["variables"]:
         value = click.prompt(v["prompt"], default=v["default"])
 
         database.query(

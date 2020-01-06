@@ -71,7 +71,7 @@ class Images(object):
                 pass
 
         headers = {
-            "uuid": "UUID",
+            "uid": "UID",
             "name": "Image Name",
             "author": "Author",
             "default_image": "Default Image",
@@ -79,10 +79,10 @@ class Images(object):
 
         return tabulate(_images, headers=headers, tablefmt="fancy_grid")
 
-    def get_image(self, uuid):
+    def get_image(self, uid):
         self._read_images()
 
-        image = list(filter(lambda img: img["uuid"] == uuid, self.images))
+        image = list(filter(lambda img: img["uid"] == uid, self.images))
 
         return image[0] if image else None
 

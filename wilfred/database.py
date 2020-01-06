@@ -87,7 +87,7 @@ class Database(object):
             """CREATE TABLE servers (
                 id VARCHAR NOT NULL UNIQUE,
                 name VARCHAR NOT NULL UNIQUE,
-                image_uuid VARCHAR NOT NULL,
+                image_uid VARCHAR NOT NULL,
                 memory INT NOT NULL,
                 port INT NOT NULL UNIQUE,
                 status VARCHAR NOT NULL,

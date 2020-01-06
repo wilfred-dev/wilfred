@@ -30,7 +30,7 @@ class Servers(object):
         headers = {
             "id": "ID",
             "name": "Name",
-            "image_uuid": "Image UUID",
+            "image_uid": "Image UID",
             "memory": "Memory (RAM)",
             "port": "Port",
             "status": "Status",
@@ -144,7 +144,7 @@ class Servers(object):
 
     def _install(self, server):
         path = f"{self._configuration['data_path']}/{server['id']}"
-        image = self._images.get_image(server["image_uuid"])
+        image = self._images.get_image(server["image_uid"])
 
         try:
             Path(path).mkdir(parents=True, exist_ok=True)
@@ -179,7 +179,7 @@ class Servers(object):
 
     def _start(self, server):
         path = f"{self._configuration['data_path']}/{server['id']}"
-        image = self._images.get_image(server["image_uuid"])
+        image = self._images.get_image(server["image_uid"])
 
         try:
             self._docker_client.containers.run(
@@ -213,7 +213,7 @@ class Servers(object):
         container.stop()
 
     def _stop(self, server):
-        image = self._images.get_image(server["image_uuid"])
+        image = self._images.get_image(server["image_uid"])
 
         try:
             self._docker_client.containers.get(f"wilfred_{server['id']}")
