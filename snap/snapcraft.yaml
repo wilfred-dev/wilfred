@@ -7,8 +7,16 @@ description: |
 
   Wilfred is currently under development and should not be considered stable. Features may brake or may not be implemented yet. Use with caution.
 
-grade: devel # 'stable' on release ('devel' during dev)
+grade: stable # 'stable' on release ('devel' during dev)
 confinement: strict
+
+plugs:
+  docker:
+    content: docker
+    default-provider: docker
+    interface: content
+    target: docker-env
+  network:
 
 parts:
   wilfred:
@@ -24,9 +32,8 @@ parts:
 apps:
   wilfred:
     command: bin/wilfred
+    plugs: [docker, network]
     environment:
       PYTHONIOENCODING: utf-8
-
-plugs:
-  docker:
-  network:
+      LC_ALL: C.UTF-8
+      LANG: C.UTF-8
