@@ -1,6 +1,8 @@
-# wilfred
+# Wilfred
+# Copyright (C) 2020, Vilhelm Prytz, <vilhelm@prytznet.se>
+#
+# Licensed under the terms of the MIT license, see LICENSE.
 # https://github.com/wilfred-dev/wilfred
-# (c) Vilhelm Prytz 2020
 
 import docker
 

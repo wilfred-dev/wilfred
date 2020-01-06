@@ -8,7 +8,7 @@ with open("README.md", "r") as f:
     long_description = f.read()
 
 setup(
-    name="wilfred",  # Replace with your own username
+    name="wilfred",
     version=version,
     author="Vilhelm Prytz",
     author_email="vlhelm@prytznet.se",
