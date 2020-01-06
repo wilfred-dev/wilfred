@@ -14,7 +14,7 @@ class ContainerVariables(object):
 
     def parse_startup_command(self, cmd):
         for k, v in self.get_env_vars().items():
-            cmd = cmd.replace("{{image.env." + k + "}}", v)
+            cmd = cmd.replace("{{image.env." + str(k) + "}}", str(v))
 
         return cmd
 
@@ -34,5 +34,8 @@ class ContainerVariables(object):
                 continue
 
             environment[var["variable"]] = value
+
+        environment["SERVER_MEMORY"] = self._server["memory"]
+        environment["SERVER_PORT"] = self._server["port"]
 
         return environment

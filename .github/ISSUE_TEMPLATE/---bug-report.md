@@ -10,7 +10,7 @@ assignees: ''
 ### Environment
 
 * Installation type: <!-- snap/pip -->
-* Python version:  <!-- Example: 3.5.4 -->
+* Python version:  <!-- Example: 3.6.9 -->
 * Wilfred version:  <!-- Example: 1.0, 2.0, …, master -->
 
 ### Steps to Reproduce

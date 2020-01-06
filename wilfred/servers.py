@@ -139,8 +139,8 @@ class Servers(object):
 
     def _parse_startup_command(self, cmd, server, image):
         return ContainerVariables(server, image, self._database).parse_startup_command(
-            cmd.replace("{{SERVER_MEMORY}}", f"{server['memory']}").replace(
-                "{{SERVER_PORT}}", f"{server['port']}"
+            cmd.replace("{{SERVER_MEMORY}}", str(server["memory"])).replace(
+                "{{SERVER_PORT}}", str(server["port"])
             )
         )
 
