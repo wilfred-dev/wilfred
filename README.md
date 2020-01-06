@@ -25,8 +25,24 @@ As long as your server can run in Docker, it can probably run using Wilfred (aft
 
 ## Installation
 
-Please refer to the [official documentation](https://wilfred.readthedocs.io/en/latest/?badge=latest) for installation instructions and documentation.
+Please refer to the [official documentation](https://wilfred.readthedocs.io/en/latest/installation/) for further installation instructions and documentation.
+
+### Quickstart
+
+Wilfred can be installed using `pip`. You need to use **Python 3.6** or newer in order for Wilfred to work.
+
+```bash
+pip install wilfred --upgrade
+```
+
+You can also install Wilfred using snap.
+
+```bash
+snap install wilfred --classic
+```
+
+Once you got it installed, run `wilfred setup` in order to set a path for Wilfred to use to store server files.
 
 ## Contributing
 
-Feel free to send a pull request or to open an issue.
+Feel free to send a pull request or open an issue.
