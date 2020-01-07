@@ -5,6 +5,7 @@
 # https://github.com/wilfred-dev/wilfred
 
 import json
+import click
 
 from tabulate import tabulate
 from appdirs import user_config_dir
@@ -97,10 +98,20 @@ class Images(object):
                     with open(join(root, file)) as f:
                         _image = json.loads(f.read())
 
-                        if _image["meta"]["version"] != API_VERSION:
+                        try:
+                            if _image["meta"]["api_version"] != API_VERSION:
+                                error(
+                                    " ".join(
+                                        (
+                                            f"{file} image has API level {_image['meta']['api_version']},",
+                                            "Wilfreds API level is {API_VERSION}",
+                                        )
+                                    ),
+                                    exit_code=1,
+                                )
+                        except Exception as e:
                             error(
-                                f"{file} image has API level {_image['meta']['version']}, Wilfreds API level is {API_VERSION}",
-                                exit_code=1,
+                                f"could not parse config, has API level changed? - {click.style(str(e), bold=True)}"
                             )
 
                         self.images.append(_image)
