@@ -120,8 +120,11 @@ def list_images(refresh):
     help="Attach to server console immediately after creation.",
     is_flag=True,
 )
+@click.option(
+    "--detach", help="Immediately detach during install.", is_flag=True,
+)
 @click.pass_context
-def create(ctx, console):
+def create(ctx, console, detach):
     """Create a new server."""
 
     if not config.configuration:
@@ -154,26 +157,41 @@ def create(ctx, console):
             (
                 "INSERT INTO servers",
                 "(id, name, image_uid, memory, port, status)"
-                f"VALUES ('{random_string()}', '{name}', '{image_uid}', '{memory}', '{port}', 'created')",
+                f"VALUES ('{random_string()}', '{name}', '{image_uid}', '{memory}', '{port}', 'installing')",
             )
         )
     )
 
-    server_id = database.query(
-        f"SELECT id FROM servers WHERE name = '{name}'", fetchone=True
-    )["id"]
+    server = database.query(
+        f"SELECT * FROM servers WHERE name = '{name}'", fetchone=True
+    )
 
     # environment variables available for the container
     for v in images.get_image(image_uid)["variables"]:
         value = click.prompt(v["prompt"], default=v["default"])
 
         database.query(
-            f"INSERT INTO variables (server_id, variable, value) VALUES ('{server_id}', '{v['variable']}', '{value}')"
+            f"INSERT INTO variables (server_id, variable, value) VALUES ('{server['id']}', '{v['variable']}', '{value}')"
         )
 
     with yaspin(text="Creating server", color="yellow") as spinner:
-        servers.sync(db_update=True)
+        if not detach:
+            spinner.write(
+                "> You can safely press CTRL+C, the installation will continue in the background."
+            )
+            spinner.write(
+                "> Run `wilfred servers` too see when the status changes from `installing` to `stopped`."
+            )
+            spinner.write(
+                f"> You can also follow the installation log using `wilfred console {server['name']}`"
+            )
 
+        if detach:
+            spinner.write(
+                "> Installation will continue in background, use `wilfred servers` to see if process has finished."
+            )
+
+        servers.install(server, skip_wait=True if detach else False)
         spinner.ok("✅ ")
 
     if console:
@@ -207,6 +225,8 @@ def start(ctx, name, console):
     name of the server as argument.
     """
 
+    servers.sync()
+
     with yaspin(text="Server start", color="yellow") as spinner:
         if not config.configuration:
             spinner.fail("💥 Wilfred has not been configured")
@@ -216,6 +236,10 @@ def start(ctx, name, console):
 
         if not server:
             spinner.fail("💥 Server does not exit")
+            sys.exit(1)
+
+        if server["status"] == "installing":
+            spinner.fail("💥 Server is installing, start blocked.")
             sys.exit(1)
 
         servers.set_status(server, "running")
@@ -262,6 +286,8 @@ def stop(name):
     Stop server.
     """
 
+    servers.sync()
+
     with yaspin(text="Stopping server", color="yellow") as spinner:
         if not config.configuration:
             spinner.fail("💥 Wilfred has not been configured")
@@ -271,6 +297,17 @@ def stop(name):
 
         if not server:
             spinner.fail("💥 Server does not exit")
+            sys.exit(1)
+
+        if server["status"] == "installing":
+            spinner.fail(
+                " ".join(
+                    (
+                        "💥 Server is installing, you cannot gracefully stop it.",
+                        "Use `wilfred kill` if the installation process has hanged.",
+                    )
+                )
+            )
             sys.exit(1)
 
         servers.set_status(server, "stopped")
@@ -319,9 +356,19 @@ def server_console(name):
     if not server:
         error("Server does not exit", exit_code=1)
 
-    click.secho(f"Viewing server console of {name} (id {server['id']})", bold=True)
+    click.secho(
+        " ".join(
+            (
+                f"Viewing server console of {name} (id {server['id']})",
+                f"{'- input disabled, installing' if server['status'] == 'installing' else ''}",
+            )
+        ),
+        bold=True,
+    )
 
-    servers.console(server)
+    servers.console(
+        server, disable_user_input=True if server["status"] == "installing" else False
+    )
 
 
 @cli.command()

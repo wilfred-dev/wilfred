@@ -11,6 +11,7 @@ from tabulate import tabulate
 from pathlib import Path
 from shutil import rmtree
 from os import remove as remove_file
+from time import sleep
 
 from wilfred.message_handler import error
 from wilfred.keyboard import KeyboardThread
@@ -29,20 +30,30 @@ class Servers(object):
     def pretty(self, server=None):
         self._running_docker_sync()
 
+        servers = [server] if server else self._servers
+
+        for server in servers:
+            server.update(
+                (
+                    k,
+                    str(v)
+                    .replace("running", click.style("running", fg="green"))
+                    .replace("stopped", click.style("stopped", fg="red"))
+                    .replace("installing", click.style("installing", fg="yellow")),
+                )
+                for k, v in server.items()
+            )
+
         headers = {
-            "id": "ID",
-            "name": "Name",
-            "image_uid": "Image UID",
-            "memory": "Memory (RAM)",
-            "port": "Port",
-            "status": "Status",
+            "id": click.style("ID", bold=True),
+            "name": click.style("Name", bold=True),
+            "image_uid": click.style("Image UID", bold=True),
+            "memory": click.style("Memory (RAM)", bold=True),
+            "port": click.style("Port", bold=True),
+            "status": click.style("Status", bold=True),
         }
 
-        return tabulate(
-            [server] if server else self._servers,
-            headers=headers,
-            tablefmt="fancy_grid",
-        )
+        return tabulate(servers, headers=headers, tablefmt="fancy_grid",)
 
     def set_status(self, server, status):
         self._database.query(
@@ -58,18 +69,18 @@ class Servers(object):
             self._servers, label="Syncing servers", length=len(self._servers)
         ) as servers:
             for server in servers:
-                start = False
-                if server["status"] == "created":
-                    self._install(server)
-                    self.set_status(server, "running")
-                    start = True
+                if server["status"] == "installing":
+                    try:
+                        self._docker_client.containers.get(f"wilfred_{server['id']}")
+                    except docker.errors.NotFound:
+                        self.set_status(server, "stopped")
 
                 # stopped
                 if server["status"] == "stopped":
                     self._stop(server)
 
                 # start
-                if server["status"] == "running" or start:
+                if server["status"] == "running":
                     try:
                         self._docker_client.containers.get(f"wilfred_{server['id']}")
                     except docker.errors.NotFound:
@@ -96,13 +107,14 @@ class Servers(object):
 
         rmtree(path, ignore_errors=True)
 
-    def console(self, server):
+    def console(self, server, disable_user_input=False):
         try:
             container = self._docker_client.containers.get(f"wilfred_{server['id']}")
         except docker.errors.NotFound:
             error("server is not running", exit_code=1)
 
-        KeyboardThread(self._console_input_callback, params=server)
+        if not disable_user_input:
+            KeyboardThread(self._console_input_callback, params=server)
 
         for line in container.logs(stream=True, tail=200):
             click.echo(line.strip())
@@ -145,7 +157,7 @@ class Servers(object):
             )
         )
 
-    def _install(self, server):
+    def install(self, server, skip_wait=False):
         path = f"{self._configuration['data_path']}/{server['id']}"
         image = self._images.get_image(server["image_uid"])
 
@@ -170,6 +182,7 @@ class Servers(object):
                     server, image, self._database, install=True
                 ).get_env_vars(),
                 remove=True,
+                detach=True,
             )
         except Exception as e:
             self._database.query(f"DELETE FROM servers WHERE id='{server['id']}'")
@@ -178,11 +191,23 @@ class Servers(object):
                 exit_code=1,
             )
 
-        remove_file(f"{path}/install.sh")
+        if not skip_wait:
+            while self._container_alive(server):
+                sleep(1)
+
+    def _container_alive(self, server):
+        try:
+            self._docker_client.containers.get(f"wilfred_{server['id']}")
+        except docker.errors.NotFound:
+            return False
+
+        return True
 
     def _start(self, server):
         path = f"{self._configuration['data_path']}/{server['id']}"
         image = self._images.get_image(server["image_uid"])
+
+        remove_file(f"{path}/install.sh")
 
         try:
             self._docker_client.containers.run(
