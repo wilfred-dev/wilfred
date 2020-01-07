@@ -207,7 +207,10 @@ class Servers(object):
         path = f"{self._configuration['data_path']}/{server['id']}"
         image = self._images.get_image(server["image_uid"])
 
-        remove_file(f"{path}/install.sh")
+        try:
+            remove_file(f"{path}/install.sh")
+        except Exception:
+            pass
 
         try:
             self._docker_client.containers.run(

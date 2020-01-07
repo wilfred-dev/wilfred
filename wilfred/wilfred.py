@@ -195,6 +195,7 @@ def create(ctx, console, detach):
         spinner.ok("✅ ")
 
     if console:
+        ctx.invoke(start, name=name)
         ctx.invoke(server_console, name=name)
 
 
@@ -225,7 +226,7 @@ def start(ctx, name, console):
     name of the server as argument.
     """
 
-    servers.sync()
+    servers.sync(db_update=True)
 
     with yaspin(text="Server start", color="yellow") as spinner:
         if not config.configuration:
