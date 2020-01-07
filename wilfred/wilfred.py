@@ -50,6 +50,9 @@ def main():
         os.environ["LC_ALL"] = "C.UTF-8"
         os.environ["LANG"] = "C.UTF-8"
 
+    if sys.platform.startswith("win"):
+        error("Wilfred does not support Windows", exit_code=1)
+
     cli()
 
 
