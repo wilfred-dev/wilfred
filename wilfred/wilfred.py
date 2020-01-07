@@ -24,6 +24,10 @@ from wilfred.images import Images
 from wilfred.message_handler import warning, error
 from wilfred.core import is_integer, random_string
 
+if sys.platform.startswith("win"):
+    click.echo("Wilfred does not support Windows")
+    sys.exit(1)
+
 config = Config()
 database = Database()
 images = Images()
@@ -49,9 +53,6 @@ def main():
     ):
         os.environ["LC_ALL"] = "C.UTF-8"
         os.environ["LANG"] = "C.UTF-8"
-
-    if sys.platform.startswith("win"):
-        error("Wilfred does not support Windows", exit_code=1)
 
     cli()
 
