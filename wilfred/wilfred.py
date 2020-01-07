@@ -324,7 +324,7 @@ def server_console(name):
 @click.argument("name")
 def edit(name):
     """
-    Edit server information (name, memory, port)
+    Edit server (name, memory, port, environment variables)
     """
 
     if not config.configuration:
@@ -338,35 +338,47 @@ def edit(name):
     click.echo(servers.pretty(server=server))
     click.echo("Leave values empty to use existing value")
 
-    name = click.prompt("Name", default="").lower()
+    name = click.prompt("Name", default=server["name"]).lower()
 
     if " " in name:
         error("space not allowed in name", exit_code=1)
 
-    port = click.prompt("Port", default="")
-    memory = click.prompt("Memory", default="")
+    port = click.prompt("Port", default=server["port"])
+    memory = click.prompt("Memory", default=server["memory"])
 
-    if name:
-        database.query(f"UPDATE servers SET name = '{name}' WHERE id='{server['id']}'")
+    if not is_integer(port) or not is_integer(memory):
+        error("port/memory must be integer", exit_code=1)
 
-    if port:
-        if not is_integer(port):
-            error("port must be integer", exit_code=1)
+    click.secho("Environment Variables", bold=True)
 
-        database.query(f"UPDATE servers SET port = {port} WHERE id='{server['id']}'")
+    for v in images.get_image(server["image_uid"])["variables"]:
+        if v["install_only"]:
+            continue
 
-    if memory:
-        if not is_integer(memory):
-            error("memory must be integer", exit_code=1)
+        curr = database.query(
+            f"SELECT * FROM variables WHERE server_id = '{server['id']}' AND variable = '{v['variable']}'",
+            fetchone=True,
+        )
+
+        if not curr:
+            continue
 
         database.query(
-            f"UPDATE servers SET memory = {memory} WHERE id='{server['id']}'"
+            " ".join(
+                (
+                    f"UPDATE variables SET value = '{click.prompt(v['prompt'], default=curr['value'])}'",
+                    f"WHERE server_id = '{server['id']}' AND variable = '{v['variable']}'",
+                )
+            )
         )
 
-    if name or port or memory:
-        click.echo(
-            "✅ Server information updated, restart server for changes to take effect"
-        )
+    database.query(f"UPDATE servers SET name = '{name}' WHERE id='{server['id']}'")
+    database.query(f"UPDATE servers SET port = {port} WHERE id='{server['id']}'")
+    database.query(f"UPDATE servers SET memory = {memory} WHERE id='{server['id']}'")
+
+    click.echo(
+        "✅ Server information updated, restart server for changes to take effect"
+    )
 
 
 if __name__ == "__main__":

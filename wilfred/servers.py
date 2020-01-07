@@ -86,6 +86,7 @@ class Servers(object):
         path = f"{self._configuration['data_path']}/{server['id']}"
 
         self._database.query(f"DELETE FROM servers WHERE id='{server['id']}'")
+        self._database.query(f"DELETE FROM variables WHERE server_id='{server['id']}'")
 
         try:
             container = self._docker_client.containers.get(f"wilfred_{server['id']}")
