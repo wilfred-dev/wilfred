@@ -248,6 +248,7 @@ class Servers(object):
                 environment=ContainerVariables(
                     server, image, self._database
                 ).get_env_vars(),
+                user=image["user"] if image["user"] else "root",
             )
         except Exception as e:
             error(

@@ -63,15 +63,19 @@ class Images(object):
         _images = self.images
 
         for d in _images:
-            try:
-                del d["meta"]
-                del d["installation"]
-                del d["docker_image"]
-                del d["command"]
-                del d["stop_command"]
-                del d["variables"]
-            except Exception:
-                pass
+            for key in (
+                "meta",
+                "installation",
+                "docker_image",
+                "command",
+                "stop_command",
+                "variables",
+                "user",
+            ):
+                try:
+                    del d[key]
+                except Exception:
+                    pass
 
         headers = {
             "uid": "UID",
@@ -88,6 +92,40 @@ class Images(object):
         image = list(filter(lambda img: img["uid"] == uid, self.images))
 
         return image[0] if image else None
+
+    def _verify(self, image, file):
+        def _exception(key):
+            error(f"image {file} is missing key {str(key)}", exit_code=1)
+
+        for key in (
+            "meta",
+            "uid",
+            "name",
+            "author",
+            "docker_image",
+            "command",
+            "user",
+            "stop_command",
+            "default_image",
+            "variables",
+            "installation",
+        ):
+            try:
+                image[key]
+            except Exception:
+                _exception(key)
+
+        for key in ["api_version"]:
+            try:
+                image["meta"][key]
+            except Exception:
+                _exception(key)
+
+        for key in ("docker_image", "shell", "script"):
+            try:
+                image["installation"][key]
+            except Exception:
+                _exception(key)
 
     def _read_images(self):
         self.images = []
@@ -114,4 +152,5 @@ class Images(object):
                                 f"could not parse config, has API level changed? - {click.style(str(e), bold=True)}"
                             )
 
+                        self._verify(_image, file)
                         self.images.append(_image)
