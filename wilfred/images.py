@@ -134,7 +134,13 @@ class Images(object):
             for file in files:
                 if file.endswith(".json"):
                     with open(join(root, file)) as f:
-                        _image = json.loads(f.read())
+                        try:
+                            _image = json.loads(f.read())
+                        except Exception as e:
+                            error(
+                                f"unable to parse {file} with error {click.style(str(e), bold=True)}",
+                                exit_code=1,
+                            )
 
                         try:
                             if _image["meta"]["api_version"] != API_VERSION:
