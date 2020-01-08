@@ -171,23 +171,7 @@ def create(ctx, console, detach):
         )
 
     with yaspin(text="Creating server", color="yellow") as spinner:
-        if not detach:
-            spinner.write(
-                "> You can safely press CTRL+C, the installation will continue in the background."
-            )
-            spinner.write(
-                "> Run `wilfred servers` too see when the status changes from `installing` to `stopped`."
-            )
-            spinner.write(
-                f"> You can also follow the installation log using `wilfred console {server['name']}`"
-            )
-
-        if detach:
-            spinner.write(
-                "> Installation will continue in background, use `wilfred servers` to see if process has finished."
-            )
-
-        servers.install(server, skip_wait=True if detach else False)
+        servers.install(server, skip_wait=True if detach else False, spinner=spinner)
         spinner.ok("✅ ")
 
     if console:
