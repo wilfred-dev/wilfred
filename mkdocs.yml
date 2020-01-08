@@ -1,6 +1,6 @@
 site_name: Wilfred
-repo_url: https://github.com/wilfred-dev/docs
-edit_uri: /wilfred-dev/docs/tree/master/docs
+repo_url: https://github.com/wilfred-dev/wilfred
+edit_uri: /wilfred-dev/wilfred/tree/master/docs
 
 nav:
   - Introduction: 'index.md'
