@@ -1,0 +1,15 @@
+site_name: Wilfred
+repo_url: https://github.com/wilfred-dev/docs
+edit_uri: /wilfred-dev/docs/tree/master/docs
+
+nav:
+  - Introduction: 'index.md'
+  - Installation: 'installation.md'
+  - Commands and Syntax: 'commands_and_syntax.md'
+  - Images: 'images.md'
+  - Development & Ops: 'development.md'
+
+theme: readthedocs
+markdown_extensions:
+    - admonition:
+    - mdx_truly_sane_lists
