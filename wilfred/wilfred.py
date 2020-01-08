@@ -82,10 +82,6 @@ def setup():
         warning("A configuration file for Wilfred already exists.")
         click.confirm("Are you sure you wan't to continue?", abort=True)
 
-    click.echo(
-        "❗ If you installed Wilfred via snap, you cannot use a directory outside the snap confinement (use the default one)."
-    )
-
     data_path = click.prompt(
         "Path for storing server data", default=f"{str(Path.home())}/wilfred/servers"
     )
