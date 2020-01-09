@@ -164,7 +164,9 @@ def create(ctx, console, detach):
 
     # environment variables available for the container
     for v in images.get_image(image_uid)["variables"]:
-        value = click.prompt(v["prompt"], default=v["default"])
+        value = click.prompt(
+            v["prompt"], default=v["default"] if v["default"] is not True else None
+        )
 
         database.query(
             f"INSERT INTO variables (server_id, variable, value) VALUES ('{server['id']}', '{v['variable']}', '{value}')"
