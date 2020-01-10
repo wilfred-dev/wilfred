@@ -1,7 +1,5 @@
 # .readthedocs.yml
 
-name: Wilfred
-
 version: 2
 
 formats: all
