@@ -28,7 +28,7 @@ python3.8 -m pip install wilfred --upgrade
 # Snap (experimental)
 
 !!! warning
-    The snap package is not considered stable. You can only install it using the `--devmode` which is not recommended in a production environment. For now, please use the pip package.
+    The snap package is not considered stable. You can only install it using the `--devmode` which is not recommended in a production environment. For now, please use the pip package. See issue [#6](https://github.com/wilfred-dev/wilfred/issues/6) for updates regarding the snap package.
 
 [![Get it from the Snap Store](https://snapcraft.io/static/images/badges/en/snap-store-black.svg)](https://snapcraft.io/wilfred)
 
@@ -51,10 +51,10 @@ wilfred setup
 Currently, the only config option required is the path for soring data.
 
 ```text
-Path for storing server data [/home/{{ username }}/wilfred/servers]:
+Path for storing server data [/home/{{ username }}/wilfred-data/servers]:
 ```
 
-By default, this is `/home/{{ username }}/wilfred/servers`. You can use any path as long as you have permissions to access it as the current user.
+By default, this is `/home/{{ username }}/wilfred-data/servers`. You can use any path as long as you have permissions to access it as the current user.
 
 To create a new server, you can run `wilfred create` and follow the instructions.
 

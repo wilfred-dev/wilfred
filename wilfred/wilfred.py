@@ -83,7 +83,8 @@ def setup():
         click.confirm("Are you sure you wan't to continue?", abort=True)
 
     data_path = click.prompt(
-        "Path for storing server data", default=f"{str(Path.home())}/wilfred/servers"
+        "Path for storing server data",
+        default=f"{str(Path.home())}/wilfred-data/servers",
     )
 
     config.write(data_path)
@@ -103,7 +104,7 @@ def list_images(refresh):
 
     if refresh:
         with yaspin(text="Refreshing images", color="yellow") as spinner:
-            images.download_default()
+            images.download_default(read=True)
 
             spinner.ok("✅")
 

@@ -35,9 +35,15 @@ class Images(object):
             )
             self.download_default()
 
-        self._read_images()
+        if not self._read_images():
+            self.download_default()
+            if not self._read_images(silent=True):
+                error(
+                    "Image still has incorrect API version after refresh", exit_code=1
+                )
+            click.echo("✅ Solved after default images refresh")
 
-    def download_default(self):
+    def download_default(self, read=False):
         rmtree(f"{self.image_dir}/default", ignore_errors=True)
 
         with open(f"{self.config_dir}/img.zip", "wb") as f:
@@ -57,7 +63,8 @@ class Images(object):
         remove(f"{self.config_dir}/img.zip")
         rmtree(f"{self.config_dir}/temp_images")
 
-        self._read_images()
+        if read:
+            self._read_images()
 
     def pretty(self):
         _images = self.images
@@ -127,7 +134,7 @@ class Images(object):
             except Exception:
                 _exception(key)
 
-    def _read_images(self):
+    def _read_images(self, silent=False):
         self.images = []
 
         for root, dirs, files in walk(self.image_dir):
@@ -144,19 +151,24 @@ class Images(object):
 
                         try:
                             if _image["meta"]["api_version"] != API_VERSION:
-                                error(
-                                    " ".join(
-                                        (
-                                            f"{file} image has API level {_image['meta']['api_version']},",
-                                            "Wilfreds API level is {API_VERSION}",
+                                if not silent:
+                                    warning(
+                                        " ".join(
+                                            (
+                                                f"{file} image has API level {_image['meta']['api_version']},",
+                                                f"Wilfreds API level is {API_VERSION}",
+                                            )
                                         )
-                                    ),
-                                    exit_code=1,
-                                )
+                                    )
+                                return False
                         except Exception as e:
-                            error(
-                                f"could not parse config, has API level changed? - {click.style(str(e), bold=True)}"
-                            )
+                            if not silent:
+                                error(
+                                    f"could not parse config, has API level changed? - {click.style(str(e), bold=True)}"
+                                )
+                            return False
 
                         self._verify(_image, file)
                         self.images.append(_image)
+
+        return True
