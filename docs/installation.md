@@ -25,22 +25,20 @@ You can install using a specific python versions, e.g. `3.8`.
 python3.8 -m pip install wilfred --upgrade
 ```
 
-# Snap
+# Snap (experimental)
+
+!!! warning
+    The snap package is not considered stable. You can only install it using the `--devmode` which is not recommended in a production environment. For now, please use the pip package.
 
 [![Get it from the Snap Store](https://snapcraft.io/static/images/badges/en/snap-store-black.svg)](https://snapcraft.io/wilfred)
-
-The snap package is not yet considered stable.
 
 Snapcraft is configured to automatically build the latest commit and push it to the `edge` release branch. These releases can be installed using snap.
 
 ```bash
-snap install wilfred --edge --classic
+snap install wilfred --edge --devmode
 ```
 
-The `--edge` release should **not** be used in a production environment.
-
-!!! note
-    The `--classic` flag is required in order for Wilfred to work. This is because Wilfred speaks to the Docker unix socket directly (`classic` confinement means no snap isolation).
+Again, the `--edge` channel and `--devmode` should **not** be used in a production environment.
 
 # Basic configuration
 

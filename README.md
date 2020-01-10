@@ -36,13 +36,9 @@ Wilfred can be installed using `pip`. You need to use **Python 3.6** or newer in
 pip install wilfred --upgrade
 ```
 
-You can also install Wilfred using snap.
+A [snap](https://snapcraft.io/wilfred) package is also in the works but currently not considered stable.
 
-```bash
-snap install wilfred --classic
-```
-
-Once you got it installed, run `wilfred setup` in order to set a path for Wilfred to use to store server files.
+Once you got Wilfred installed, run `wilfred setup` in order to set a path for Wilfred to use to store server files.
 
 ## Contributing
 
