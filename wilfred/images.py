@@ -164,7 +164,12 @@ class Images(object):
                         except Exception as e:
                             if not silent:
                                 error(
-                                    f"could not parse config, has API level changed? - {click.style(str(e), bold=True)}"
+                                    " ".join(
+                                        (
+                                            f"could not parse config for image {file},",
+                                            f"has API level changed? - {click.style(str(e), bold=True)}",
+                                        )
+                                    )
                                 )
                             return False
 

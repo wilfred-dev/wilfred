@@ -35,13 +35,37 @@ servers = Servers(database, docker_client(), config.configuration, images)
 
 
 def print_version(ctx, param, value):
+    """
+    print version and exit
+    """
+
     if not value or ctx.resilient_parsing:
         return
+
     click.echo(
         "✨ wilfred version {}".format(
             "development (0.0.0.dev0)" if version == "0.0.0.dev0" else version
         )
     )
+    ctx.exit()
+
+
+def print_path(ctx, param, value):
+    """
+    print config/data paths
+    """
+
+    if not value or ctx.resilient_parsing:
+        return
+
+    click.echo(f"Configuration file: {click.format_filename(config.config_path)}")
+    click.echo(f"Image config file: {click.format_filename(images.image_dir)}")
+    click.echo(f"Database file: {click.format_filename(database.database_path)}")
+    if config.configuration:
+        click.echo(
+            f"Server data: {click.format_filename(config.configuration['data_path'])}"
+        )
+
     ctx.exit()
 
 
@@ -60,6 +84,9 @@ def main():
 @click.group()
 @click.option(
     "--version", is_flag=True, callback=print_version, expose_value=False, is_eager=True
+)
+@click.option(
+    "--path", is_flag=True, callback=print_path, expose_value=False, is_eager=True
 )
 def cli():
     """

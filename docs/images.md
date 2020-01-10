@@ -2,22 +2,25 @@
 
 Not to be confused with actual Docker images, Wilfred images are configuration files used by Wilfred to create game servers. It tells Wilfred which Docker container to run the server in, with which command the server is started with and how to initially install libraries etc.
 
+Wilfred images are formatted in JSON.
+
 This is the configuration file for Vanilla Minecraft.
 
 ```json
 {
     "meta": {
-        "version": 0
+        "api_version": 0
     },
     "uid": "minecraft-vanilla",
     "name": "Vanilla Minecraft",
     "author": "vilhelm@prytznet.se",
-    "docker_image": "openjdk:8-alpine",
+    "docker_image": "wilfreddev/java:latest",
     "command": "java -Xms128M -Xmx{{SERVER_MEMORY}}M -jar server.jar",
+    "user": "container",
     "stop_command": "stop",
     "default_image": true,
     "installation": {
-        "docker_image": "alpine",
+        "docker_image": "alpine:latest",
         "shell": "/bin/ash",
         "script": [
             "apk add curl --no-cache --update jq",
@@ -31,7 +34,9 @@ This is the configuration file for Vanilla Minecraft.
             "curl -o server.jar $DOWNLOAD_URL",
             "if [ \"$EULA_ACCEPTANCE\" == \"true\" ]; then",
             "   echo \"eula=true\" > eula.txt",
-            "fi"
+            "fi",
+            "curl -o server.properties https://raw.githubusercontent.com/wilfred-dev/images/master/configs/minecraft/standard/server.properties",
+            "sed -i \"s/{{SERVER_PORT}}/$SERVER_PORT/g\" server.properties"
         ]
     },
     "variables": [
@@ -50,6 +55,30 @@ This is the configuration file for Vanilla Minecraft.
     ]
 }
 ```
+
+# Image syntax
+
+**All** variables are required for image configurations.
+
+- `meta`
+  - `api_version` - Version of configuration.
+- `uid` - A unique ID for this config, do not uses spaces.
+- `name` - Name of image to be displayed to user.
+- `author` - Email of author.
+- `docker_image` - Docker image to run server in.
+- `command` - Command to be executed on start.
+- `user` - User to run command as, leave empty for default `root`.
+- `stop_command` - Command to send to STDIN in order to stop the container.
+- `default_image` - Indicates to Wilfred that the image is an official image from the Wilfred project.
+- `installation`
+  - `docker_image` - Docker image to use during installation.
+  - `shell` - Shell to use (usually `/bin/ash` for Alpine or `/bin/bash` for Ubuntu/Debian).
+  - `script` - List (array) of commands to execute during installation.
+- `variables` - List of environment variables.
+  - `prompt` - Prompt during server creation/modification.
+  - `variable` - Name of environment variable.
+  - `install_only` - boolean, variable will only be accessible during installation if `true`.
+  - `default` - Default value for prompt, use boolean `true` in order to make variable requried but not set a default value and use `""` to make it optional, without default value.
 
 # Environment Variables
 
