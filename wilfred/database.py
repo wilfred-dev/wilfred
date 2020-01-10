@@ -42,7 +42,6 @@ def _query(path, query, fetchone=False):
         conn.commit()
         conn.close()
     except sqlite3.OperationalError as e:
-        print(query)
         error(
             "could not communicate with database " + click.style(str(e), bold=True),
             exit_code=1,
@@ -92,6 +91,7 @@ class Database(object):
                 image_uid VARCHAR NOT NULL,
                 memory INT NOT NULL,
                 port INT NOT NULL UNIQUE,
+                custom_startup VARCHAR,
                 status VARCHAR NOT NULL,
                 PRIMARY KEY (id)
             );""",

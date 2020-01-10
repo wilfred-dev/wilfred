@@ -51,6 +51,7 @@ class Servers(object):
             "memory": click.style("Memory (RAM)", bold=True),
             "port": click.style("Port", bold=True),
             "status": click.style("Status", bold=True),
+            "custom_startup": click.style("Custom startup command", bold=True),
         }
 
         return tabulate(servers, headers=headers, tablefmt="fancy_grid",)
@@ -235,7 +236,9 @@ class Servers(object):
         try:
             self._docker_client.containers.run(
                 image["docker_image"],
-                f"{self._parse_startup_command(image['command'], server, image)}",
+                self._parse_startup_command(server["custom_startup"], server, image)
+                if server["custom_startup"] is not None
+                else f"{self._parse_startup_command(image['command'], server, image)}",
                 volumes={path: {"bind": "/server", "mode": "rw"}},
                 name=f"wilfred_{server['id']}",
                 remove=True,

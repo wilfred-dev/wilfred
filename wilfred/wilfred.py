@@ -153,8 +153,8 @@ def create(ctx, console, detach):
         " ".join(
             (
                 "INSERT INTO servers",
-                "(id, name, image_uid, memory, port, status)"
-                f"VALUES ('{random_string()}', '{name}', '{image_uid}', '{memory}', '{port}', 'installing')",
+                "(id, name, image_uid, memory, port, custom_startup, status)"
+                f"VALUES ('{random_string()}', '{name}', '{image_uid}', '{memory}', '{port}', NULL, 'installing')",
             )
         )
     )
@@ -171,6 +171,16 @@ def create(ctx, console, detach):
 
         database.query(
             f"INSERT INTO variables (server_id, variable, value) VALUES ('{server['id']}', '{v['variable']}', '{value}')"
+        )
+
+    # custom startup command
+    if click.confirm("Would you like to set a custom startup command (optional)?"):
+        custom_startup = click.prompt(
+            "Custom startup command", default=images.get_image(image_uid)["command"]
+        )
+
+        database.query(
+            f"UPDATE servers SET custom_startup = '{custom_startup}' WHERE id='{server['id']}'"
         )
 
     with yaspin(text="Creating server", color="yellow") as spinner:
@@ -407,9 +417,32 @@ def edit(name):
             )
         )
 
+    server["custom_startup"] = (
+        None if server["custom_startup"] == "None" else server["custom_startup"]
+    )
+    custom_startup = None
+
+    if server["custom_startup"] is not None:
+        print(server)
+        custom_startup = click.prompt(
+            "Custom startup command", default=server["custom_startup"]
+        )
+
+    if server["custom_startup"] is None:
+        if click.confirm("Would you like to set a custom startup command?"):
+            custom_startup = click.prompt(
+                "Custom startup command",
+                default=images.get_image(server["image_uid"])["command"],
+            )
+
     database.query(f"UPDATE servers SET name = '{name}' WHERE id='{server['id']}'")
     database.query(f"UPDATE servers SET port = {port} WHERE id='{server['id']}'")
     database.query(f"UPDATE servers SET memory = {memory} WHERE id='{server['id']}'")
+
+    if custom_startup:
+        database.query(
+            f"UPDATE servers SET custom_startup = '{custom_startup}' WHERE id='{server['id']}'"
+        )
 
     click.echo(
         "✅ Server information updated, restart server for changes to take effect"
