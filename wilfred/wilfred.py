@@ -95,7 +95,7 @@ def cli():
     🐿️  A CLI for managing game servers using Docker.
 
     ⚠️  Wilfred is currently under development and should not be considered stable.
-    Features may brake or may not beimplemented yet. Use with caution.
+    Features may break or may not be implemented yet. Use with caution.
     """
 
     pass
@@ -154,13 +154,13 @@ def create(ctx, console, detach):
     if not config.configuration:
         error("Wilfred has not been configured", exit_code=1)
 
-    click.secho("Available Images", bold=True)
-    click.echo(images.pretty())
-
-    name = click.prompt("Name").lower()
+    name = click.prompt("Server Name").lower()
 
     if " " in name:
         error("space not allowed in name", exit_code=1)
+
+    click.secho("Available Images", bold=True)
+    click.echo(images.pretty())
 
     image_uid = click.prompt("Image UID", default="minecraft-vanilla")
 

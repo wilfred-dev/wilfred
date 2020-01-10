@@ -10,7 +10,7 @@
 
 Wilfred is a command-line interface for running game servers locally. It uses Docker to run game servers in containers, which means they are completely separated. Wilfred can run any game that can run in Docker.
 
-⚠️ Wilfred is currently under development and should not be considered stable. Features may brake or may not be implemented yet. Use with caution.
+⚠️ Wilfred is currently under development and should not be considered stable. Features may break or may not be implemented yet. Use with caution.
 
 ## Supported games
 
