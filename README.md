@@ -9,7 +9,7 @@
 [![Downloads](https://pepy.tech/badge/wilfred)](https://pepy.tech/project/wilfred)
 [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
 
-Wilfred is a command-line interface for running game servers locally. It uses Docker to run game servers in containers, which means they are completely separated. Wilfred can run any game that can run in Docker.
+Wilfred is a command-line interface for running and managing game servers locally. It uses Docker to run game servers in containers, which means they are completely separated. Wilfred can run any game that can run in Docker.
 
 ⚠️ Wilfred is currently under development and should not be considered stable. Features may break or may not be implemented yet. Use with caution.
 
@@ -32,7 +32,7 @@ Please refer to the [official documentation](https://wilfred.readthedocs.io/en/l
 
 ### Quickstart
 
-Wilfred can be installed using `pip`. You need to use **Python 3.6** or newer in order for Wilfred to work.
+Wilfred can be installed using `pip`. You need to use **Python 3.6** or newer to run Wilfred.
 
 ```bash
 pip install wilfred --upgrade --user
@@ -40,7 +40,7 @@ pip install wilfred --upgrade --user
 
 A [snap](https://snapcraft.io/wilfred) package is also in the works but currently not considered stable.
 
-Once you got Wilfred installed, run `wilfred setup` in order to set a path for Wilfred to use to store server files.
+Once you got Wilfred installed, run `wilfred setup` to set a path for Wilfred to use to store server files.
 
 ## Contributing
 

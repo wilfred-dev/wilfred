@@ -9,17 +9,17 @@ user@host:~$ docker --version
 Docker version XX.XX.X, build XXXXXXXXXX
 ```
 
-If you're having trouble accessing the Docker CLI as an non-root user, you can [add yourself to the Docker group](https://docs.docker.com/install/linux/linux-postinstall/#manage-docker-as-a-non-root-user).
+If you're having trouble accessing the Docker CLI as a non-root user, you can [add yourself to the Docker group](https://docs.docker.com/install/linux/linux-postinstall/#manage-docker-as-a-non-root-user).
 
 # Pip
 
-Wilfred can be installed using `pip`. You need to use **Python 3.6** or newer in order for Wilfred to work.
+Wilfred can be installed using `pip`. You need to use **Python 3.6** or newer to run Wilfred.
 
 ```bash
 pip install wilfred --upgrade --user
 ```
 
-You can install using a specific python versions, e.g. `3.8`.
+You can install using a specific python version, e.g. `3.8`.
 
 ```bash
 python3.8 -m pip install wilfred --upgrade
@@ -42,7 +42,7 @@ Again, the `--edge` channel and `--devmode` should **not** be used in a producti
 
 # Basic configuration
 
-Once you got Wilfred installed, you can run the setup command in order to create the basic configuration.
+Once you got Wilfred installed, you can run the setup command to create the basic configuration.
 
 ```bash
 wilfred setup

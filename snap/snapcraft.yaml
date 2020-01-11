@@ -1,6 +1,6 @@
 name: wilfred
 base: core18
-version: '0.1.1' # set version on release ('0.1.0') and use 'git' during dev
+version: git # set version on release ('v0.1.0') and use 'git' during dev
 summary: A CLI for managing game servers using Docker # 79 char long summary
 description: |
   Wilfred is a command-line interface for running game servers locally. It uses Docker to run game servers in containers, which means they are completely separated. Wilfred can run any game that can run in Docker.

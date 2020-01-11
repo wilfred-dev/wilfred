@@ -87,7 +87,7 @@ This is the configuration file for Vanilla Minecraft.
 
 Environment variables can be defined in the image configuration. The user will be prompted to enter values for these variables when creating a new server.
 
-The variables are accessible from the installation script and the startup command. But refering to them is slightly different.
+The variables are accessible from the installation script and the startup command. But referring to them is slightly different.
 
 To access an environment variable named `MINECRAFT_VERSION` from the installation script, one can use `$MINECRAFT_VERSION` (just as you'd expect it to work).
 
@@ -101,6 +101,6 @@ The variable `SERVER_MEMORY` and `SERVER_PORT` (so `{{SERVER_MEMORY}}` from the 
 
 You can find the default images [here](https://github.com/wilfred-dev/images/tree/master/images).
 
-# Creating your own image
+# Creating a custom image
 
-When creating your own image, make sure to **not** put it in the same folder as the default ones. The `default` folder is deleted when Wilfred updates the images from GitHub.
+When creating a custom image, make sure to **not** put it in the same folder as the default ones. The `default` folder is deleted when Wilfred updates the images from GitHub.
