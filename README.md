@@ -21,6 +21,7 @@ As long as your server can run in Docker, it can probably run using Wilfred (aft
   - BungeeCord
   - Paper
   - Waterfall
+  - Bedrock
 - Voice Servers
   - Mumble
 

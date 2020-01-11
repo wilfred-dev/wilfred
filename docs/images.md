@@ -44,13 +44,15 @@ This is the configuration file for Vanilla Minecraft.
             "prompt": "Which Minecraft version to use during install?",
             "variable": "MINECRAFT_VERSION",
             "install_only": true,
-            "default": "latest"
+            "default": "latest",
+            "hidden": false
         },
         {
             "prompt": "Do you agree to the Minecraft EULA (https://account.mojang.com/documents/minecraft_eula)?",
             "variable": "EULA_ACCEPTANCE",
             "install_only": true,
-            "default": "true"
+            "default": "true",
+            "hidden": false
         }
     ]
 }
@@ -79,6 +81,7 @@ This is the configuration file for Vanilla Minecraft.
   - `variable` - Name of environment variable.
   - `install_only` - boolean, variable will only be accessible during installation if `true`.
   - `default` - Default value for prompt, use boolean `true` in order to make variable requried but not set a default value and use `""` to make it optional, without default value.
+  - `hidden` - Boolean, decides whether this value should be hidden from the user (i.e. static variables).
 
 # Environment Variables
 
