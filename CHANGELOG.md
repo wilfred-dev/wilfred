@@ -4,6 +4,10 @@ Please refer to the [official documentation](https://wilfred.readthedocs.io/en/l
 
 ## next-release
 
+### Bugs
+
+* Only perform Travis CI `pypi` deployment once, an error in the config caused the CI to deploy twice during the `v0.1.0` release.
+
 ## v0.1.0 (released on 2020-01-11)
 
 * Initial release
