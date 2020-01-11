@@ -7,6 +7,7 @@ Please refer to the [official documentation](https://wilfred.readthedocs.io/en/l
 ### Enhancements
 
 * [#11](https://github.com/wilfred-dev/wilfred/issues/11) Build `wheel` package along with standard `sdist` on Travis CI pypi deployment.
+* Update help texts.
 
 ### Bugs
 

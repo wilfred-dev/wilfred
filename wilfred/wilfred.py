@@ -226,7 +226,7 @@ def create(ctx, console, detach):
 @cli.command("sync")
 def sync_cmd():
     """
-    Sync all servers on file with Docker (start/stop/kill/create).
+    Sync all servers on file with Docker (start/stop/kill).
     """
 
     with yaspin(text="Docker sync", color="yellow") as spinner:
@@ -308,7 +308,7 @@ def kill(name):
 @click.argument("name")
 def stop(name):
     """
-    Stop server.
+    Stop server gracefully.
     """
 
     servers.sync()
@@ -366,7 +366,20 @@ def delete(name):
             spinner.ok("✅ ")
 
 
-@cli.command("console")
+@cli.command(
+    "console",
+    short_help="\n\n".join(
+        (
+            " ".join(
+                (
+                    "Attach current terminal to the console of a specific server (STDIN of running process).",
+                    "This allows you to view the current log and send commands.",
+                )
+            ),
+            "Use CTRL+C to exit the console, the server will continue to run in the background.",
+        )
+    ),
+)
 @click.argument("name")
 def server_console(name):
     """
@@ -396,7 +409,14 @@ def server_console(name):
     )
 
 
-@cli.command()
+@cli.command(
+    short_help=" ".join(
+        (
+            "Edit existing server (name, memory, port, environment variables and the custom startup command).",
+            "Restart server after update for changes to take effect.",
+        )
+    )
+)
 @click.argument("name")
 def edit(name):
     """

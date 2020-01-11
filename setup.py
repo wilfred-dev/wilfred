@@ -23,6 +23,7 @@ setup(
     long_description_content_type="text/markdown",
     url="https://github.com/wilfred-dev/wilfred",
     packages=find_packages(),
+    license="MIT",
     classifiers=[
         "Programming Language :: Python",
         "Programming Language :: Python :: 3.6",
@@ -34,6 +35,7 @@ setup(
         "Operating System :: MacOS :: MacOS X",
         "Operating System :: POSIX :: Linux",
         "Operating System :: Unix",
+        "Natural Language :: English",
     ],
     python_requires=">=3.6",
     install_requires=[
