@@ -8,6 +8,7 @@ flake8 = "*"
 black = "==19.10b0"
 mkdocs = "*"
 mdx-truly-sane-lists = "*"
+tox = "*"
 
 [packages]
 docker = "*"

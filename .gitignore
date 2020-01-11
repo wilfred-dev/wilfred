@@ -5,5 +5,10 @@ build
 dist
 .eggs
 
+# Tests
+.tox
+.coveralls.yml
+.coverage
+
 # IDE
 .vscode
