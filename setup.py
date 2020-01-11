@@ -31,6 +31,8 @@ setup(
         "Programming Language :: Python :: 3 :: Only",
         "Environment :: Console",
         "License :: OSI Approved :: MIT License",
+        "Operating System :: MacOS :: MacOS X",
+        "Operating System :: POSIX :: Linux",
         "Operating System :: Unix",
     ],
     python_requires=">=3.6",

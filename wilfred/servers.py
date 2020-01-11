@@ -9,7 +9,7 @@ import docker
 
 from tabulate import tabulate
 from pathlib import Path
-from shutil import rmtree
+from shutil import rmtree, get_terminal_size
 from os import remove as remove_file
 from time import sleep
 
@@ -44,17 +44,30 @@ class Servers(object):
                 for k, v in server.items()
             )
 
+            _term_diff = get_terminal_size((80, 20))[0] - 75
+
+            if len(str(server["custom_startup"])) > _term_diff:
+                server.update(
+                    {
+                        "custom_startup": f"{str(server['custom_startup'])[:_term_diff]}..."
+                    }
+                )
+
         headers = {
             "id": click.style("ID", bold=True),
             "name": click.style("Name", bold=True),
             "image_uid": click.style("Image UID", bold=True),
-            "memory": click.style("Memory (RAM)", bold=True),
+            "memory": click.style("RAM", bold=True),
             "port": click.style("Port", bold=True),
             "status": click.style("Status", bold=True),
-            "custom_startup": click.style("Custom startup command", bold=True),
+            "custom_startup": click.style("Custom startup", bold=True),
         }
 
-        return tabulate(servers, headers=headers, tablefmt="fancy_grid",)
+        return tabulate(
+            servers,
+            headers=headers,
+            tablefmt="plain" if get_terminal_size((80, 20))[0] < 96 else "fancy_grid",
+        )
 
     def set_status(self, server, status):
         self._database.query(
