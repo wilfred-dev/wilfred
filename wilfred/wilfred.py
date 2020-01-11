@@ -343,6 +343,28 @@ def stop(name):
 
 @cli.command()
 @click.argument("name")
+@click.option(
+    "--console", help="Attach to server console immediately after start.", is_flag=True
+)
+@click.pass_context
+def restart(ctx, name, console):
+    """
+    Restart server by specifiying the
+    name of the server as argument.
+    """
+
+    if not config.configuration:
+        error("Wilfred has not been configured", exit_code=1)
+
+    ctx.invoke(stop, name=name)
+    ctx.invoke(start, name=name)
+
+    if console:
+        ctx.invoke(server_console, name=name)
+
+
+@cli.command()
+@click.argument("name")
 def delete(name):
     """
     Delete existing server.

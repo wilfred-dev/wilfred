@@ -24,3 +24,5 @@ Basic commands and syntax available for Wilfred.
   - Required argument `NAME` - Name of the server.
 - `stop` - Gracefully stop the container, sends stop command and waits for the container to die.
   - Required argument `NAME` - Name of the server.
+- `restart` - Restart server (using gracful stop).
+  - Required argument `NAME` - Name of the server.
