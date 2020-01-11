@@ -18,7 +18,7 @@ from shutil import move, rmtree
 
 from wilfred.message_handler import warning, error
 
-API_VERSION = 0
+API_VERSION = 1
 
 
 class Images(object):

@@ -13,7 +13,7 @@ from pathlib import Path
 
 from wilfred.message_handler import info, error
 
-API_VERSION = 0
+API_VERSION = 1
 
 
 def _query(path, query, fetchone=False):

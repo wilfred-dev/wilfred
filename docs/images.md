@@ -9,7 +9,7 @@ This is the configuration file for Vanilla Minecraft.
 ```json
 {
     "meta": {
-        "api_version": 0
+        "api_version": 1
     },
     "uid": "minecraft-vanilla",
     "name": "Vanilla Minecraft",

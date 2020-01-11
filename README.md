@@ -34,7 +34,7 @@ Please refer to the [official documentation](https://wilfred.readthedocs.io/en/l
 Wilfred can be installed using `pip`. You need to use **Python 3.6** or newer in order for Wilfred to work.
 
 ```bash
-pip install wilfred --upgrade
+pip install wilfred --upgrade --user
 ```
 
 A [snap](https://snapcraft.io/wilfred) package is also in the works but currently not considered stable.
