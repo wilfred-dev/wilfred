@@ -133,44 +133,6 @@ class Servers(object):
         for line in container.logs(stream=True, tail=200):
             click.echo(line.strip())
 
-    def _console_input_callback(self, payload, server):
-        self._command(server, payload)
-
-    def _command(self, server, command):
-        try:
-            container = self._docker_client.containers.get(f"wilfred_{server['id']}")
-        except docker.errors.NotFound:
-            error("server is not running", exit_code=1)
-
-        try:
-            s = container.attach_socket(params={"stdin": 1, "stream": 1})
-            s._sock.send(f"{command}\n".encode("utf-8"))
-            s.close()
-        except Exception as e:
-            error(
-                f"unable to send command '{command}' on server {server['id']}, err {click.style(str(e), bold=True)}",
-                exit_code=1,
-            )
-
-    def _get_db_servers(self):
-        self._servers = self._database.query("SELECT * FROM servers")
-
-    def _running_docker_sync(self):
-        for server in self._servers:
-            try:
-                self._docker_client.containers.get(f"wilfred_{server['id']}")
-            except docker.errors.NotFound:
-                self.set_status(server, "stopped")
-
-        self._get_db_servers()
-
-    def _parse_startup_command(self, cmd, server, image):
-        return ContainerVariables(server, image, self._database).parse_startup_command(
-            cmd.replace("{{SERVER_MEMORY}}", str(server["memory"])).replace(
-                "{{SERVER_PORT}}", str(server["port"])
-            )
-        )
-
     def install(self, server, skip_wait=False, spinner=None):
         path = f"{self._configuration['data_path']}/{server['id']}"
         image = self._images.get_image(server["image_uid"])
@@ -229,6 +191,52 @@ class Servers(object):
             while self._container_alive(server):
                 sleep(1)
 
+    def kill(self, server):
+        try:
+            container = self._docker_client.containers.get(f"wilfred_{server['id']}")
+        except docker.errors.NotFound:
+            return
+
+        container.kill()
+
+    def _console_input_callback(self, payload, server):
+        self._command(server, payload)
+
+    def _command(self, server, command):
+        try:
+            container = self._docker_client.containers.get(f"wilfred_{server['id']}")
+        except docker.errors.NotFound:
+            error("server is not running", exit_code=1)
+
+        try:
+            s = container.attach_socket(params={"stdin": 1, "stream": 1})
+            s._sock.send(f"{command}\n".encode("utf-8"))
+            s.close()
+        except Exception as e:
+            error(
+                f"unable to send command '{command}' on server {server['id']}, err {click.style(str(e), bold=True)}",
+                exit_code=1,
+            )
+
+    def _get_db_servers(self):
+        self._servers = self._database.query("SELECT * FROM servers")
+
+    def _running_docker_sync(self):
+        for server in self._servers:
+            try:
+                self._docker_client.containers.get(f"wilfred_{server['id']}")
+            except docker.errors.NotFound:
+                self.set_status(server, "stopped")
+
+        self._get_db_servers()
+
+    def _parse_startup_command(self, cmd, server, image):
+        return ContainerVariables(server, image, self._database).parse_startup_command(
+            cmd.replace("{{SERVER_MEMORY}}", str(server["memory"])).replace(
+                "{{SERVER_PORT}}", str(server["port"])
+            )
+        )
+
     def _container_alive(self, server):
         try:
             self._docker_client.containers.get(f"wilfred_{server['id']}")
@@ -271,14 +279,6 @@ class Servers(object):
                 f"unable to start Docker container {click.style(str(e), bold=True)}",
                 exit_code=1,
             )
-
-    def kill(self, server):
-        try:
-            container = self._docker_client.containers.get(f"wilfred_{server['id']}")
-        except docker.errors.NotFound:
-            return
-
-        container.kill()
 
     def _stop(self, server):
         image = self._images.get_image(server["image_uid"])
