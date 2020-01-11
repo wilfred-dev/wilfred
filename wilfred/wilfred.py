@@ -192,9 +192,13 @@ def create(ctx, console, detach):
 
     # environment variables available for the container
     for v in images.get_image(image_uid)["variables"]:
-        value = click.prompt(
-            v["prompt"], default=v["default"] if v["default"] is not True else None
-        )
+        if not v["hidden"]:
+            value = click.prompt(
+                v["prompt"], default=v["default"] if v["default"] is not True else None
+            )
+
+        if v["hidden"]:
+            value = v["default"]
 
         database.query(
             f"INSERT INTO variables (server_id, variable, value) VALUES ('{server['id']}', '{v['variable']}', '{value}')"
@@ -435,10 +439,16 @@ def edit(name):
         if not curr:
             continue
 
+        if not v["hidden"]:
+            value = click.prompt(v["prompt"], default=curr["value"])
+
+        if v["hidden"]:
+            value = v["default"]
+
         database.query(
             " ".join(
                 (
-                    f"UPDATE variables SET value = '{click.prompt(v['prompt'], default=curr['value'])}'",
+                    f"UPDATE variables SET value = '{value}'",
                     f"WHERE server_id = '{server['id']}' AND variable = '{v['variable']}'",
                 )
             )
@@ -450,7 +460,6 @@ def edit(name):
     custom_startup = None
 
     if server["custom_startup"] is not None:
-        print(server)
         custom_startup = click.prompt(
             "Custom startup command", default=server["custom_startup"]
         )

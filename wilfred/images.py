@@ -102,7 +102,9 @@ class Images(object):
 
     def _verify(self, image, file):
         def _exception(key):
-            error(f"image {file} is missing key {str(key)}", exit_code=1)
+            error(f"image {file} is missing key {str(key)}")
+
+            return False
 
         for key in (
             "meta",
@@ -120,19 +122,29 @@ class Images(object):
             try:
                 image[key]
             except Exception:
-                _exception(key)
+                return _exception(key)
 
         for key in ["api_version"]:
             try:
                 image["meta"][key]
             except Exception:
-                _exception(key)
+                return _exception(key)
 
         for key in ("docker_image", "shell", "script"):
             try:
                 image["installation"][key]
             except Exception:
-                _exception(key)
+                return _exception(key)
+
+        if len(image["variables"]) > 0:
+            for i in range(len(image["variables"])):
+                for key in ("prompt", "variable", "install_only", "default", "hidden"):
+                    try:
+                        image["variables"][i][key]
+                    except Exception:
+                        return _exception(key)
+
+        return True
 
     def _read_images(self, silent=False):
         self.images = []
@@ -173,7 +185,8 @@ class Images(object):
                                 )
                             return False
 
-                        self._verify(_image, file)
+                        if not self._verify(_image, file):
+                            return False
                         self.images.append(_image)
 
         return True

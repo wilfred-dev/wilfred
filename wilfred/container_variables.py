@@ -14,7 +14,7 @@ class ContainerVariables(object):
 
     def parse_startup_command(self, cmd):
         for k, v in self.get_env_vars().items():
-            cmd = cmd.replace("{{image.env." + str(k) + "}}", str(v))
+            cmd = cmd.replace("{{image.env." + str(k) + "}}", str(v if v else ""))
 
         return cmd
 
