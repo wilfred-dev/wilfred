@@ -4,6 +4,10 @@ Please refer to the [official documentation](https://wilfred.readthedocs.io/en/l
 
 ## next-release
 
+### Enhancements
+
+* [#11](https://github.com/wilfred-dev/wilfred/issues/11) Build `wheel` package along with standard `sdist` on Travis CI pypi deployment.
+
 ### Bugs
 
 * Only perform Travis CI `pypi` deployment once, an error in the config caused the CI to deploy twice during the `v0.1.0` release.
