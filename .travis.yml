@@ -10,20 +10,20 @@ matrix:
       env: TOXENV=py37
     - python: 3.8
       env: TOXENV=py38
+
+before_install:
+  - python -m pip install --upgrade pip
+  - jq -r '.default | to_entries[] | .key + .value.version' Pipfile.lock > requirements.txt
+  - jq -r '.develop | to_entries[] | .key + .value.version' Pipfile.lock > requirements.txt
+install:
+  - pip install tox
+script:
+  - tox
+after_script:
+  - rm -rf requirements.txt
+
 jobs:
   include:
-  - stage: Tests
-    before_install:
-      - python -m pip install --upgrade pip
-      - jq -r '.default | to_entries[] | .key + .value.version' Pipfile.lock > requirements.txt
-      - jq -r '.develop | to_entries[] | .key + .value.version' Pipfile.lock > requirements.txt
-    install:
-      - pip install tox
-    script:
-      - tox
-    after_script:
-      - rm -rf requirements.txt
-
   - stage: Code style
     env: TOXENV=style
     before_install:
