@@ -200,9 +200,9 @@ class Servers(object):
         container.kill()
 
     def _console_input_callback(self, payload, server):
-        self._command(server, payload)
+        self.command(server, payload)
 
-    def _command(self, server, command):
+    def command(self, server, command):
         try:
             container = self._docker_client.containers.get(f"wilfred_{server['id']}")
         except docker.errors.NotFound:
@@ -299,7 +299,7 @@ class Servers(object):
 
             return
 
-        self._command(server, image["stop_command"])
+        self.command(server, image["stop_command"])
 
         stopped = False
 

@@ -388,6 +388,25 @@ def delete(name):
             spinner.ok("✅ ")
 
 
+@cli.command("command")
+@click.argument("name")
+@click.argument("command")
+def run_command(name, command):
+    """
+    Send command to STDIN of server
+    """
+
+    if not config.configuration:
+        error("Wilfred has not been configured", exit_code=1)
+
+    server = servers.get_by_name(name.lower())
+    
+    if not server:
+        error("Server does not exit", exit_code=1)
+
+    servers.command(server, command)
+
+
 @cli.command(
     "console",
     short_help="\n\n".join(
