@@ -23,6 +23,7 @@ As long as your server can run in Docker, it can probably run using Wilfred (aft
   - Paper
   - Waterfall
   - Bedrock
+- Multi Theft Auto
 - Voice Servers
   - Mumble
 

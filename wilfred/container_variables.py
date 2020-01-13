@@ -27,9 +27,6 @@ class ContainerVariables(object):
                 fetchone=True,
             )["value"]
 
-            if not value:
-                continue
-
             if var["install_only"] and not self._install:
                 continue
 
