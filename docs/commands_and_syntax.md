@@ -26,3 +26,6 @@ Basic commands and syntax available for Wilfred.
   - Required argument `NAME` - Name of the server.
 - `restart` - Restart server (using graceful stop).
   - Required argument `NAME` - Name of the server.
+- `command` - Send command to STDIN of server (without attaching to console).
+  - Required argument `NAME` - Name of the server.
+  - Required argument `COMMAND` - Command to send, can be put in `"` for commands with whitespaces. Example: `wilfred command <name> "say Hello World"`.

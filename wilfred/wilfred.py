@@ -400,7 +400,7 @@ def run_command(name, command):
         error("Wilfred has not been configured", exit_code=1)
 
     server = servers.get_by_name(name.lower())
-    
+
     if not server:
         error("Server does not exit", exit_code=1)
 
