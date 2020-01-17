@@ -5,9 +5,6 @@ build
 dist
 .eggs
 
-# Alembic
-alembic.ini
-
 # Tests
 .tox
 .coveralls.yml

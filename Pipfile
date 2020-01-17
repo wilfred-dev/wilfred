@@ -18,7 +18,6 @@ appdirs = "*"
 requests = "*"
 tabulate = "*"
 yaspin = "*"
-alembic = "*"
 sqlalchemy = "*"
 
 [requires]

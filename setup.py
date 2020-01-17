@@ -46,7 +46,6 @@ setup(
         "requests",
         "tabulate",
         "yaspin",
-        "alembic",
         "sqlalchemy",
     ],
     entry_points={"console_scripts": ["wilfred=wilfred.wilfred:main"]},
