@@ -15,7 +15,7 @@ from wilfred.message_handler import error
 from wilfred.database import session, Server, EnvironmentVariable
 
 
-class Migrate():
+class Migrate:
     def __init__(self):
         self._legacy_sqlite_path = f"{user_data_dir()}/wilfred/wilfred.db"
 
@@ -50,15 +50,17 @@ class Migrate():
     def _legacy_sqlite_db_check(self):
         if isfile(self._legacy_sqlite_path):
             for server in self._legacy_sqlite_query("SELECT * FROM servers"):
-                session.add(Server(
-                    id=server["id"],
-                    name=server["name"],
-                    image_uid=server["image_uid"],
-                    memory=server["memory"],
-                    port=server["port"],
-                    custom_startup=server["custom_startup"],
-                    status=server["status"],
-                ))
+                session.add(
+                    Server(
+                        id=server["id"],
+                        name=server["name"],
+                        image_uid=server["image_uid"],
+                        memory=server["memory"],
+                        port=server["port"],
+                        custom_startup=server["custom_startup"],
+                        status=server["status"],
+                    )
+                )
 
             try:
                 session.commit()
@@ -66,11 +68,13 @@ class Migrate():
                 error(str(e), exit_code=1)
 
             for variable in self._legacy_sqlite_query("SELECT * FROM variables"):
-                session.add(EnvironmentVariable(
-                    server_id=variable["server_id"],
-                    variable=variable["variable"],
-                    value=variable["value"]
-                ))
+                session.add(
+                    EnvironmentVariable(
+                        server_id=variable["server_id"],
+                        variable=variable["variable"],
+                        value=variable["value"],
+                    )
+                )
 
             try:
                 session.commit()
