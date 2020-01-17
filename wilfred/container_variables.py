@@ -4,12 +4,13 @@
 # Licensed under the terms of the MIT license, see LICENSE.
 # https://github.com/wilfred-dev/wilfred
 
+from wilfred.database import session, EnvironmentVariable
+
 
 class ContainerVariables(object):
-    def __init__(self, server, image, database, install=False):
+    def __init__(self, server, image, install=False):
         self._server = server
         self._image = image
-        self._database = database
         self._install = install
 
     def parse_startup_command(self, cmd):
@@ -22,17 +23,20 @@ class ContainerVariables(object):
         environment = {}
 
         for var in self._image["variables"]:
-            value = self._database.query(
-                f"SELECT value FROM variables WHERE server_id = '{self._server['id']}' AND variable = '{var['variable']}'",
-                fetchone=True,
-            )["value"]
+            value = (
+                session.query(EnvironmentVariable)
+                .filter_by(server_id=self._server.id)
+                .filter_by(variable=var["variable"])
+                .first()
+                .value
+            )
 
             if var["install_only"] and not self._install:
                 continue
 
             environment[var["variable"]] = value
 
-        environment["SERVER_MEMORY"] = self._server["memory"]
-        environment["SERVER_PORT"] = self._server["port"]
+        environment["SERVER_MEMORY"] = self._server.memory
+        environment["SERVER_PORT"] = self._server.port
 
         return environment

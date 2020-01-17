@@ -13,26 +13,38 @@ from shutil import rmtree, get_terminal_size
 from os import remove as remove_file
 from time import sleep
 
+from wilfred.database import session, Server, EnvironmentVariable
 from wilfred.message_handler import error
 from wilfred.keyboard import KeyboardThread
 from wilfred.container_variables import ContainerVariables
 
 
 class Servers(object):
-    def __init__(self, database, docker_client, configuration, images):
-        self._database = database
+    def __init__(self, docker_client, configuration, images):
         self._images = images
         self._configuration = configuration
         self._docker_client = docker_client
 
-        self._get_db_servers()
-
     def pretty(self, server=None):
         self._running_docker_sync()
 
-        servers = [server] if server else self._servers
+        servers = (
+            [
+                dict(
+                    (col, getattr(server, col))
+                    for col in server.__table__.columns.keys()
+                )
+            ]
+            if server
+            else [u.__dict__ for u in session.query(Server).all()]
+        )
 
         for server in servers:
+            try:
+                del server["_sa_instance_state"]
+            except Exception:
+                pass
+
             server.update(
                 (
                     k,
@@ -70,51 +82,48 @@ class Servers(object):
         )
 
     def set_status(self, server, status):
-        self._database.query(
-            f"UPDATE servers SET status = '{status}' WHERE id = '{server['id']}'"
-        )
-        self._get_db_servers()
+        server.status = status
+        session.commit()
 
-    def sync(self, db_update=False):
-        if db_update:
-            self._get_db_servers()
-
+    def sync(self):
         with click.progressbar(
-            self._servers, label="Syncing servers", length=len(self._servers)
+            session.query(Server).all(),
+            label="Syncing servers",
+            length=len(session.query(Server).all()),
         ) as servers:
             for server in servers:
-                if server["status"] == "installing":
+                if server.status == "installing":
                     try:
-                        self._docker_client.containers.get(f"wilfred_{server['id']}")
+                        self._docker_client.containers.get(f"wilfred_{server.id}")
                     except docker.errors.NotFound:
                         self.set_status(server, "stopped")
 
                 # stopped
-                if server["status"] == "stopped":
+                if server.status == "stopped":
                     self._stop(server)
 
                 # start
-                if server["status"] == "running":
+                if server.status == "running":
                     try:
-                        self._docker_client.containers.get(f"wilfred_{server['id']}")
+                        self._docker_client.containers.get(f"wilfred_{server.id}")
                     except docker.errors.NotFound:
                         self._start(server)
 
-    def get_by_name(self, name):
-        self._get_db_servers()
-
-        server = list(filter(lambda x: x["name"] == name, self._servers))
-
-        return server[0] if server else None
+    # def get_by_name(self, name):
+    # server = list(filter(lambda x: x["name"] == name, self._servers))
+    # return server[0] if server else None
 
     def remove(self, server):
-        path = f"{self._configuration['data_path']}/{server['id']}"
+        path = f"{self._configuration['data_path']}/{server.id}"
 
-        self._database.query(f"DELETE FROM servers WHERE id='{server['id']}'")
-        self._database.query(f"DELETE FROM variables WHERE server_id='{server['id']}'")
+        session.delete(
+            session.query(EnvironmentVariable).filter_by(server_id=server.id).first()
+        )
+        session.delete(server)
+        session.commit()
 
         try:
-            container = self._docker_client.containers.get(f"wilfred_{server['id']}")
+            container = self._docker_client.containers.get(f"wilfred_{server.id}")
             container.stop()
         except docker.errors.NotFound:
             pass
@@ -123,7 +132,7 @@ class Servers(object):
 
     def console(self, server, disable_user_input=False):
         try:
-            container = self._docker_client.containers.get(f"wilfred_{server['id']}")
+            container = self._docker_client.containers.get(f"wilfred_{server.id}")
         except docker.errors.NotFound:
             error("server is not running", exit_code=1)
 
@@ -134,8 +143,8 @@ class Servers(object):
             click.echo(line.strip())
 
     def install(self, server, skip_wait=False, spinner=None):
-        path = f"{self._configuration['data_path']}/{server['id']}"
-        image = self._images.get_image(server["image_uid"])
+        path = f"{self._configuration['data_path']}/{server.id}"
+        image = self._images.get_image(server.image_uid)
 
         try:
             Path(path).mkdir(parents=True, exist_ok=True)
@@ -158,15 +167,16 @@ class Servers(object):
                 image["installation"]["docker_image"],
                 f"{image['installation']['shell']} /server/install.sh",
                 volumes={path: {"bind": "/server", "mode": "rw"}},
-                name=f"wilfred_{server['id']}",
+                name=f"wilfred_{server.id}",
                 environment=ContainerVariables(
-                    server, image, self._database, install=True
+                    server, image, install=True
                 ).get_env_vars(),
                 remove=True,
                 detach=True,
             )
         except Exception as e:
-            self._database.query(f"DELETE FROM servers WHERE id='{server['id']}'")
+            session.delete(server)
+            session.commit()
             error(
                 f"unable to create installation Docker container, server removed {click.style(str(e), bold=True)}",
                 exit_code=1,
@@ -186,14 +196,14 @@ class Servers(object):
                     "> Run `wilfred servers` too see when the status changes from `installing` to `stopped`."
                 )
                 spinner.write(
-                    f"> You can also follow the installation log using `wilfred console {server['name']}`"
+                    f"> You can also follow the installation log using `wilfred console {server.name}`"
                 )
             while self._container_alive(server):
                 sleep(1)
 
     def kill(self, server):
         try:
-            container = self._docker_client.containers.get(f"wilfred_{server['id']}")
+            container = self._docker_client.containers.get(f"wilfred_{server.id}")
         except docker.errors.NotFound:
             return
 
@@ -204,7 +214,7 @@ class Servers(object):
 
     def command(self, server, command):
         try:
-            container = self._docker_client.containers.get(f"wilfred_{server['id']}")
+            container = self._docker_client.containers.get(f"wilfred_{server.id}")
         except docker.errors.NotFound:
             error("server is not running", exit_code=1)
 
@@ -214,40 +224,35 @@ class Servers(object):
             s.close()
         except Exception as e:
             error(
-                f"unable to send command '{command}' on server {server['id']}, err {click.style(str(e), bold=True)}",
+                f"unable to send command '{command}' on server {server.id}, err {click.style(str(e), bold=True)}",
                 exit_code=1,
             )
 
-    def _get_db_servers(self):
-        self._servers = self._database.query("SELECT * FROM servers")
-
     def _running_docker_sync(self):
-        for server in self._servers:
+        for server in session.query(Server).all():
             try:
-                self._docker_client.containers.get(f"wilfred_{server['id']}")
+                self._docker_client.containers.get(f"wilfred_{server.id}")
             except docker.errors.NotFound:
                 self.set_status(server, "stopped")
 
-        self._get_db_servers()
-
     def _parse_startup_command(self, cmd, server, image):
-        return ContainerVariables(server, image, self._database).parse_startup_command(
-            cmd.replace("{{SERVER_MEMORY}}", str(server["memory"])).replace(
-                "{{SERVER_PORT}}", str(server["port"])
+        return ContainerVariables(server, image).parse_startup_command(
+            cmd.replace("{{SERVER_MEMORY}}", str(server.memory)).replace(
+                "{{SERVER_PORT}}", str(server.port)
             )
         )
 
     def _container_alive(self, server):
         try:
-            self._docker_client.containers.get(f"wilfred_{server['id']}")
+            self._docker_client.containers.get(f"wilfred_{server.id}")
         except docker.errors.NotFound:
             return False
 
         return True
 
     def _start(self, server):
-        path = f"{self._configuration['data_path']}/{server['id']}"
-        image = self._images.get_image(server["image_uid"])
+        path = f"{self._configuration['data_path']}/{server.id}"
+        image = self._images.get_image(server.image_uid)
 
         try:
             remove_file(f"{path}/install.sh")
@@ -257,21 +262,19 @@ class Servers(object):
         try:
             self._docker_client.containers.run(
                 image["docker_image"],
-                self._parse_startup_command(server["custom_startup"], server, image)
-                if server["custom_startup"] is not None
+                self._parse_startup_command(server.custom_startup, server, image)
+                if server.custom_startup is not None
                 else f"{self._parse_startup_command(image['command'], server, image)}",
                 volumes={path: {"bind": "/server", "mode": "rw"}},
-                name=f"wilfred_{server['id']}",
+                name=f"wilfred_{server.id}",
                 remove=True,
-                ports={f"{server['port']}/tcp": server["port"]},
+                ports={f"{server.port}/tcp": server.port},
                 detach=True,
                 working_dir="/server",
-                mem_limit=f"{server['memory']}m",
+                mem_limit=f"{server.memory}m",
                 oom_kill_disable=True,
                 stdin_open=True,
-                environment=ContainerVariables(
-                    server, image, self._database
-                ).get_env_vars(),
+                environment=ContainerVariables(server, image).get_env_vars(),
                 user=image["user"] if image["user"] else "root",
             )
         except Exception as e:
@@ -281,10 +284,10 @@ class Servers(object):
             )
 
     def _stop(self, server):
-        image = self._images.get_image(server["image_uid"])
+        image = self._images.get_image(server.image_uid)
 
         try:
-            container = self._docker_client.containers.get(f"wilfred_{server['id']}")
+            container = self._docker_client.containers.get(f"wilfred_{server.id}")
         except docker.errors.NotFound:
             return
 
@@ -305,6 +308,6 @@ class Servers(object):
 
         while not stopped:
             try:
-                self._docker_client.containers.get(f"wilfred_{server['id']}")
+                self._docker_client.containers.get(f"wilfred_{server.id}")
             except docker.errors.NotFound:
                 stopped = True

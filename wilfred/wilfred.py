@@ -14,24 +14,26 @@ import sys
 
 from yaspin import yaspin
 from pathlib import Path
+from sqlalchemy.exc import IntegrityError
 
 from wilfred.docker_conn import docker_client
 from wilfred.version import version
 from wilfred.config_parser import Config
-from wilfred.database import Database
+from wilfred.database import session, database_path, Server, EnvironmentVariable
 from wilfred.servers import Servers
 from wilfred.images import Images
 from wilfred.message_handler import warning, error
 from wilfred.core import is_integer, random_string
 
+
 if sys.platform.startswith("win"):
     click.echo("Wilfred does not support Windows")
     sys.exit(1)
 
+
 config = Config()
-database = Database()
 images = Images()
-servers = Servers(database, docker_client(), config.configuration, images)
+servers = Servers(docker_client(), config.configuration, images)
 
 
 def print_version(ctx, param, value):
@@ -60,7 +62,7 @@ def print_path(ctx, param, value):
 
     click.echo(f"Configuration file: {click.format_filename(config.config_path)}")
     click.echo(f"Image config file: {click.format_filename(images.image_dir)}")
-    click.echo(f"Database file: {click.format_filename(database.database_path)}")
+    click.echo(f"Database file: {click.format_filename(database_path)}")
     if config.configuration:
         click.echo(
             f"Server data: {click.format_filename(config.configuration['data_path'])}"
@@ -176,19 +178,21 @@ def create(ctx, console, detach):
     click.secho("Environment Variables", bold=True)
 
     # create
-    database.query(
-        " ".join(
-            (
-                "INSERT INTO servers",
-                "(id, name, image_uid, memory, port, custom_startup, status)"
-                f"VALUES ('{random_string()}', '{name}', '{image_uid}', '{memory}', '{port}', NULL, 'installing')",
-            )
-        )
+    server = Server(
+        id=random_string(),
+        name=name,
+        image_uid=image_uid,
+        memory=memory,
+        port=port,
+        custom_startup=None,
+        status="installing",
     )
+    session.add(server)
 
-    server = database.query(
-        f"SELECT * FROM servers WHERE name = '{name}'", fetchone=True
-    )
+    try:
+        session.commit()
+    except IntegrityError as e:
+        error(f"unable to create server {click.style(str(e), bold=True)}", exit_code=1)
 
     # environment variables available for the container
     for v in images.get_image(image_uid)["variables"]:
@@ -200,8 +204,16 @@ def create(ctx, console, detach):
         if v["hidden"]:
             value = v["default"]
 
-        database.query(
-            f"INSERT INTO variables (server_id, variable, value) VALUES ('{server['id']}', '{v['variable']}', '{value}')"
+        variable = EnvironmentVariable(
+            server_id=server.id, variable=v["variable"], value=value
+        )
+        session.add(variable)
+
+    try:
+        session.commit()
+    except IntegrityError as e:
+        error(
+            f"unable to create variables {click.style(str(e), bold=True)}", exit_code=1
         )
 
     # custom startup command
@@ -210,9 +222,14 @@ def create(ctx, console, detach):
             "Custom startup command", default=images.get_image(image_uid)["command"]
         )
 
-        database.query(
-            f"UPDATE servers SET custom_startup = '{custom_startup}' WHERE id='{server['id']}'"
-        )
+        server.custom_startup = custom_startup
+        try:
+            session.commit()
+        except IntegrityError as e:
+            error(
+                f"unable to set startup command {click.style(str(e), bold=True)}",
+                exit_code=1,
+            )
 
     with yaspin(text="Creating server", color="yellow") as spinner:
         servers.install(server, skip_wait=True if detach else False, spinner=spinner)
@@ -250,20 +267,20 @@ def start(ctx, name, console):
     name of the server as argument.
     """
 
-    servers.sync(db_update=True)
+    servers.sync()
 
     with yaspin(text="Server start", color="yellow") as spinner:
         if not config.configuration:
             spinner.fail("💥 Wilfred has not been configured")
             sys.exit(1)
 
-        server = servers.get_by_name(name.lower())
+        server = session.query(Server).filter_by(name=name.lower()).first()
 
         if not server:
             spinner.fail("💥 Server does not exit")
             sys.exit(1)
 
-        if server["status"] == "installing":
+        if server.status == "installing":
             spinner.fail("💥 Server is installing, start blocked.")
             sys.exit(1)
 
@@ -291,7 +308,7 @@ def kill(name):
                 spinner.fail("💥 Wilfred has not been configured")
                 sys.exit(1)
 
-            server = servers.get_by_name(name.lower())
+            server = session.query(Server).filter_by(name=name.lower()).first()
 
             if not server:
                 spinner.fail("💥 Server does not exit")
@@ -318,13 +335,13 @@ def stop(name):
             spinner.fail("💥 Wilfred has not been configured")
             sys.exit(1)
 
-        server = servers.get_by_name(name.lower())
+        server = session.query(Server).filter_by(name=name.lower()).first()
 
         if not server:
             spinner.fail("💥 Server does not exit")
             sys.exit(1)
 
-        if server["status"] == "installing":
+        if server.status == "installing":
             spinner.fail(
                 " ".join(
                     (
@@ -378,7 +395,7 @@ def delete(name):
                 spinner.fail("💥 Wilfred has not been configured")
                 sys.exit(1)
 
-            server = servers.get_by_name(name.lower())
+            server = session.query(Server).filter_by(name=name.lower()).first()
 
             if not server:
                 spinner.fail("💥 Server does not exit")
@@ -399,7 +416,7 @@ def run_command(name, command):
     if not config.configuration:
         error("Wilfred has not been configured", exit_code=1)
 
-    server = servers.get_by_name(name.lower())
+    server = session.query(Server).filter_by(name=name.lower()).first()
 
     if not server:
         error("Server does not exit", exit_code=1)
@@ -430,7 +447,7 @@ def server_console(name):
     if not config.configuration:
         error("Wilfred has not been configured", exit_code=1)
 
-    server = servers.get_by_name(name.lower())
+    server = session.query(Server).filter_by(name=name.lower()).first()
 
     if not server:
         error("Server does not exit", exit_code=1)
@@ -438,15 +455,15 @@ def server_console(name):
     click.secho(
         " ".join(
             (
-                f"Viewing server console of {name} (id {server['id']})",
-                f"{'- input disabled, installing' if server['status'] == 'installing' else ''}",
+                f"Viewing server console of {name} (id {server.id})",
+                f"{'- input disabled, installing' if server.status == 'installing' else ''}",
             )
         ),
         bold=True,
     )
 
     servers.console(
-        server, disable_user_input=True if server["status"] == "installing" else False
+        server, disable_user_input=True if server.status == "installing" else False
     )
 
 
@@ -467,7 +484,7 @@ def edit(name):
     if not config.configuration:
         error("Wilfred has not been configured", exit_code=1)
 
-    server = servers.get_by_name(name.lower())
+    server = session.query(Server).filter_by(name=name.lower()).first()
 
     if not server:
         error("Server does not exist", exit_code=1)
@@ -475,71 +492,77 @@ def edit(name):
     click.echo(servers.pretty(server=server))
     click.echo("Leave values empty to use existing value")
 
-    name = click.prompt("Name", default=server["name"]).lower()
+    name = click.prompt("Name", default=server.name).lower()
 
     if " " in name:
         error("space not allowed in name", exit_code=1)
 
-    port = click.prompt("Port", default=server["port"])
-    memory = click.prompt("Memory", default=server["memory"])
+    port = click.prompt("Port", default=server.port)
+    memory = click.prompt("Memory", default=server.memory)
 
     if not is_integer(port) or not is_integer(memory):
         error("port/memory must be integer", exit_code=1)
 
     click.secho("Environment Variables", bold=True)
 
-    for v in images.get_image(server["image_uid"])["variables"]:
+    for v in images.get_image(server.image_uid)["variables"]:
         if v["install_only"]:
             continue
 
-        curr = database.query(
-            f"SELECT * FROM variables WHERE server_id = '{server['id']}' AND variable = '{v['variable']}'",
-            fetchone=True,
+        current_variable = (
+            session.query(EnvironmentVariable)
+            .filter_by(server_id=server.id)
+            .filter_by(variable=v["variable"])
+            .first()
         )
 
-        if not curr:
+        if not current_variable:
             continue
 
         if not v["hidden"]:
-            value = click.prompt(v["prompt"], default=curr["value"])
+            value = click.prompt(v["prompt"], default=current_variable["value"])
 
         if v["hidden"]:
             value = v["default"]
 
-        database.query(
-            " ".join(
-                (
-                    f"UPDATE variables SET value = '{value}'",
-                    f"WHERE server_id = '{server['id']}' AND variable = '{v['variable']}'",
-                )
-            )
-        )
+        current_variable.value = value
 
-    server["custom_startup"] = (
-        None if server["custom_startup"] == "None" else server["custom_startup"]
+        try:
+            session.commit()
+        except IntegrityError as e:
+            error(
+                f"unable to edit variables {click.style(str(e), bold=True)}",
+                exit_code=1,
+            )
+
+    server.custom_startup = (
+        None if server.custom_startup == "None" else server.custom_startup
     )
     custom_startup = None
 
-    if server["custom_startup"] is not None:
+    if server.custom_startup is not None:
         custom_startup = click.prompt(
-            "Custom startup command", default=server["custom_startup"]
+            "Custom startup command", default=server.custom_startup
         )
 
-    if server["custom_startup"] is None:
+    if server.custom_startup is None:
         if click.confirm("Would you like to set a custom startup command?"):
             custom_startup = click.prompt(
                 "Custom startup command",
-                default=images.get_image(server["image_uid"])["command"],
+                default=images.get_image(server.image_uid)["command"],
             )
 
-    database.query(f"UPDATE servers SET name = '{name}' WHERE id='{server['id']}'")
-    database.query(f"UPDATE servers SET port = {port} WHERE id='{server['id']}'")
-    database.query(f"UPDATE servers SET memory = {memory} WHERE id='{server['id']}'")
+    server.name = name
+    server.port = port
+    server.memory = memory
 
     if custom_startup:
-        database.query(
-            f"UPDATE servers SET custom_startup = '{custom_startup}' WHERE id='{server['id']}'"
-        )
+        server.custom_startup = custom_startup
+
+    try:
+        session.commit()
+    except IntegrityError as e:
+        error(f"unable to edit server {click.style(str(e), bold=True)}", exit_code=1)
 
     click.echo(
         "✅ Server information updated, restart server for changes to take effect"
