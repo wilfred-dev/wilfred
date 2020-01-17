@@ -523,7 +523,7 @@ def edit(name):
             continue
 
         if not v["hidden"]:
-            value = click.prompt(v["prompt"], default=current_variable["value"])
+            value = click.prompt(v["prompt"], default=current_variable.value)
 
         if v["hidden"]:
             value = v["default"]
