@@ -24,7 +24,7 @@ from wilfred.servers import Servers
 from wilfred.images import Images
 from wilfred.message_handler import warning, error
 from wilfred.core import is_integer, random_string
-
+from wilfred.migrate import Migrate
 
 if sys.platform.startswith("win"):
     click.echo("Wilfred does not support Windows")
@@ -34,6 +34,9 @@ if sys.platform.startswith("win"):
 config = Config()
 images = Images()
 servers = Servers(docker_client(), config.configuration, images)
+
+# check
+Migrate()
 
 
 def print_version(ctx, param, value):

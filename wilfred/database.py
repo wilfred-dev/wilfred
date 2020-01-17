@@ -4,22 +4,19 @@
 # Licensed under the terms of the MIT license, see LICENSE.
 # https://github.com/wilfred-dev/wilfred
 
-# import sqlite3
-# import click
-
 from sqlalchemy import create_engine, Column, Integer, String, ForeignKey
 from sqlalchemy.orm import relationship, sessionmaker
 from sqlalchemy.ext.declarative import declarative_base
 
 from appdirs import user_data_dir
+from os.path import isdir
+from pathlib import Path
 
-# from os.path import isfile, isdir
-# from pathlib import Path
 
-# from wilfred.message_handler import info, error
+if not isdir(f"{user_data_dir()}/wilfred"):
+    Path(f"{user_data_dir()}/wilfred").mkdir(parents=True, exist_ok=True)
 
-database_path = f"{user_data_dir()}/wilfred/test_wilfred.sqlite"
-
+database_path = f"{user_data_dir()}/wilfred/wilfred.sqlite"
 engine = create_engine(f"sqlite:///{database_path}")
 Base = declarative_base()
 
