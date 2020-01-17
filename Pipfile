@@ -18,6 +18,7 @@ appdirs = "*"
 requests = "*"
 tabulate = "*"
 yaspin = "*"
+sqlalchemy = "*"
 
 [requires]
 python_version = "3.6"
