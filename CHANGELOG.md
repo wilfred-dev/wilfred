@@ -12,7 +12,7 @@ Please refer to the [official documentation](https://wilfred.readthedocs.io/en/l
 ### Changed
 
 * Empty environment variables in startup commands are now correctly replaced.
-* [#16](https://github.com/wilfred-dev/wilfred/issues/16) Rewrite database
+* [#16](https://github.com/wilfred-dev/wilfred/issues/16) Changed database management (major rewrite), use SQLAlchemy instead of raw SQL queries everywhere
 
 ## v0.1.1 (released on 2020-01-11)
 
