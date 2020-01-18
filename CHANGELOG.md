@@ -7,12 +7,15 @@ Please refer to the [official documentation](https://wilfred.readthedocs.io/en/l
 ### Added
 
 * [#14](https://github.com/wilfred-dev/wilfred/issues/14) Added ability to restart servers using `wilfred restart <name>`.
-* [#15](https://github.com/wilfred-dev/wilfred/issues/15) Added ability to send a single command to STDIN of server without attaching to server console.
+* [#15](https://github.com/wilfred-dev/wilfred/issues/15) Added ability to send a single command to STDIN of the server without attaching to the server console.
 
 ### Changed
 
-* Empty environment variables in startup commands are now correctly replaced.
 * [#16](https://github.com/wilfred-dev/wilfred/issues/16) Changed database management (major rewrite), use SQLAlchemy instead of raw SQL queries everywhere
+
+### Fixed
+
+* Empty environment variables in startup commands are now correctly replaced (bug).
 
 ## v0.1.1 (released on 2020-01-11)
 
