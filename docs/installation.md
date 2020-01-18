@@ -32,13 +32,13 @@ python3.8 -m pip install wilfred --upgrade
 
 [![Get it from the Snap Store](https://snapcraft.io/static/images/badges/en/snap-store-black.svg)](https://snapcraft.io/wilfred)
 
-Snapcraft is configured to automatically build the latest commit and push it to the `edge` release branch. These releases can be installed using snap.
+Snapcraft is configured to automatically build the latest commit and push it to the `edge` release branch. These releases can be installed using snap. Currently, the same releases pushed to Pip are also pushed to the `beta` branch.
 
 ```bash
-snap install wilfred --edge --devmode
+snap install wilfred --beta --devmode
 ```
 
-Again, the `--edge` channel and `--devmode` should **not** be used in a production environment.
+Again, the `--beta` channel and `--devmode` should **not** be used in a production environment.
 
 # Basic configuration
 

@@ -80,7 +80,7 @@ This is the configuration file for Vanilla Minecraft.
   - `prompt` - Prompt during server creation/modification.
   - `variable` - Name of environment variable.
   - `install_only` - boolean, variable will only be accessible during installation if `true`.
-  - `default` - Default value for prompt, use boolean `true` in order to make variable requried but not set a default value and use `""` to make it optional, without default value.
+  - `default` - Default value for prompt, use boolean `true` in order to make variable required but not set a default value and use `""` to make it optional, without default value.
   - `hidden` - Boolean, decides whether this value should be hidden from the user (i.e. static variables).
 
 # Environment Variables
