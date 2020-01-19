@@ -23,7 +23,7 @@ from wilfred.database import session, database_path, Server, EnvironmentVariable
 from wilfred.servers import Servers
 from wilfred.images import Images
 from wilfred.message_handler import warning, error
-from wilfred.core import is_integer, random_string
+from wilfred.core import is_integer, random_string, check_for_new_releases
 from wilfred.migrate import Migrate
 
 if sys.platform.startswith("win"):
@@ -47,9 +47,11 @@ def print_version(ctx, param, value):
     if not value or ctx.resilient_parsing:
         return
 
+    check_for_new_releases()
+
     click.echo(
         "✨ wilfred version {}".format(
-            "development (0.0.0.dev0)" if version == "0.0.0.dev0" else version
+            "development (0.0.0.dev0)" if version == "0.0.0.dev0" else f"v{version}"
         )
     )
     ctx.exit()
