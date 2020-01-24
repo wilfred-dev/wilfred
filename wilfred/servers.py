@@ -109,10 +109,6 @@ class Servers(object):
                     except docker.errors.NotFound:
                         self._start(server)
 
-    # def get_by_name(self, name):
-    # server = list(filter(lambda x: x["name"] == name, self._servers))
-    # return server[0] if server else None
-
     def remove(self, server):
         path = f"{self._configuration['data_path']}/{server.id}"
 

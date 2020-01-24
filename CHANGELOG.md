@@ -6,7 +6,12 @@ Please refer to the [official documentation](https://wilfred.readthedocs.io/en/l
 
 ### Added
 
-* Check for new releases against GitHub when running `wilfred --version`.
+* Added check for new releases against GitHub when running `wilfred --version`.
+* Added check so that it is now required for all images UID's to be lowercase.
+
+### Changed
+
+* Refactor: more clean way of searching for images internally (improved the `image.get_image` function using `next`).
 
 ## v0.2.0 (released on 2020-01-18)
 

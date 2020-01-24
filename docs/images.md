@@ -64,7 +64,7 @@ This is the configuration file for Vanilla Minecraft.
 
 - `meta`
   - `api_version` - Version of configuration.
-- `uid` - A unique ID for this config, do not uses spaces.
+- `uid` - A unique ID for this config, do not uses spaces. **Must be lowercase.**
 - `name` - Name of image to be displayed to user.
 - `author` - Email of author.
 - `docker_image` - Docker image to run server in.

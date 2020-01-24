@@ -96,9 +96,7 @@ class Images(object):
     def get_image(self, uid):
         self._read_images()
 
-        image = list(filter(lambda img: img["uid"] == uid, self.images))
-
-        return image[0] if image else None
+        return next(filter(lambda img: img["uid"] == uid, self.images), None)
 
     def _verify(self, image, file):
         def _exception(key):
@@ -123,6 +121,11 @@ class Images(object):
                 image[key]
             except Exception:
                 return _exception(key)
+
+        if image["uid"] != image["uid"].lower():
+            error(f"image {file} uid must be lowercase")
+
+            return False
 
         for key in ["api_version"]:
             try:
