@@ -25,7 +25,9 @@ class Servers(object):
         self._configuration = configuration
         self._docker_client = docker_client
 
-    def pretty(self, server=None):
+    def pretty_data(self, server=None, cpu_load=False, memory_usage=False):
+        """reformats data in preperation for printing to user"""
+
         self._running_docker_sync()
 
         servers = (
@@ -64,6 +66,65 @@ class Servers(object):
                         "custom_startup": f"{str(server['custom_startup'])[:_term_diff]}..."
                     }
                 )
+
+        # reorder variables for a more print-friendly format
+        servers = [
+            {
+                k: _server[k]
+                for k in [
+                    "id",
+                    "name",
+                    "image_uid",
+                    "port",
+                    "memory",
+                    "status",
+                    "custom_startup",
+                ]
+            }
+            for _server in servers
+        ]
+
+        if cpu_load or memory_usage:
+            for server in servers:
+                _running = True
+
+                try:
+                    container = self._docker_client.containers.get(
+                        f"wilfred_{server['id']}"
+                    )
+                    d = container.stats(stream=False)
+                except docker.errors.NotFound:
+                    server.update({"cpu_load": "-"})
+                    server.update({"memory_usage": "-"})
+                    _running = False
+
+                if cpu_load and _running:
+                    cpu_count = len(d["cpu_stats"]["cpu_usage"]["percpu_usage"])
+                    cpu_percent = 0.0
+                    cpu_delta = float(
+                        d["cpu_stats"]["cpu_usage"]["total_usage"]
+                    ) - float(d["precpu_stats"]["cpu_usage"]["total_usage"])
+                    system_delta = float(d["cpu_stats"]["system_cpu_usage"]) - float(
+                        d["precpu_stats"]["system_cpu_usage"]
+                    )
+                    if system_delta > 0.0:
+                        cpu_percent = (
+                            f"{round(cpu_delta / system_delta * 100.0 * cpu_count)}%"
+                        )
+
+                    server.update({"cpu_load": cpu_percent if cpu_percent else "-"})
+
+                if memory_usage and _running:
+                    server.update(
+                        {
+                            "memory_usage": f"{round(d['memory_stats']['usage'] / 10**6)} MB"
+                        }
+                    )
+
+        return servers
+
+    def pretty(self, server=None, *args, **kwargs):
+        servers = self.pretty_data(server=server, *args, **kwargs)
 
         headers = {
             "id": click.style("ID", bold=True),
