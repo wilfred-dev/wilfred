@@ -3,6 +3,31 @@
 !!! note
     This is mostly used as a reference for the core project team.
 
+## Working with Wilfred locally
+
+Make sure you have [pipenv](https://github.com/pypa/pipenv) installed and that you have cloned the repository to your computer (perhaps created a fork).
+
+At the root of the project, enter the `shell` for the development environment.
+
+```bash
+pipenv shell
+```
+
+This will create the environment. Then you need to install the dependencies.
+
+```bash
+pipenv install
+pipenv install --dev
+```
+
+Instead of using `wilfred <command>` to run Wilfred, you can use the built-in run script.
+
+```bash
+./run.py <command>
+```
+
+In this way, you can develop and see your changes instantly.
+
 ## Publishing a release
 
 Update the version in `wilfred/version.py` and `snap/snapcraft.yml` accordingly.
