@@ -15,6 +15,8 @@ import sys
 from yaspin import yaspin
 from pathlib import Path
 from sqlalchemy.exc import IntegrityError
+from time import sleep
+from tabulate import tabulate
 
 from wilfred.docker_conn import docker_client
 from wilfred.version import version
@@ -572,6 +574,32 @@ def edit(name):
     click.echo(
         "✅ Server information updated, restart server for changes to take effect"
     )
+
+
+@cli.command(
+    short_help=" ".join(("Show server statistics, CPU load, memory load etc.",))
+)
+def top():
+    while True:
+        click.clear()
+
+        data = servers.pretty_data(cpu_load=True, memory_usage=True)
+
+        headers = {
+            "id": click.style("ID", bold=True),
+            "name": click.style("Name", bold=True),
+            "image_uid": click.style("Image UID", bold=True),
+            "memory": click.style("RAM", bold=True),
+            "port": click.style("Port", bold=True),
+            "status": click.style("Status", bold=True),
+            "custom_startup": click.style("Custom startup", bold=True),
+            "cpu_load": click.style("CPU", bold=True),
+            "memory_usage": click.style("RAM usage", bold=True),
+        }
+
+        click.echo(tabulate(data, headers=headers, tablefmt="plain",))
+
+        sleep(1)
 
 
 if __name__ == "__main__":
