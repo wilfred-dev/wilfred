@@ -2,6 +2,12 @@
 
 Please refer to the [official documentation](https://wilfred.readthedocs.io/en/latest/development/) for more information about the CHANGELOG and releases.
 
+## next-release
+
+### Added
+
+* [#23](https://github.com/wilfred-dev/wilfred/issues/23) Added `wilfred top`, server statistics that fill the screen and updates in real-time (like `top`).
+
 ## v0.3.0 (released on 2020-01-25)
 
 ### Added
