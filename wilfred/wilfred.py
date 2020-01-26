@@ -603,13 +603,25 @@ def top():
         sleep(1)
 
 
-@cli.command()
+@cli.command("config")
 @click.argument("name")
-def test(name):
+@click.argument("variable", required=False)
+@click.argument("value", required=False)
+def config_command(name, variable, value):
     server = session.query(Server).filter_by(name=name.lower()).first()
     image = images.get_image(server.image_uid)
 
-    click.echo(ServerConfig(config.configuration, server, image).pretty())
+    server_conf = ServerConfig(config.configuration, server, image)
+
+    if variable and not value:
+        click.echo(f"{variable}: '{server_conf.raw[0][variable]}'")
+        exit(0)
+
+    if variable and value:
+        server_conf.edit(variable, value)
+        exit(0)
+
+    click.echo(server_conf.pretty())
 
 
 if __name__ == "__main__":
