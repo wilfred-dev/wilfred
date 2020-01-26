@@ -97,6 +97,10 @@ class Servers(object):
                     server.update({"cpu_load": "-"})
                     server.update({"memory_usage": "-"})
                     _running = False
+                except Exception:
+                    server.update({"cpu_load": "error"})
+                    server.update({"memory_usage": "error"})
+                    _running = False
 
                 if cpu_load and _running:
                     cpu_count = len(d["cpu_stats"]["cpu_usage"]["percpu_usage"])
