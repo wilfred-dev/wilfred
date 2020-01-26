@@ -27,6 +27,7 @@ from wilfred.images import Images
 from wilfred.message_handler import warning, error
 from wilfred.core import is_integer, random_string, check_for_new_releases
 from wilfred.migrate import Migrate
+from wilfred.server_config import ServerConfig
 
 if sys.platform.startswith("win"):
     click.echo("Wilfred does not support Windows")
@@ -600,6 +601,15 @@ def top():
         click.echo(tabulate(data, headers=headers, tablefmt="plain",))
 
         sleep(1)
+
+
+@cli.command()
+@click.argument("name")
+def test(name):
+    server = session.query(Server).filter_by(name=name.lower()).first()
+    image = images.get_image(server.image_uid)
+
+    click.echo(ServerConfig(config.configuration, server, image).pretty())
 
 
 if __name__ == "__main__":
