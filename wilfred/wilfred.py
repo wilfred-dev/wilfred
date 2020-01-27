@@ -297,7 +297,9 @@ def start(ctx, name, console):
         if not image:
             error("Image UID does not exit", exit_code=1)
 
-        ServerConfig(config.configuration, servers, server, image).write_environment_variables()
+        ServerConfig(
+            config.configuration, servers, server, image
+        ).write_environment_variables()
 
         servers.set_status(server, "running")
         servers.sync()

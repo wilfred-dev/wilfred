@@ -105,4 +105,6 @@ class ServerConfig:
                 env_vars = ContainerVariables(self._server, self._image).get_env_vars()
 
                 if _env["environment_variable"] in env_vars:
-                    self.edit(_env["config_variable"], env_vars[_env["environment_variable"]])
+                    self.edit(
+                        _env["config_variable"], env_vars[_env["environment_variable"]]
+                    )
