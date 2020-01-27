@@ -12,16 +12,18 @@ from wilfred.parser.properties import properties_read, properties_write
 
 
 class ServerConfig:
-    def __init__(self, configuration, server, image):
+    def __init__(self, configuration, servers, server, image):
         """
         Read, edit and update configurations for servers. Exposes server specific configs to Wilfred.
 
-        :param dictionary configuration: JSON dict for Wilfred config
+        :param configuration: JSON dict for Wilfred config
+        :param object servers: wilfred.servers object
         :param str server: SQLAlchemy server object
         :param dictionary image: Image dict object
         """
 
         self._configuration = configuration
+        self._servers = servers
         self._server = server
         self._image = image
 
@@ -60,7 +62,7 @@ class ServerConfig:
             for k, v in file.items():
                 data.append(
                     {"file": file["_wilfred_config_filename"], "setting": k, "value": v}
-                )
+                ) if k != "_wilfred_config_filename" else None
 
         return tabulate(data, headers=headers, tablefmt="fancy_grid",)
 
@@ -88,3 +90,8 @@ class ServerConfig:
 
                 if file["parser"] == "properties":
                     properties_write(f"{path}/{file['filename']}", variable, value)
+
+                if variable in file["action"]:
+                    self._servers.command(
+                        self._server, file["action"][variable].format(value)
+                    )

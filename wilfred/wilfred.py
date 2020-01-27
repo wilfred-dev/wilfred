@@ -609,9 +609,13 @@ def top():
 @click.argument("value", required=False)
 def config_command(name, variable, value):
     server = session.query(Server).filter_by(name=name.lower()).first()
+
+    if not server:
+        error("Server does not exist", exit_code=1)
+
     image = images.get_image(server.image_uid)
 
-    server_conf = ServerConfig(config.configuration, server, image)
+    server_conf = ServerConfig(config.configuration, servers, server, image)
 
     if variable and not value:
         click.echo(f"{variable}: '{server_conf.raw[0][variable]}'")
