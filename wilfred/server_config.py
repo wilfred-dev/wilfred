@@ -9,6 +9,7 @@ import click
 from tabulate import tabulate
 
 from wilfred.parser.properties import properties_read, properties_write
+from wilfred.container_variables import ContainerVariables
 
 
 class ServerConfig:
@@ -95,3 +96,13 @@ class ServerConfig:
                     self._servers.command(
                         self._server, file["action"][variable].format(value)
                     )
+
+    def write_environment_variables(self):
+        """Writes environment variable to config file"""
+
+        for file in self._image["config"]["files"]:
+            for _env in file["environment"]:
+                env_vars = ContainerVariables(self._server, self._image).get_env_vars()
+
+                if _env["environment_variable"] in env_vars:
+                    self.edit(_env["config_variable"], env_vars[_env["environment_variable"]])

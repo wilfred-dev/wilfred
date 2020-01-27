@@ -292,6 +292,13 @@ def start(ctx, name, console):
             spinner.fail("💥 Server is installing, start blocked.")
             sys.exit(1)
 
+        image = images.get_image(server.image_uid)
+
+        if not image:
+            error("Image UID does not exit", exit_code=1)
+
+        ServerConfig(config.configuration, servers, server, image).write_environment_variables()
+
         servers.set_status(server, "running")
         servers.sync()
 
@@ -614,6 +621,9 @@ def config_command(name, variable, value):
         error("Server does not exist", exit_code=1)
 
     image = images.get_image(server.image_uid)
+
+    if not image:
+        error("Image UID does not exit", exit_code=1)
 
     server_conf = ServerConfig(config.configuration, servers, server, image)
 

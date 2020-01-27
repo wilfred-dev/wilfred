@@ -149,7 +149,7 @@ class Images(object):
 
         if len(image["config"]["files"]) > 0:
             for i in range(len(image["config"]["files"])):
-                for key in ("filename", "parser", "environment", "pretty", "action"):
+                for key in ("filename", "parser", "environment", "action"):
                     try:
                         image["config"]["files"][i][key]
                     except Exception:
