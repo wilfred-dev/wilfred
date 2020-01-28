@@ -67,19 +67,24 @@ class ServerConfig:
 
         return tabulate(data, headers=headers, tablefmt="fancy_grid",)
 
-    def edit(self, variable, value):
+    def edit(self, variable, value, specific_file=None):
         """Modifies value of specified variable"""
 
-        _times = 0
+        _variable_occurrences = []
         for file in self.raw:
             if variable in file:
-                _times += 1
 
-        if _times > 2:
+                _variable_occurrences.append(file)
+
+        if len(_variable_occurrences) > 1:
             # unhandled yet, will redo
             raise Exception("same variable key exists in multiple files")
 
-        for file in self._image["config"]["files"]:
+        for file in (
+            [specific_file]
+            if specific_file is not None
+            else self._image["config"]["files"]
+        ):
             if variable in next(
                 filter(
                     lambda x: x["_wilfred_config_filename"] == file["filename"],
@@ -106,5 +111,7 @@ class ServerConfig:
 
                 if _env["environment_variable"] in env_vars:
                     self.edit(
-                        _env["config_variable"], env_vars[_env["environment_variable"]]
+                        _env["config_variable"],
+                        env_vars[_env["environment_variable"]],
+                        specific_file=file,
                     )

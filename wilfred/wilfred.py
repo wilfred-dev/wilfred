@@ -612,11 +612,21 @@ def top():
         sleep(1)
 
 
-@cli.command("config")
+@cli.command(
+    "config",
+    short_help="".join(
+        (
+            "View and edit configuration variables (e.g. the settings in `server.properties` for Minecraft).",
+        )
+    ),
+)
 @click.argument("name")
 @click.argument("variable", required=False)
 @click.argument("value", required=False)
 def config_command(name, variable, value):
+    def _get():
+        return ServerConfig(config.configuration, servers, server, image)
+
     server = session.query(Server).filter_by(name=name.lower()).first()
 
     if not server:
@@ -627,7 +637,7 @@ def config_command(name, variable, value):
     if not image:
         error("Image UID does not exit", exit_code=1)
 
-    server_conf = ServerConfig(config.configuration, servers, server, image)
+    server_conf = _get()
 
     if variable and not value:
         click.echo(f"{variable}: '{server_conf.raw[0][variable]}'")
@@ -635,6 +645,9 @@ def config_command(name, variable, value):
 
     if variable and value:
         server_conf.edit(variable, value)
+        server_conf = _get()
+        click.echo(f"{variable}: '{server_conf.raw[0][variable]}'")
+
         exit(0)
 
     click.echo(server_conf.pretty())
