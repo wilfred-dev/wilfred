@@ -130,6 +130,14 @@ class ServerConfig:
                             f"unable to edit config {file['filename']}, err {click.style(str(e), bold=True)}"
                         )
 
+                if file["parser"] == "yaml":
+                    try:
+                        yaml_write(f"{path}/{file['filename']}", variable, value)
+                    except Exception as e:
+                        error(
+                            f"unable to edit config {file['filename']}, err {click.style(str(e), bold=True)}"
+                        )
+
                 if variable in file["action"]:
                     self._servers.command(
                         self._server, file["action"][variable].format(value)

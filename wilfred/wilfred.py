@@ -640,13 +640,22 @@ def config_command(name, variable, value):
     server_conf = _get()
 
     if variable and not value:
-        click.echo(f"{variable}: '{server_conf.raw[0][variable]}'")
+        if variable not in server_conf.raw[0]:
+            error(
+                "variable does not exist", exit_code=1
+            )  # should handle when multiple has the same key!!!
+
+        click.echo(
+            f"{variable}: '{server_conf.raw[0][variable]}'"
+        )  # should handle when multiple has the same key!!!
         exit(0)
 
     if variable and value:
         server_conf.edit(variable, value)
         server_conf = _get()
-        click.echo(f"{variable}: '{server_conf.raw[0][variable]}'")
+        click.echo(
+            f"{variable}: '{server_conf.raw[0][variable]}'"
+        )  # should handle when multiple has the same key!!!
 
         exit(0)
 
