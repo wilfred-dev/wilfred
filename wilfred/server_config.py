@@ -10,6 +10,7 @@ from tabulate import tabulate
 
 from wilfred.parser.properties import properties_read, properties_write
 from wilfred.container_variables import ContainerVariables
+from wilfred.message_handler import error
 
 
 class ServerConfig:
@@ -38,7 +39,14 @@ class ServerConfig:
             path = f"{self._configuration['data_path']}/{self._server.id}"
 
             if file["parser"] == "properties":
-                _raw = properties_read(f"{path}/{file['filename']}")
+                try:
+                    _raw = properties_read(f"{path}/{file['filename']}")
+                except Exception as e:
+                    error(
+                        f"unable to edit config {file['filename']}, err {click.style(str(e), bold=True)}",
+                        exit_code=1,
+                    )
+
                 _raw["_wilfred_config_filename"] = file["filename"]
 
                 self.raw.append(_raw)
@@ -95,7 +103,12 @@ class ServerConfig:
                 path = f"{self._configuration['data_path']}/{self._server.id}"
 
                 if file["parser"] == "properties":
-                    properties_write(f"{path}/{file['filename']}", variable, value)
+                    try:
+                        properties_write(f"{path}/{file['filename']}", variable, value)
+                    except Exception as e:
+                        error(
+                            f"unable to edit config {file['filename']}, err {click.style(str(e), bold=True)}"
+                        )
 
                 if variable in file["action"]:
                     self._servers.command(
