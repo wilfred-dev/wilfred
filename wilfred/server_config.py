@@ -8,9 +8,11 @@ import click
 
 from tabulate import tabulate
 
-from wilfred.parser.properties import properties_read, properties_write
 from wilfred.container_variables import ContainerVariables
 from wilfred.message_handler import error
+
+from wilfred.parser.properties import properties_read, properties_write
+from wilfred.parser.yaml import yaml_read, yaml_write
 
 
 class ServerConfig:
@@ -35,17 +37,20 @@ class ServerConfig:
         self._parse()
 
     def _parse(self):
+        def _err(e):
+            error(
+                f"unable to edit config {file['filename']}, err {click.style(str(e), bold=True)}",
+                exit_code=1,
+            )
+
         for file in self._image["config"]["files"]:
-            path = f"{self._configuration['data_path']}/{self._server.id}"
+            path = f"{self._configuration['data_path']}/{self._server.id}/{file['filename']}"
 
             if file["parser"] == "properties":
                 try:
-                    _raw = properties_read(f"{path}/{file['filename']}")
+                    _raw = properties_read(path)
                 except Exception as e:
-                    error(
-                        f"unable to edit config {file['filename']}, err {click.style(str(e), bold=True)}",
-                        exit_code=1,
-                    )
+                    _err(e)
 
                 _raw["_wilfred_config_filename"] = file["filename"]
 
@@ -53,7 +58,22 @@ class ServerConfig:
 
                 continue
 
-            raise Exception("no available parser for this type of file")
+            if file["parser"] == "yaml":
+                try:
+                    _raw = yaml_read(path)
+                except Exception as e:
+                    _err(e)
+
+                _raw["_wilfred_config_filename"] = file["filename"]
+
+                self.raw.append(_raw)
+
+                continue
+
+            error(
+                f"no available parser for this type of file ({file['parser']})",
+                exit_code=1,
+            )
         return True
 
     def pretty(self):
