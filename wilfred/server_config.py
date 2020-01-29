@@ -39,7 +39,7 @@ class ServerConfig:
     def _parse(self):
         def _err(e):
             error(
-                f"unable to edit config {file['filename']}, err {click.style(str(e), bold=True)}",
+                f"unable to parse config {file['filename']}, err {click.style(str(e), bold=True)}",
                 exit_code=1,
             )
 
@@ -153,6 +153,10 @@ class ServerConfig:
                 if _env["environment_variable"] in env_vars:
                     self.edit(
                         _env["config_variable"],
-                        env_vars[_env["environment_variable"]],
+                        _env["value_format"].format(
+                            env_vars[_env["environment_variable"]]
+                        )
+                        if _env["value_format"]
+                        else env_vars[_env["environment_variable"]],
                         specific_file=file,
                     )

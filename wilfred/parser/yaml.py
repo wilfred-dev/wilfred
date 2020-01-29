@@ -7,6 +7,8 @@
 import yaml
 import click
 
+from wilfred.core import set_in_dict
+
 
 def _remove_unnecessary_lists(raw):
     d = {}
@@ -69,6 +71,10 @@ def yaml_read(path):
 def yaml_write(path, key, value):  # editing does not do anything yet!!!
     with open(path) as f:
         _raw = yaml.load(f, Loader=yaml.FullLoader)
+
+    _raw[key.split("/")[1]][0] = set_in_dict(
+        _remove_unnecessary_lists(_raw), key.split("/")[1:], value
+    )
 
     with open(path, "w") as f:
         yaml.dump(_raw, f)
