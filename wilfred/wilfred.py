@@ -627,6 +627,20 @@ def config_command(name, variable, value):
     def _get():
         return ServerConfig(config.configuration, servers, server, image)
 
+    def _print_all_values(variable, config_list):
+        for var in config_list:
+            click.echo(
+                f"{click.style(var['_wilfred_config_filename'], bold=True)} {variable}: '{var[variable]}'"
+            )
+
+    def _get_variable_occurrences(variable, raw):
+        _variable_occurrences = []
+        for x in raw:
+            if variable in x:
+                _variable_occurrences.append(x)
+
+        return _variable_occurrences
+
     server = session.query(Server).filter_by(name=name.lower()).first()
 
     if not server:
@@ -639,23 +653,47 @@ def config_command(name, variable, value):
 
     server_conf = _get()
 
-    if variable and not value:
-        if variable not in server_conf.raw[0]:
-            error(
-                "variable does not exist", exit_code=1
-            )  # should handle when multiple has the same key!!!
+    _variable_occurrences = _get_variable_occurrences(variable, server_conf.raw)
 
-        click.echo(
-            f"{variable}: '{server_conf.raw[0][variable]}'"
-        )  # should handle when multiple has the same key!!!
+    if variable and len(_variable_occurrences) == 0:
+        error("variable does not exist", exit_code=1)
+
+    if variable and len(_variable_occurrences) > 1:
+        click.echo("This variable exists in multiple configuration files.")
+
+    if variable and not value:
+        _print_all_values(variable, _variable_occurrences)
         exit(0)
 
     if variable and value:
-        server_conf.edit(variable, value)
+        user_selection = None
+        if len(_variable_occurrences) > 1:
+            for i in range(len(_variable_occurrences)):
+                click.echo(
+                    f"[{i}] - {_variable_occurrences[i]['_wilfred_config_filename']}"
+                )
+
+            user_selection = click.prompt(
+                "In which file would like to modify this setting?", default=0
+            )
+
+            if (
+                int(user_selection) >= len(_variable_occurrences)
+                or int(user_selection) < 0
+            ):
+                error(
+                    "integer is not valid, please pick one from the list", exit_code=1
+                )
+
+        filename = _variable_occurrences[user_selection if user_selection else 0][
+            "_wilfred_config_filename"
+        ]
+
+        server_conf.edit(filename, variable, value)
         server_conf = _get()
-        click.echo(
-            f"{variable}: '{server_conf.raw[0][variable]}'"
-        )  # should handle when multiple has the same key!!!
+        _print_all_values(
+            variable, _get_variable_occurrences(variable, server_conf.raw)
+        )
 
         exit(0)
 
