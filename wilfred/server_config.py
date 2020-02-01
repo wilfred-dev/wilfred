@@ -98,6 +98,17 @@ class ServerConfig:
     def edit(self, filename, variable, value):
         """Modifies value of specified variable"""
 
+        try:
+            value = int(value)
+        except Exception:
+            pass
+
+        try:
+            value = True if value.lower() == "true" else value
+            value = False if value.lower() == "false" else value
+        except Exception:
+            pass
+
         for file in self._image["config"]["files"]:
             if file["filename"] == filename:
                 path = f"{self._configuration['data_path']}/{self._server.id}"

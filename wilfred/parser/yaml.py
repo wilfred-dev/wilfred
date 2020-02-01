@@ -6,6 +6,8 @@
 
 import yaml
 
+from wilfred.core import is_integer, set_in_dict
+
 
 def yaml_read(path):  # this function should be refactored later on!!!
     with open(path) as f:
@@ -56,6 +58,16 @@ def yaml_read(path):  # this function should be refactored later on!!!
 
 
 def yaml_write(path, key, value):  # does not work yet!!
-    # _raw = yaml_read(path)
+    with open(path) as f:
+        _raw = yaml.load(f.read(), Loader=yaml.FullLoader)
 
-    pass
+    for x in key.split("/"):
+        if is_integer(x):
+            raise Exception("Wilfred is not able to edit lists")
+
+    _new = set_in_dict(_raw, key.split("/"), value)
+
+    with open(path, "w") as f:
+        yaml.dump(_new, f)
+
+    return True
