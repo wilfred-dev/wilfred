@@ -56,11 +56,3 @@ def is_integer(variable):
         return False
 
     return True
-
-
-def set_in_dict(dic, keys, value):
-    for key in keys[:-1]:
-        dic = dic.setdefault(key, {})
-    dic[keys[-1]] = value
-
-    return dic
