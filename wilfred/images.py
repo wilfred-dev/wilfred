@@ -155,6 +155,20 @@ class Images(object):
                     except Exception:
                         return _exception(key)
 
+                # check for valid syntax in environment variables
+                for x in range(len(image["config"]["files"][i]["environment"])):
+                    for key in (
+                        "config_variable",
+                        "environment_variable",
+                        "value_format",
+                    ):
+                        try:
+                            image["config"]["files"][i]["environment"][x][key]
+                        except Exception:
+                            return _exception(
+                                f"{image['config']['files'][i]['filename']} environment key {key}"
+                            )
+
             # should also check for valid syntax in environment variable linking
 
         if len(image["variables"]) > 0:

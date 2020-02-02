@@ -58,4 +58,4 @@ def json_read(path):
 def json_write(path, key, value):
     raise Exception("Modifying JSON variables is currently not supported")
 
-    return True
+    # return True

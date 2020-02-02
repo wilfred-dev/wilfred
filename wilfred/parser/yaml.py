@@ -99,8 +99,8 @@ def yaml_read(path):  # this function should be refactored later on!!!
 def yaml_write(path, key, value):  # does not work yet!!
     raise Exception("Modifying YAML variables is currently not supported")
 
-    with open(path) as f:
-        _raw = yaml.load(f.read(), Loader=yaml.FullLoader)
+    # with open(path) as f:
+    #     _raw = yaml.load(f.read(), Loader=yaml.FullLoader)
 
     # def _entrypoint(search, current, value, parent):
     #     if type(value) in [dict]:
@@ -131,7 +131,7 @@ def yaml_write(path, key, value):  # does not work yet!!
     #         if _search[_current] == k:
     #             _entrypoint(_search, _current, v, _raw)
 
-    with open(path, "w") as f:
-        yaml.dump(_raw)
+    # with open(path, "w") as f:
+    #     yaml.dump(_raw)
 
-    return True
+    # return True
