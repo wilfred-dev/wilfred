@@ -27,6 +27,7 @@ from wilfred.images import Images
 from wilfred.message_handler import warning, error
 from wilfred.core import is_integer, random_string, check_for_new_releases
 from wilfred.migrate import Migrate
+from wilfred.server_config import ServerConfig
 
 if sys.platform.startswith("win"):
     click.echo("Wilfred does not support Windows")
@@ -290,6 +291,15 @@ def start(ctx, name, console):
         if server.status == "installing":
             spinner.fail("💥 Server is installing, start blocked.")
             sys.exit(1)
+
+        image = images.get_image(server.image_uid)
+
+        if not image:
+            error("Image UID does not exit", exit_code=1)
+
+        ServerConfig(
+            config.configuration, servers, server, image
+        ).write_environment_variables()
 
         servers.set_status(server, "running")
         servers.sync()
@@ -600,6 +610,94 @@ def top():
         click.echo(tabulate(data, headers=headers, tablefmt="plain",))
 
         sleep(1)
+
+
+@cli.command(
+    "config",
+    short_help="".join(
+        (
+            "View and edit configuration variables (e.g. the settings in `server.properties` for Minecraft).",
+        )
+    ),
+)
+@click.argument("name")
+@click.argument("variable", required=False)
+@click.argument("value", required=False)
+def config_command(name, variable, value):
+    def _get():
+        return ServerConfig(config.configuration, servers, server, image)
+
+    def _print_all_values(variable, config_list):
+        for var in config_list:
+            click.echo(
+                f"{click.style(var['_wilfred_config_filename'], bold=True)} {variable}: '{var[variable]}'"
+            )
+
+    def _get_variable_occurrences(variable, raw):
+        _variable_occurrences = []
+        for x in raw:
+            if variable in x:
+                _variable_occurrences.append(x)
+
+        return _variable_occurrences
+
+    server = session.query(Server).filter_by(name=name.lower()).first()
+
+    if not server:
+        error("Server does not exist", exit_code=1)
+
+    image = images.get_image(server.image_uid)
+
+    if not image:
+        error("Image UID does not exit", exit_code=1)
+
+    server_conf = _get()
+
+    _variable_occurrences = _get_variable_occurrences(variable, server_conf.raw)
+
+    if variable and len(_variable_occurrences) == 0:
+        error("variable does not exist", exit_code=1)
+
+    if variable and len(_variable_occurrences) > 1:
+        click.echo("This variable exists in multiple configuration files.")
+
+    if variable and not value:
+        _print_all_values(variable, _variable_occurrences)
+        exit(0)
+
+    if variable and value:
+        user_selection = None
+        if len(_variable_occurrences) > 1:
+            for i in range(len(_variable_occurrences)):
+                click.echo(
+                    f"[{i}] - {_variable_occurrences[i]['_wilfred_config_filename']}"
+                )
+
+            user_selection = click.prompt(
+                "In which file would like to modify this setting?", default=0
+            )
+
+            if (
+                int(user_selection) >= len(_variable_occurrences)
+                or int(user_selection) < 0
+            ):
+                error(
+                    "integer is not valid, please pick one from the list", exit_code=1
+                )
+
+        filename = _variable_occurrences[user_selection if user_selection else 0][
+            "_wilfred_config_filename"
+        ]
+
+        server_conf.edit(filename, variable, value)
+        server_conf = _get()
+        _print_all_values(
+            variable, _get_variable_occurrences(variable, server_conf.raw)
+        )
+
+        exit(0)
+
+    click.echo(server_conf.pretty())
 
 
 if __name__ == "__main__":

@@ -18,7 +18,7 @@ from shutil import move, rmtree
 
 from wilfred.message_handler import warning, error
 
-API_VERSION = 1
+API_VERSION = 2
 
 
 class Images(object):
@@ -48,7 +48,8 @@ class Images(object):
 
         with open(f"{self.config_dir}/img.zip", "wb") as f:
             response = get(
-                "https://github.com/wilfred-dev/images/archive/master.zip", stream=True
+                "https://github.com/wilfred-dev/images/archive/v2.zip",
+                stream=True,  # don't forget to revert this!!
             )
             f.write(response.content)
 
@@ -56,7 +57,7 @@ class Images(object):
             obj.extractall(f"{self.config_dir}/temp_images")
 
         move(
-            f"{self.config_dir}/temp_images/images-master/images",
+            f"{self.config_dir}/temp_images/images-2/images",  # don't forget to revert this!!
             f"{self.image_dir}/default",
         )
 
@@ -78,6 +79,7 @@ class Images(object):
                 "stop_command",
                 "variables",
                 "user",
+                "config",
             ):
                 try:
                     del d[key]
@@ -85,10 +87,10 @@ class Images(object):
                     pass
 
         headers = {
-            "uid": "UID",
-            "name": "Image Name",
-            "author": "Author",
-            "default_image": "Default Image",
+            "uid": click.style("UID", bold=True),
+            "name": click.style("Image Name", bold=True),
+            "author": click.style("Author", bold=True),
+            "default_image": click.style("Default Image", bold=True),
         }
 
         return tabulate(_images, headers=headers, tablefmt="fancy_grid")
@@ -116,6 +118,7 @@ class Images(object):
             "default_image",
             "variables",
             "installation",
+            "config",
         ):
             try:
                 image[key]
@@ -138,6 +141,35 @@ class Images(object):
                 image["installation"][key]
             except Exception:
                 return _exception(key)
+
+        try:
+            image["config"]["files"]
+        except Exception:
+            return _exception(key)
+
+        if len(image["config"]["files"]) > 0:
+            for i in range(len(image["config"]["files"])):
+                for key in ("filename", "parser", "environment", "action"):
+                    try:
+                        image["config"]["files"][i][key]
+                    except Exception:
+                        return _exception(key)
+
+                # check for valid syntax in environment variables
+                for x in range(len(image["config"]["files"][i]["environment"])):
+                    for key in (
+                        "config_variable",
+                        "environment_variable",
+                        "value_format",
+                    ):
+                        try:
+                            image["config"]["files"][i]["environment"][x][key]
+                        except Exception:
+                            return _exception(
+                                f"{image['config']['files'][i]['filename']} environment key {key}"
+                            )
+
+            # should also check for valid syntax in environment variable linking
 
         if len(image["variables"]) > 0:
             for i in range(len(image["variables"])):
