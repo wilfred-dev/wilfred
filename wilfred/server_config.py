@@ -13,6 +13,7 @@ from wilfred.message_handler import error
 
 from wilfred.parser.properties import properties_read, properties_write
 from wilfred.parser.yaml import yaml_read, yaml_write
+from wilfred.parser.json import json_read, json_write
 
 
 class ServerConfig:
@@ -53,7 +54,6 @@ class ServerConfig:
                     _err(e)
 
                 _raw["_wilfred_config_filename"] = file["filename"]
-
                 self.raw.append(_raw)
 
                 continue
@@ -65,7 +65,17 @@ class ServerConfig:
                     _err(e)
 
                 _raw["_wilfred_config_filename"] = file["filename"]
+                self.raw.append(_raw)
 
+                continue
+
+            if file["parser"] == "json":
+                try:
+                    _raw = json_read(path)
+                except Exception as e:
+                    _err(e)
+
+                _raw["_wilfred_config_filename"] = file["filename"]
                 self.raw.append(_raw)
 
                 continue
@@ -124,6 +134,14 @@ class ServerConfig:
                 if file["parser"] == "yaml":
                     try:
                         yaml_write(f"{path}/{file['filename']}", variable, value)
+                    except Exception as e:
+                        error(
+                            f"unable to edit config {file['filename']}, err {click.style(str(e), bold=True)}"
+                        )
+
+                if file["parser"] == "json":
+                    try:
+                        json_write(f"{path}/{file['filename']}", variable, value)
                     except Exception as e:
                         error(
                             f"unable to edit config {file['filename']}, err {click.style(str(e), bold=True)}"

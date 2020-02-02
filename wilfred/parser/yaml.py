@@ -97,6 +97,8 @@ def yaml_read(path):  # this function should be refactored later on!!!
 
 
 def yaml_write(path, key, value):  # does not work yet!!
+    raise Exception("Modifying YAML variables is currently not supported")
+
     with open(path) as f:
         _raw = yaml.load(f.read(), Loader=yaml.FullLoader)
 
