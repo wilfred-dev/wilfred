@@ -47,6 +47,7 @@ setup(
         "tabulate",
         "yaspin",
         "sqlalchemy",
+        "pyyaml",
     ],
     entry_points={"console_scripts": ["wilfred=wilfred.wilfred:main"]},
 )

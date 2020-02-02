@@ -4,7 +4,10 @@ Please refer to the [official documentation](https://wilfred.readthedocs.io/en/l
 
 ## next-release
 
+* **Added** [#21](https://github.com/wilfred-dev/wilfred/issues/21) Added `wilfred config`, ability to edit server configuration files. Exposes the server configuration to Wilfred. Currently supporting `.properties` and read-only `.yml` and `.json`.
+* **Added** Added image API version 2, introduces configuration files.
 * **Added** [#23](https://github.com/wilfred-dev/wilfred/issues/23) Added `wilfred top`, server statistics that fill the screen and updates in real-time (like `top`).
+* **Fixed** [#17](https://github.com/wilfred-dev/wilfred/issues/17) Changing port using `wilfred edit` should be able to trigger configuration update on supported filetypes (this is closely related to image API v2 and [#21](https://github.com/wilfred-dev/wilfred/issues/21)).
 
 ## v0.3.0 (released on 2020-01-25)
 
