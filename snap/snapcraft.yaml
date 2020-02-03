@@ -20,19 +20,19 @@ confinement: devmode # should be 'classic' once we have the classic confinement 
 
 parts:
   wilfred:
+    override-build: |
+      sed -i "s/development/`git log -1 --format="%H"`/g" wilfred/version.py
+      snapcraftctl build
     plugin: python
     source: .
     build-packages:
-      - python3-distutils
-      - build-essential
-    stage-packages:
       - python3-distutils
       - build-essential
 
 apps:
   wilfred:
     command: bin/wilfred
-    #plugs: [docker, network]
+    # plugs: [docker, network]
     environment:
       PYTHONIOENCODING: utf-8
       LC_ALL: C.UTF-8

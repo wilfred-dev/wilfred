@@ -41,6 +41,7 @@ jobs:
     script:
       - jq -r '.default | to_entries[] | .key + .value.version' Pipfile.lock > requirements.txt
       - pip install -r requirements.txt
+      - sed -i "s/development/$TRAVIS_COMMIT/g" wilfred/version.py
     deploy:
       - provider: pypi
         user: __token__

@@ -19,7 +19,7 @@ from time import sleep
 from tabulate import tabulate
 
 from wilfred.docker_conn import docker_client
-from wilfred.version import version
+from wilfred.version import version, commit_hash
 from wilfred.config_parser import Config
 from wilfred.database import session, database_path, Server, EnvironmentVariable
 from wilfred.servers import Servers
@@ -50,13 +50,16 @@ def print_version(ctx, param, value):
     if not value or ctx.resilient_parsing:
         return
 
-    check_for_new_releases()
+    _commit_hash = commit_hash[0:7]
 
-    click.echo(
-        "✨ wilfred version {}".format(
-            "development (0.0.0.dev0)" if version == "0.0.0.dev0" else f"v{version}"
+    if str(version) == "0.0.0.dev0":
+        click.echo(
+            f"✨ wilfred version edge/{_commit_hash} (development build, v0.0.0.dev0)"
         )
-    )
+    else:
+        check_for_new_releases()
+        click.echo(f"✨ wilfred version v{version} (commit {_commit_hash})")
+
     ctx.exit()
 
 
