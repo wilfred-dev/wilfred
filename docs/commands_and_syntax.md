@@ -29,3 +29,8 @@ Basic commands and syntax available for Wilfred.
 - `command` - Send command to STDIN of server (without attaching to console).
   - Required argument `NAME` - Name of the server.
   - Required argument `COMMAND` - Command to send, can be put in `"` for commands with whitespaces. Example: `wilfred command <name> "say Hello World"`.
+- `top` - Displays server statistics such as CPU load, memory usage etc., updates in real-time (like `top`)
+- `config` - View and edit configuration settings for a specific server. It parses configuration files for supported games and allows the user to modify settings without ever touching the actual config file (such as `server.properties` for Minecraft). Example: `wilfred config server-name white-list "on"`
+  - Required argument `NAME` - Name of the server.
+  - Optional argument `VARIABLE` - Name of an available setting. Displays the value of the specified variable if a new value is not set.
+  - Optional argument `VALUE` - The new value for the variable setting.

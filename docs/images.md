@@ -9,7 +9,7 @@ This is the configuration file for Vanilla Minecraft.
 ```json
 {
     "meta": {
-        "api_version": 1
+        "api_version": 2
     },
     "uid": "minecraft-vanilla",
     "name": "Vanilla Minecraft",
@@ -19,8 +19,27 @@ This is the configuration file for Vanilla Minecraft.
     "user": "container",
     "stop_command": "stop",
     "default_image": true,
+    "config": {
+        "files": [
+            {
+                "filename": "server.properties",
+                "parser": "properties",
+                "environment": [
+                    {
+                        "config_variable": "server-port",
+                        "environment_variable": "SERVER_PORT",
+                        "value_format": null
+                    }
+                ],
+                "action": {
+                    "difficulty": "difficulty {}",
+                    "white-list": "whitelist {}"
+                }
+            }
+        ]
+    },
     "installation": {
-        "docker_image": "alpine:latest",
+        "docker_image": "wilfreddev/alpine:latest",
         "shell": "/bin/ash",
         "script": [
             "apk add curl --no-cache --update jq",
@@ -36,7 +55,8 @@ This is the configuration file for Vanilla Minecraft.
             "   echo \"eula=true\" > eula.txt",
             "fi",
             "curl -o server.properties https://raw.githubusercontent.com/wilfred-dev/images/master/configs/minecraft/standard/server.properties",
-            "sed -i \"s/{{SERVER_PORT}}/$SERVER_PORT/g\" server.properties"
+            "sed -i \"s/{{SERVER_PORT}}/$SERVER_PORT/g\" server.properties",
+            "chown -R container:container /server"
         ]
     },
     "variables": [
@@ -72,6 +92,16 @@ This is the configuration file for Vanilla Minecraft.
 - `user` - User to run command as, leave empty for default `root`.
 - `stop_command` - Command to send to STDIN in order to stop the container.
 - `default_image` - Indicates to Wilfred that the image is an official image from the Wilfred project.
+- `config` - Configuration files and how Wilfred should parse them, used within the `wilfred config` command (such as `server.properties` for Minecraft or `config.yml` for BungeeCord).
+  - `files` - List of files to parse.
+    - `filename` - The filename to read and write to.
+    - `parser` - What parser Wilfred should use (file-type). Currently, only `properties`, `yaml` and `json` are supported parsers.
+    - `environment` - List of environment variables to link to specific config settings.
+      - `config_variable` - The setting (variable name) as it's named within the configuration file (e.g. `server-port` as that's the name of the setting in `server.properties`).
+      - `environment_variable` - A valid environment variable to link with the specified setting. Apart from the variables specified in the image config, `SERVER_PORT` and `SERVER_MEMORY` are valid values.
+      - `value_format` - Can be used to append a prefix to the value. Specifying `null` just replaces the value of the setting with the value of the environment variable, without prefixes and suffixes. Otherwise, use `{}` to indicate where the actual value should be set (e.g. `0.0.0.0:{}` is valid syntax).
+    - `action` - Dictionary, sends a command to the STDIN of the container when the setting updates.
+      - `{SETTING_NAME}` - The value should contain the command that should be sent to the container when the specified setting changes. Use `{}` to indicate where the actual value should be set (e.g. `whitelist {}` would send `whitelist on` if the user runs `wilfred config my-server white-list "on"`).
 - `installation`
   - `docker_image` - Docker image to use during installation.
   - `shell` - Shell to use (usually `/bin/ash` for Alpine or `/bin/bash` for Ubuntu/Debian).
