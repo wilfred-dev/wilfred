@@ -42,6 +42,8 @@ class ServerConfig:
         self._parse()
 
     def _parse(self):
+        """iterates configuration files for the specific server and parses the files"""
+
         def _err(e):
             error(
                 f"unable to parse config {file['filename']}, err {click.style(str(e), bold=True)}",
@@ -91,7 +93,7 @@ class ServerConfig:
         return True
 
     def pretty(self):
-        """Returns parsed configuration variables in a print-friendly format"""
+        """returns parsed configuration variables in a print-friendly format"""
 
         headers = {
             "file": click.style("Config File", bold=True),
@@ -110,7 +112,7 @@ class ServerConfig:
         return tabulate(data, headers=headers, tablefmt="fancy_grid",)
 
     def edit(self, filename, variable, value):
-        """Modifies value of specified variable"""
+        """modifies value of specified variable"""
 
         try:
             value = int(value)
@@ -157,7 +159,7 @@ class ServerConfig:
                     )
 
     def write_environment_variables(self):
-        """Writes environment variable to config file"""
+        """writes environment variable to config file(s)"""
 
         for file in self._image["config"]["files"]:
             for _env in file["environment"]:

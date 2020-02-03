@@ -113,6 +113,12 @@ def cli():
 
     ⚠️  Wilfred is currently under development and should not be considered stable.
     Features may break or may not be implemented yet. Use with caution.
+
+    Source code - https://github.com/wilfred-dev/wilfred
+
+    Official documentation - https://wilfred.readthedocs.io/
+
+    Discord server for support - https://discord.gg/Ry7zV8B
     """
 
     pass

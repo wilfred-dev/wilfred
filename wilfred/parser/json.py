@@ -17,6 +17,12 @@ def json_read(path):
     _reformatted = {}
 
     def _iterate_dict(data, _name):
+        """
+        iterates a dictionary and continues to iterate the value of the dict if the
+        type is dictionary, list or tuple (recursion). Adds the dictionary key and value
+        to the _reformatted dict if it's a string, integer or boolean
+        """
+
         _def = _name
         for k, v in data.items():
             _name = f"{_def}/{k}"
@@ -29,6 +35,12 @@ def json_read(path):
                 _reformatted[f"{_def}/{k}"] = v
 
     def _iterate_list(data, _name):
+        """
+        iterates a list and continues to iterate the values of the list if the
+        type is dictionary, list or tuple (recursion). Adds the list value
+        to the _reformatted dict if it's a string, integer or boolean
+        """
+
         _def = _name
 
         i = 0

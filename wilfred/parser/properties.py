@@ -12,6 +12,9 @@ from configparser import RawConfigParser
 
 
 def _config_parser(path):
+    """appends a dummy section to the top of the raw file so that the built-in
+    python function, ConfigParser, can read and parse the file"""
+
     with open(path) as f:
         file_content = "[dummy_section]\n" + f.read()
 
