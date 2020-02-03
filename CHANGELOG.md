@@ -8,6 +8,7 @@ Please refer to the [official documentation](https://wilfred.readthedocs.io/en/l
 * **Added** Added image API version 2, introduces configuration files.
 * **Added** [#23](https://github.com/wilfred-dev/wilfred/issues/23) Added `wilfred top`, server statistics that fill the screen and updates in real-time (like `top`).
 * **Changed** [#30](https://github.com/wilfred-dev/wilfred/issues/30) Releases are now built with the git commit hash saved as a variable (including versions pushed to the Snap edge channel). `wilfred --version` displays the commit hash accordingly.
+* **Changed** Removed unnecessary `python3-distutils` and `build-essential` from `stage-packages` within the Snapcraft configuration (see [this comment](https://github.com/wilfred-dev/wilfred/issues/30#issuecomment-581396779)). 53 MB decrease in package size.
 * **Fixed** [#17](https://github.com/wilfred-dev/wilfred/issues/17) Changing port using `wilfred edit` should be able to trigger configuration update on supported filetypes (this is closely related to image API v2 and [#21](https://github.com/wilfred-dev/wilfred/issues/21)).
 
 ## v0.3.0 (released on 2020-01-25)
