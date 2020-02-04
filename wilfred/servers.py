@@ -181,9 +181,11 @@ class Servers(object):
     def remove(self, server):
         path = f"{self._configuration['data_path']}/{server.id}"
 
-        session.delete(
-            session.query(EnvironmentVariable).filter_by(server_id=server.id).first()
-        )
+        for x in (
+            session.query(EnvironmentVariable).filter_by(server_id=server.id).all()
+        ):
+            session.delete(x)
+
         session.delete(server)
         session.commit()
 
