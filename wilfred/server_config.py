@@ -105,6 +105,14 @@ class ServerConfig:
 
         for file in self.raw:
             for k, v in file.items():
+                for _image_config_file in self._image["config"]["files"]:
+                    for x in _image_config_file["environment"]:
+                        k = (
+                            f"{k} ({click.style('not editable', fg='red', bold=True)})"
+                            if x["config_variable"] == k
+                            else k
+                        )
+
                 data.append(
                     {"file": file["_wilfred_config_filename"], "setting": k, "value": v}
                 ) if k != "_wilfred_config_filename" else None
@@ -128,6 +136,14 @@ class ServerConfig:
         for file in self._image["config"]["files"]:
             if file["filename"] == filename:
                 path = f"{self._configuration['data_path']}/{self._server.id}"
+
+                for _image_config_file in self._image["config"]["files"]:
+                    for x in _image_config_file["environment"]:
+                        if x["config_variable"] == variable:
+                            error(
+                                "This setting is linked to an environment variable and is therefore not editable directly",
+                                exit_code=1,
+                            )
 
                 if file["parser"] == "properties":
                     try:

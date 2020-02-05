@@ -42,6 +42,7 @@ jobs:
       - jq -r '.default | to_entries[] | .key + .value.version' Pipfile.lock > requirements.txt
       - pip install -r requirements.txt
       - sed -i "s/development/$TRAVIS_COMMIT/g" wilfred/version.py
+      - sed -i "s/YYYY-MM-DD/`git log -1 --format="%at" | xargs -I{} date -d @{} +%Y-%m-%d`/g" wilfred/version.py
     deploy:
       - provider: pypi
         user: __token__
