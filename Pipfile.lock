@@ -56,11 +56,11 @@
         },
         "docker": {
             "hashes": [
-                "sha256:6e06c5e70ba4fad73e35f00c55a895a448398f3ada7faae072e2bb01348bafc1",
-                "sha256:8f93775b8bdae3a2df6bc9a5312cce564cade58d6555f2c2570165a1270cd8a7"
+                "sha256:1c2ddb7a047b2599d1faec00889561316c674f7099427b9c51e8cb804114b553",
+                "sha256:ddae66620ab5f4bce769f64bcd7934f880c8abe6aa50986298db56735d0f722e"
             ],
             "index": "pypi",
-            "version": "==4.1.0"
+            "version": "==4.2.0"
         },
         "idna": {
             "hashes": [
@@ -216,10 +216,10 @@
         },
         "markdown": {
             "hashes": [
-                "sha256:2e50876bcdd74517e7b71f3e7a76102050edec255b3983403f1a63e7c8a41e7a",
-                "sha256:56a46ac655704b91e5b7e6326ce43d5ef72411376588afa1dd90e881b83c7e8c"
+                "sha256:5ad7180c3ec16422a764568ad6409ec82460c40d1631591fa53d597033cc98bf",
+                "sha256:9c71241ec237505535eabff7a38b1307250f16cea174bb1e505c3e032f108867"
             ],
-            "version": "==3.1.1"
+            "version": "==3.2"
         },
         "markupsafe": {
             "hashes": [
