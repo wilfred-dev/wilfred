@@ -122,7 +122,7 @@ def cli():
 
     Source code - https://github.com/wilfred-dev/wilfred
 
-    Discord server for support - https://discord.gg/Ry7zV8B
+    Discord server for support - https://wilfredproject.org/discord
     """
 
     pass
