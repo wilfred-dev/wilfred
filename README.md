@@ -16,7 +16,7 @@ Wilfred is a command-line interface for running and managing game servers locall
 
 ## Documentation
 
-The official documentation is available [here](https://wilfred.readthedocs.io/en/latest/). For support, use our [Discord Chat](https://discord.gg/Ry7zV8B). For bugs, you can open an issue [here](https://github.com/wilfred-dev/wilfred/issues).
+The official documentation is available [here](https://docs.wilfredproject.org/en/latest/). For support, use our [Discord Chat](https://discord.gg/Ry7zV8B). For bugs, you can open an issue [here](https://github.com/wilfred-dev/wilfred/issues).
 
 ## Supported games
 
@@ -34,7 +34,7 @@ As long as your server can run in Docker, it can probably run using Wilfred (aft
 
 ## Installation
 
-Please refer to the [official documentation](https://wilfred.readthedocs.io/en/latest/installation/) for further installation instructions and documentation.
+Please refer to the [official documentation](https://docs.wilfredproject.org/en/latest/installation/) for further installation instructions and documentation.
 
 ### Quickstart
 

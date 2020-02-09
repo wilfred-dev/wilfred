@@ -25,7 +25,7 @@ setup(
     description="A CLI for managing game servers using Docker.",
     long_description=long_description,
     long_description_content_type="text/markdown",
-    url="https://github.com/wilfred-dev/wilfred",
+    url="https://wilfredproject.org",
     packages=find_packages(),
     license="MIT",
     classifiers=[

@@ -1,6 +1,6 @@
 # CHANGELOG
 
-Please refer to the [official documentation](https://wilfred.readthedocs.io/en/latest/development/) for more information about the CHANGELOG and releases.
+Please refer to the [official documentation](https://docs.wilfredproject.org/en/latest/development/) for more information about the CHANGELOG and releases.
 
 ## next-release
 
