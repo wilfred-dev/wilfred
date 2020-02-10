@@ -2,6 +2,10 @@
 
 Please refer to the [official documentation](https://docs.wilfredproject.org/en/latest/development/) for more information about the CHANGELOG and releases.
 
+## v0.4.1 (released on 2020-02-10)
+
+* **Fixed** [#37](https://github.com/wilfred-dev/wilfred/issues/37) Fixed so that the commit hash and build date are correctly displayed on `wilfred --version` for pip installations (error in Travis CI config).
+
 ## v0.4.0 (released on 2020-02-10)
 
 * **Added** [#21](https://github.com/wilfred-dev/wilfred/issues/21) Added `wilfred config`, ability to edit server configuration files. Exposes the server configuration to Wilfred. Currently supporting `.properties` and read-only `.yml` and `.json`.
