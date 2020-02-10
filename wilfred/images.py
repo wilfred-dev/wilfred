@@ -52,8 +52,7 @@ class Images(object):
 
         with open(f"{self.config_dir}/img.zip", "wb") as f:
             response = get(
-                "https://github.com/wilfred-dev/images/archive/v2.zip",
-                stream=True,  # don't forget to revert this!!
+                "https://github.com/wilfred-dev/images/archive/master.zip", stream=True,
             )
             f.write(response.content)
 
@@ -61,7 +60,7 @@ class Images(object):
             obj.extractall(f"{self.config_dir}/temp_images")
 
         move(
-            f"{self.config_dir}/temp_images/images-2/images",  # don't forget to revert this!!
+            f"{self.config_dir}/temp_images/images-master/images",
             f"{self.image_dir}/default",
         )
 

@@ -2,7 +2,7 @@
 
 Please refer to the [official documentation](https://docs.wilfredproject.org/en/latest/development/) for more information about the CHANGELOG and releases.
 
-## next-release
+## v0.4.0 (released on 2020-02-10)
 
 * **Added** [#21](https://github.com/wilfred-dev/wilfred/issues/21) Added `wilfred config`, ability to edit server configuration files. Exposes the server configuration to Wilfred. Currently supporting `.properties` and read-only `.yml` and `.json`.
 * **Added** Added image API version 2, introduces configuration files.
