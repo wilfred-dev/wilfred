@@ -32,6 +32,7 @@ from wilfred.message_handler import warning, error
 from wilfred.core import is_integer, random_string, check_for_new_releases
 from wilfred.migrate import Migrate
 from wilfred.server_config import ServerConfig
+from wilfred.scheduler import TaskScheduler
 
 if sys.platform.startswith("win"):
     click.echo("Wilfred does not support Windows")
@@ -715,6 +716,25 @@ def config_command(name, variable, value):
         exit(0)
 
     click.echo(server_conf.pretty())
+
+
+@cli.command(short_help="Schedule tasks/scripts for a specific server.")
+@click.argument("name")
+@click.argument("action", required=False)
+def tasks(name, action):
+    server = session.query(Server).filter_by(name=name.lower()).first()
+
+    if not server:
+        error("Server does not exist", exit_code=1)
+
+    _tasks = TaskScheduler(server)
+
+    if not action:
+        click.echo(_tasks.pretty())
+        exit(0)
+
+    if action.lower() == "create":
+        click.echo("todo")
 
 
 if __name__ == "__main__":

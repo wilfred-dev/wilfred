@@ -37,6 +37,7 @@ class Server(Base):
     status = Column(String)
 
     environment_variables = relationship("EnvironmentVariable")
+    scheduled_tasks = relationship("ScheduledTask")
 
     def __repr__(self):
         return f"<Server(id='{self.id}', name='{self.name}', image_uid='{self.image_uid}', port='{self.port}')>"
@@ -48,6 +49,22 @@ class EnvironmentVariable(Base):
     id = Column(Integer, primary_key=True)
     server_id = Column(String, ForeignKey("servers.id"), unique=False)
     variable = Column(String)
+    value = Column(String)
+
+
+class ScheduledTask(Base):
+    __tablename__ = "scheduled_task"
+
+    id = Column(Integer, primary_key=True)
+    server_id = Column(String, ForeignKey("servers.id"), unique=False)
+
+    minute = Column(Integer, nullable=True)
+    hour = Column(Integer, nullable=True)
+    day_of_the_month = Column(Integer, nullable=True)
+    month = Column(Integer, nullable=True)
+    day_of_the_week = Column(Integer, nullable=True)
+
+    task_type = Column(String)
     value = Column(String)
 
 
