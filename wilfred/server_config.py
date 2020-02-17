@@ -119,7 +119,7 @@ class ServerConfig:
 
         return tabulate(data, headers=headers, tablefmt="fancy_grid",)
 
-    def edit(self, filename, variable, value):
+    def edit(self, filename, variable, value, override_linking_check=False):
         """modifies value of specified variable"""
 
         try:
@@ -139,7 +139,10 @@ class ServerConfig:
 
                 for _image_config_file in self._image["config"]["files"]:
                     for x in _image_config_file["environment"]:
-                        if x["config_variable"] == variable:
+                        if (
+                            x["config_variable"] == variable
+                            and not override_linking_check
+                        ):
                             error(
                                 "This setting is linked to an environment variable and is therefore not editable directly",
                                 exit_code=1,
@@ -190,4 +193,5 @@ class ServerConfig:
                         )
                         if _env["value_format"]
                         else env_vars[_env["environment_variable"]],
+                        override_linking_check=True,
                     )
