@@ -12,6 +12,8 @@ import click
 
 from tabulate import tabulate
 
+from wilfred.database import session, ScheduledTask
+
 
 class TaskScheduler(object):
     def __init__(self, server):
@@ -31,3 +33,24 @@ class TaskScheduler(object):
         }
 
         return tabulate(data, headers=headers, tablefmt="fancy_grid",)
+
+    def create(
+        self, minute, hour, day_of_the_month, month, day_of_the_week, task_type, value
+    ):
+        # create
+        new_task = ScheduledTask(
+            server_id=self._server.id,
+            minute=minute,
+            hour=hour,
+            day_of_the_month=day_of_the_month,
+            month=month,
+            day_of_the_week=day_of_the_week,
+            task_type=task_type,
+            value=value,
+        )
+        session.add(new_task)
+
+        try:
+            session.commit()
+        except Exception as e:
+            raise Exception(f"could not create task, {str(e)}")
