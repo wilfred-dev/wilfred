@@ -230,10 +230,10 @@
         },
         "markdown": {
             "hashes": [
-                "sha256:5ad7180c3ec16422a764568ad6409ec82460c40d1631591fa53d597033cc98bf",
-                "sha256:9c71241ec237505535eabff7a38b1307250f16cea174bb1e505c3e032f108867"
+                "sha256:90fee683eeabe1a92e149f7ba74e5ccdc81cd397bd6c516d93a8da0ef90b6902",
+                "sha256:e4795399163109457d4c5af2183fbe6b60326c17cfdf25ce6e7474c6624f725d"
             ],
-            "version": "==3.2"
+            "version": "==3.2.1"
         },
         "markupsafe": {
             "hashes": [
@@ -416,11 +416,11 @@
         },
         "tox": {
             "hashes": [
-                "sha256:06ba73b149bf838d5cd25dc30c2dd2671ae5b2757cf98e5c41a35fe449f131b3",
-                "sha256:806d0a9217584558cc93747a945a9d9bff10b141a5287f0c8429a08828a22192"
+                "sha256:5c45d08f1dcc9bc97cdea3e5a69c8f4ad042cc37cbe6cf53e126f4a9005b7d3b",
+                "sha256:73e2ade68cd71a2765ee739ecc27c8c92e9b9c09acbad0f2c5307b20214e0d13"
             ],
             "index": "pypi",
-            "version": "==3.14.3"
+            "version": "==3.14.4"
         },
         "typed-ast": {
             "hashes": [
@@ -450,10 +450,10 @@
         },
         "virtualenv": {
             "hashes": [
-                "sha256:526484e29a9a12f0680d251331e7841b36f1e2b918935377f173f764b1b8be89",
-                "sha256:ec376274f5abb6da25e0ef81d082d2884cda8fd924e1ff73b4c2bb5416d48c87"
+                "sha256:08f3623597ce73b85d6854fb26608a6f39ee9d055c81178dc6583803797f8994",
+                "sha256:de2cbdd5926c48d7b84e0300dea9e8f276f61d186e8e49223d71d91250fbaebd"
             ],
-            "version": "==20.0.3"
+            "version": "==20.0.4"
         },
         "zipp": {
             "hashes": [

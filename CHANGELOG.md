@@ -2,6 +2,10 @@
 
 Please refer to the [official documentation](https://docs.wilfredproject.org/en/latest/development/) for more information about the CHANGELOG and releases.
 
+## v0.4.2 (released on 2020-02-16)
+
+* **Fixed** [#41](https://github.com/wilfred-dev/wilfred/issues/41) Fixed a critical bug that caused servers with config settings linked to environment variables not to start.
+
 ## v0.4.1 (released on 2020-02-10)
 
 * **Fixed** [#37](https://github.com/wilfred-dev/wilfred/issues/37) Fixed so that the commit hash and build date are correctly displayed on `wilfred --version` for pip installations (error in Travis CI config).
