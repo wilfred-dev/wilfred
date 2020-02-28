@@ -19,8 +19,15 @@ def test_basic():
     assert result.exit_code == 0
 
 
-def test_path():
+def test_verion():
     runner = CliRunner()
     result = runner.invoke(cli, "--version")
+
+    assert result.exit_code == 0
+
+
+def test_path():
+    runner = CliRunner()
+    result = runner.invoke(cli, "--path")
 
     assert result.exit_code == 0
