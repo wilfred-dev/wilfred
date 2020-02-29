@@ -47,6 +47,7 @@ def test_create_server():
     session.commit()
 
     servers.install(server, skip_wait=False)
+    servers.sync()
 
 
 def test_start_server():
