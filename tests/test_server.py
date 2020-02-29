@@ -11,10 +11,13 @@
 from wilfred.images import Images
 from wilfred.servers import Servers
 from wilfred.docker_conn import docker_client
+from wilfred.server_config import ServerConfig
 from wilfred.database import Server, EnvironmentVariable, session
 
+
+configuration = {"data_path": "/tmp/wilred/servers"}
 images = Images()
-servers = Servers(docker_client(), {"data_path": "/tmp/wilfred/servers"}, images)
+servers = Servers(docker_client(), configuration, images)
 
 
 def test_create_server():
@@ -44,3 +47,22 @@ def test_create_server():
     session.commit()
 
     servers.install(server, skip_wait=False)
+
+
+def test_start_server():
+    server = session.query(Server).filter_by(id="test").first()
+
+    if server.status == "installing":
+        raise Exception("server is installing")
+
+    image = images.get_image(server.image_uid)
+
+    ServerConfig(configuration, servers, server, image).write_environment_variables()
+
+    servers.set_status(server, "running")
+    servers.sync()
+
+
+def test_delete_server():
+    server = session.query(Server).filter_by(id="test").first()
+    servers.remove(server)
