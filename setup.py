@@ -14,7 +14,7 @@ from wilfred.version import version
 
 assert sys.version_info >= (3, 6, 0), "Wilfred requires Python 3.6+"
 
-with open("README.md", "r") as f:
+with open("README.md", "r", encoding="utf-8") as f:
     long_description = f.read()
 
 setup(
