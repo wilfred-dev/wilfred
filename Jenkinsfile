@@ -1,5 +1,5 @@
 pipeline {
-    agent { docker { image 'docker:dind' } }
+    agent { docker { image 'debian:latest' } }
     stages {
         stage('build') {
             steps {
