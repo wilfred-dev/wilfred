@@ -44,6 +44,17 @@ After the [snap build](https://build.snapcraft.io/user/wilfred-dev/wilfred) has 
 
 Revert the changes in `wilfred/version.py` and commit the changes (should therefore not be included in the release).
 
+## Windows
+
+You have to install `pypiwin32` to develop on Windows.
+
+```bash
+pipenv shell
+pip install pypiwin32
+```
+
+This is not ideal, but due to a bug in Pipenv we cannot put the `pypiwin32` package as a platform specific dependency in the `Pipfile`.
+
 ## Versioning convention
 
 Wilfred releases should use the [semantic versioning convention](https://semver.org/) (i.e. `MAJOR.MINOR.PATCH`).
