@@ -52,7 +52,7 @@ setup(
         "yaspin",
         "sqlalchemy",
         "pyyaml",
-        "pypiwin32 ; platform_system=='Windows'"
+        "pypiwin32 ; platform_system=='Windows'",
     ],
     entry_points={"console_scripts": ["wilfred=wilfred.wilfred:main"]},
 )
