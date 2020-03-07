@@ -20,6 +20,7 @@ tabulate = "*"
 yaspin = "*"
 sqlalchemy = "*"
 pyyaml = "*"
+pypiwin32 = "*"
 
 [requires]
 python_version = "3.6"

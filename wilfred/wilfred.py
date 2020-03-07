@@ -33,10 +33,6 @@ from wilfred.core import is_integer, random_string, check_for_new_releases
 from wilfred.migrate import Migrate
 from wilfred.server_config import ServerConfig
 
-if sys.platform.startswith("win"):
-    click.echo("Wilfred does not support Windows")
-    sys.exit(1)
-
 
 config = Config()
 images = Images()
