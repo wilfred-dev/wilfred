@@ -16,6 +16,7 @@ from pathlib import Path
 from shutil import rmtree, get_terminal_size
 from os import remove as remove_file
 from time import sleep
+from sys import platform
 
 from wilfred.database import session, Server, EnvironmentVariable
 from wilfred.message_handler import error
@@ -212,6 +213,9 @@ class Servers(object):
     def install(self, server, skip_wait=False, spinner=None):
         path = f"{self._configuration['data_path']}/{server.id}"
         image = self._images.get_image(server.image_uid)
+
+        if platform.startswith("win"):
+            path = path.replace("/", "\\")
 
         try:
             Path(path).mkdir(parents=True, exist_ok=True)
