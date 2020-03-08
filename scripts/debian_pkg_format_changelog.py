@@ -15,8 +15,10 @@ def main():
     with open("debian/changelog") as f:
         raw = f.read()
 
-    raw = raw.replace("{VERSION}", commit_hash if version == "0.0.0.dev0" else version)
-    raw = raw.replace("{HASH}", commit_hash)
+    raw = raw.replace(
+        "{VERSION}", commit_hash[0:7] if version == "0.0.0.dev0" else version
+    )
+    raw = raw.replace("{HASH}", commit_hash[0:7])
     raw = raw.replace("{DATE}", strftime("%a, %d %b %Y %H:%M:%S +0100"))
 
     with open("debian/changelog", "w") as f:
