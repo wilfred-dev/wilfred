@@ -7,6 +7,6 @@ Standards-Version: 3.9.5
 
 Package: wilfred
 Architecture: any
-Pre-Depends: dpkg (>= 1.16.1), python (>= 3.6), ${misc:Pre-Depends}
+Pre-Depends: dpkg (>= 1.16.1), python3 (>= 3.6), ${misc:Pre-Depends}
 Depends: ${misc:Depends}
 Description: A CLI for managing game servers using Docker.
