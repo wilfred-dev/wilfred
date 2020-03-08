@@ -1,4 +1,4 @@
-wilfred ({VERSION}); urgency=medium
+wilfred ({VERSION}) unstable; urgency=medium
 
   * Release generated from Git commit {HASH}
 
