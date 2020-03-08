@@ -1,0 +1,11 @@
+version: 2.1
+
+jobs:
+  build:
+    machine: true
+    steps:
+      - checkout
+      # build deb package in Docker
+      - run: |
+          bash scripts/build_debian_package.sh
+ 
