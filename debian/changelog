@@ -1,5 +1,5 @@
-wilfred (0.5.0) UNRELEASED; urgency=medium
+wilfred ({VERSION}); urgency=medium
 
-  * Release generated from Git
+  * Release generated from Git commit {HASH}
 
- -- Vilhelm Prytz <vilhelm@prytznet.se>  Sun, 01 Mar 2020 19:26:26 +0100
+ -- Vilhelm Prytz <vilhelm@prytznet.se>  {DATE}
