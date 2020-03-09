@@ -55,15 +55,20 @@ def print_version(ctx, param, value):
         return
 
     _commit_hash = commit_hash[0:7]
+    _snap = (
+        f" via snap (revision {os.environ['SNAP_REVISION']})"
+        if "SNAP" in os.environ and "SNAP_REVISION" in os.environ
+        else ""
+    )
 
     if str(version) == "0.0.0.dev0":
         click.echo(
-            f"✨ wilfred version {_commit_hash}/edge (development build) built {commit_date}"
+            f"✨ wilfred version {_commit_hash}/edge (development build) built {commit_date}{_snap}"
         )
     else:
         check_for_new_releases()
         click.echo(
-            f"✨ wilfred version v{version}/stable (commit {_commit_hash}) built {commit_date}"
+            f"✨ wilfred version v{version}/stable (commit {_commit_hash}) built {commit_date}{_snap}"
         )
 
     ctx.exit()

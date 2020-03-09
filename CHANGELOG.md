@@ -5,6 +5,7 @@ Please refer to the [official documentation](https://docs.wilfredproject.org/en/
 ## next-release
 
 * **Added** Added new unit tests.
+* **Added** Print snap revision if Wilfred is installed via snap.
 
 ## v0.4.2 (released on 2020-02-16)
 
