@@ -76,10 +76,14 @@ def print_path(ctx, param, value):
     click.echo(f"Configuration file: {click.format_filename(config.config_path)}")
     click.echo(f"Image config file: {click.format_filename(images.image_dir)}")
     click.echo(f"Database file: {click.format_filename(database_path)}")
+
     if config.configuration:
-        click.echo(
-            f"Server data: {click.format_filename(config.configuration['data_path'])}"
-        )
+        _path = f"{click.format_filename(config.configuration['data_path'])}"
+
+        if sys.platform.startswith("win"):
+            _path = _path.replace("/", "\\")
+
+        click.echo(f"Server data: {_path}")
 
     ctx.exit()
 
