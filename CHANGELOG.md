@@ -5,7 +5,6 @@ Please refer to the [official documentation](https://docs.wilfredproject.org/en/
 ## next-release
 
 * **Added** Added new unit tests.
-* **Added** Experimental: Created Debian package
 
 ## v0.4.2 (released on 2020-02-16)
 
