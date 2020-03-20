@@ -48,10 +48,10 @@ A [snap](https://snapcraft.io/wilfred) package is also in the works but currentl
 
 Once you got Wilfred installed, run `wilfred setup` to set a path for Wilfred to use to store server files.
 
-## Contributing
+## Helping
 
 The best places to contribute are through the issue tracker and the official Discord server. For code contributions, pull requests and patches are always welcome!
 
-## Credits
+## Contributors ✨
 
 Created, written and maintained by [Vilhelm Prytz](https://github.com/VilhelmPrytz).

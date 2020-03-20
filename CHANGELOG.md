@@ -4,8 +4,11 @@ Please refer to the [official documentation](https://docs.wilfredproject.org/en/
 
 ## next-release
 
+* **Added** [#12](https://github.com/wilfred-dev/wilfred/issues/12) Added support for Windows.
 * **Added** Added new unit tests.
 * **Added** Print snap revision if Wilfred is installed via snap.
+* **Changed** Replaced [yaspin](https://pypi.org/project/yaspin/) with [halo](https://pypi.org/project/halo/) for terminal spinners (mostly because yaspin does not support Windows).
+* **Changed** Updated copyright headers.
 
 ## v0.4.2 (released on 2020-02-16)
 
