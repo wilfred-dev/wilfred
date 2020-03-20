@@ -16,6 +16,8 @@ from pathlib import Path
 from shutil import rmtree, get_terminal_size
 from os import remove as remove_file
 from time import sleep
+from sys import platform
+from subprocess import call
 
 from wilfred.database import session, Server, EnvironmentVariable
 from wilfred.message_handler import error
@@ -203,15 +205,24 @@ class Servers(object):
         except docker.errors.NotFound:
             error("server is not running", exit_code=1)
 
-        if not disable_user_input:
-            KeyboardThread(self._console_input_callback, params=server)
+        if platform.startswith("win"):
+            click.echo(container.logs())
+            call(["docker", "attach", container.id])
+        else:
+            if not disable_user_input:
+                _thread = KeyboardThread(self._console_input_callback, params=server)
 
-        for line in container.logs(stream=True, tail=200):
-            click.echo(line.strip())
+            for line in container.logs(stream=True, tail=200):
+                if not _thread._running:
+                    exit(0)
+                click.echo(line.strip())
 
     def install(self, server, skip_wait=False, spinner=None):
         path = f"{self._configuration['data_path']}/{server.id}"
         image = self._images.get_image(server.image_uid)
+
+        if platform.startswith("win"):
+            path = path.replace("/", "\\")
 
         try:
             Path(path).mkdir(parents=True, exist_ok=True)
@@ -221,13 +232,14 @@ class Servers(object):
                 exit_code=1,
             )
 
-        with open(f"{path}/install.sh", "w") as f:
+        with open(f"{path}/install.sh", "w", newline="\n") as f:
             f.write("cd /server\n" + "\n".join(image["installation"]["script"]))
 
         if spinner:
-            spinner.write(
-                "> Pulling Docker image and creating installation container, do not exit"
+            spinner.info(
+                "Pulling Docker image and creating installation container, do not exit"
             )
+            spinner.start()
 
         try:
             self._docker_client.containers.run(
@@ -250,21 +262,23 @@ class Servers(object):
             )
 
         if skip_wait and spinner:
-            spinner.write(
-                "> Installation will continue in background, use `wilfred servers` to see if process has finished."
+            spinner.info(
+                "Installation will continue in background, use `wilfred servers` to see if process has finished."
             )
+            spinner.start()
 
         if not skip_wait:
             if spinner:
-                spinner.write(
-                    "> You can safely press CTRL+C, the installation will continue in the background."
+                spinner.info(
+                    "You can safely press CTRL+C, the installation will continue in the background."
                 )
-                spinner.write(
-                    "> Run `wilfred servers` too see when the status changes from `installing` to `stopped`."
+                spinner.info(
+                    "Run `wilfred servers` too see when the status changes from `installing` to `stopped`."
                 )
-                spinner.write(
-                    f"> You can also follow the installation log using `wilfred console {server.name}`"
+                spinner.info(
+                    f"You can also follow the installation log using `wilfred console {server.name}`"
                 )
+                spinner.start()
             while self._container_alive(server):
                 sleep(1)
 
@@ -280,6 +294,8 @@ class Servers(object):
         self.command(server, payload)
 
     def command(self, server, command):
+        _cmd = f"{command}\n".encode("utf-8")
+
         try:
             container = self._docker_client.containers.get(f"wilfred_{server.id}")
         except docker.errors.NotFound:
@@ -287,7 +303,7 @@ class Servers(object):
 
         try:
             s = container.attach_socket(params={"stdin": 1, "stream": 1})
-            s._sock.send(f"{command}\n".encode("utf-8"))
+            s.send(_cmd) if platform.startswith("win") else s._sock.send(_cmd)
             s.close()
         except Exception as e:
             error(

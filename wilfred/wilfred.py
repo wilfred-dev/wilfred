@@ -16,7 +16,7 @@ import locale
 import os
 import sys
 
-from yaspin import yaspin
+from halo import Halo
 from pathlib import Path
 from sqlalchemy.exc import IntegrityError
 from time import sleep
@@ -32,10 +32,6 @@ from wilfred.message_handler import warning, error
 from wilfred.core import is_integer, random_string, check_for_new_releases
 from wilfred.migrate import Migrate
 from wilfred.server_config import ServerConfig
-
-if sys.platform.startswith("win"):
-    click.echo("Wilfred does not support Windows")
-    sys.exit(1)
 
 
 config = Config()
@@ -85,10 +81,14 @@ def print_path(ctx, param, value):
     click.echo(f"Configuration file: {click.format_filename(config.config_path)}")
     click.echo(f"Image config file: {click.format_filename(images.image_dir)}")
     click.echo(f"Database file: {click.format_filename(database_path)}")
+
     if config.configuration:
-        click.echo(
-            f"Server data: {click.format_filename(config.configuration['data_path'])}"
-        )
+        _path = f"{click.format_filename(config.configuration['data_path'])}"
+
+        if sys.platform.startswith("win"):
+            _path = _path.replace("/", "\\")
+
+        click.echo(f"Server data: {_path}")
 
     ctx.exit()
 
@@ -162,10 +162,10 @@ def list_images(refresh):
     """List images available on file."""
 
     if refresh:
-        with yaspin(text="Refreshing images", color="yellow") as spinner:
+        with Halo(text="Refreshing images", color="yellow", spinner="dots") as spinner:
             images.download_default(read=True)
 
-            spinner.ok("✅")
+            spinner.succeed("Images refreshed")
 
     click.echo(images.pretty())
 
@@ -261,9 +261,9 @@ def create(ctx, console, detach):
                 exit_code=1,
             )
 
-    with yaspin(text="Creating server", color="yellow") as spinner:
+    with Halo(text="Creating server", color="yellow", spinner="dots") as spinner:
         servers.install(server, skip_wait=True if detach else False, spinner=spinner)
-        spinner.ok("✅ ")
+        spinner.succeed("Server created")
 
     if console:
         ctx.invoke(start, name=name)
@@ -276,13 +276,12 @@ def sync_cmd():
     Sync all servers on file with Docker (start/stop/kill).
     """
 
-    with yaspin(text="Docker sync", color="yellow") as spinner:
+    with Halo(text="Docker sync", color="yellow", spinner="dots") as spinner:
         if not config.configuration:
-            spinner.fail("💥 Wilfred has not been configured")
+            spinner.fail("Wilfred has not been configured")
 
         servers.sync()
-
-        spinner.ok("✅ ")
+        spinner.succeed("Servers synced")
 
 
 @cli.command()
@@ -299,19 +298,19 @@ def start(ctx, name, console):
 
     servers.sync()
 
-    with yaspin(text="Server start", color="yellow") as spinner:
+    with Halo(text="Starting server", color="yellow", spinner="dots") as spinner:
         if not config.configuration:
-            spinner.fail("💥 Wilfred has not been configured")
+            spinner.fail("Wilfred has not been configured")
             sys.exit(1)
 
         server = session.query(Server).filter_by(name=name.lower()).first()
 
         if not server:
-            spinner.fail("💥 Server does not exit")
+            spinner.fail("Server does not exit")
             sys.exit(1)
 
         if server.status == "installing":
-            spinner.fail("💥 Server is installing, start blocked.")
+            spinner.fail("Server is installing, start blocked.")
             sys.exit(1)
 
         image = images.get_image(server.image_uid)
@@ -326,7 +325,7 @@ def start(ctx, name, console):
         servers.set_status(server, "running")
         servers.sync()
 
-        spinner.ok("✅ ")
+        spinner.succeed("Server started")
 
         if console:
             ctx.invoke(server_console, name=name)
@@ -342,22 +341,22 @@ def kill(name):
     if click.confirm(
         "Are you sure you want to do this? This will kill the running container without saving data."
     ):
-        with yaspin(text="Killing server", color="yellow") as spinner:
+        with Halo(text="Killing server", color="yellow", spinner="dots") as spinner:
             if not config.configuration:
-                spinner.fail("💥 Wilfred has not been configured")
+                spinner.fail("Wilfred has not been configured")
                 sys.exit(1)
 
             server = session.query(Server).filter_by(name=name.lower()).first()
 
             if not server:
-                spinner.fail("💥 Server does not exit")
+                spinner.fail("Server does not exit")
                 sys.exit(1)
 
             servers.kill(server)
             servers.set_status(server, "stopped")
             servers.sync()
 
-            spinner.ok("✅ ")
+            spinner.succeed("Server killed")
 
 
 @cli.command()
@@ -369,22 +368,22 @@ def stop(name):
 
     servers.sync()
 
-    with yaspin(text="Stopping server", color="yellow") as spinner:
+    with Halo(text="Stopping server", color="yellow", spinner="dots") as spinner:
         if not config.configuration:
-            spinner.fail("💥 Wilfred has not been configured")
+            spinner.fail("Wilfred has not been configured")
             sys.exit(1)
 
         server = session.query(Server).filter_by(name=name.lower()).first()
 
         if not server:
-            spinner.fail("💥 Server does not exit")
+            spinner.fail("Server does not exit")
             sys.exit(1)
 
         if server.status == "installing":
             spinner.fail(
                 " ".join(
                     (
-                        "💥 Server is installing, you cannot gracefully stop it.",
+                        "Server is installing, you cannot gracefully stop it.",
                         "Use `wilfred kill` if the installation process has hanged.",
                     )
                 )
@@ -394,7 +393,7 @@ def stop(name):
         servers.set_status(server, "stopped")
         servers.sync()
 
-        spinner.ok("✅ ")
+        spinner.succeed("Server stopped")
 
 
 @cli.command()
@@ -429,19 +428,19 @@ def delete(name):
     if click.confirm(
         "Are you sure you want to do this? All data will be permanently deleted."
     ):
-        with yaspin(text="Deleting server", color="yellow") as spinner:
+        with Halo(text="Deleting server", color="yellow", spinner="dots") as spinner:
             if not config.configuration:
-                spinner.fail("💥 Wilfred has not been configured")
+                spinner.fail("Wilfred has not been configured")
                 sys.exit(1)
 
             server = session.query(Server).filter_by(name=name.lower()).first()
 
             if not server:
-                spinner.fail("💥 Server does not exit")
+                spinner.fail("Server does not exit")
                 sys.exit(1)
 
             servers.remove(server)
-            spinner.ok("✅ ")
+            spinner.succeed("Server removed")
 
 
 @cli.command("command")
@@ -613,9 +612,11 @@ def edit(name):
 )
 def top():
     while True:
-        click.clear()
-
+        # retrieve data (this can take a split moment)
         data = servers.pretty_data(cpu_load=True, memory_usage=True)
+
+        # clear the screen
+        click.clear()
 
         headers = {
             "id": click.style("ID", bold=True),
@@ -629,8 +630,10 @@ def top():
             "memory_usage": click.style("RAM usage", bold=True),
         }
 
+        # display table
         click.echo(tabulate(data, headers=headers, tablefmt="plain",))
 
+        # cooldown before repeating
         sleep(1)
 
 

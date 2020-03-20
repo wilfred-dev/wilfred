@@ -1,6 +1,12 @@
 # Prerequisites
 
-Before installing Wilfred, make sure you already have [Docker](https://docs.docker.com/install/) installed on your system.
+Wilfred currently supports Linux (should be everywhere where Python and Docker is supported), MacOS and now Windows.
+
+Before installing, make sure you have Docker already installed and configured. You can install it from the links below.
+
+* [Docker on Linux](https://docs.docker.com/install/)
+* [Docker Desktop on MacOS](https://docs.docker.com/docker-for-mac/install/)
+* [Docker Desktop on Windows](https://docs.docker.com/docker-for-windows/install/)
 
 You can verify that Docker is installed using `docker --version` or `docker info` (`info` shows more information).
 
