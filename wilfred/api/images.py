@@ -10,6 +10,7 @@
 
 import json
 import click
+import warnings
 
 from tabulate import tabulate
 from appdirs import user_config_dir
@@ -19,8 +20,6 @@ from os import walk, remove
 from requests import get
 from zipfile import ZipFile
 from shutil import move, rmtree
-
-from wilfred.message_handler import warning, error
 
 API_VERSION = 2
 
@@ -34,7 +33,7 @@ class Images(object):
             Path(self.image_dir).mkdir(parents=True, exist_ok=True)
 
         if not isdir(f"{self.image_dir}/default"):
-            warning(
+            warnings.warn(
                 "default image directory does not exist, downloading default images"
             )
             self.download_default()
@@ -42,9 +41,7 @@ class Images(object):
         if not self._read_images():
             self.download_default()
             if not self._read_images(silent=True):
-                error(
-                    "Image still has incorrect API version after refresh", exit_code=1
-                )
+                raise Exception("Image still has incorrect API version after refresh")
             click.echo("✅ Solved after default images refresh")
 
     def download_default(self, read=False):
@@ -105,7 +102,7 @@ class Images(object):
 
     def _verify(self, image, file):
         def _exception(key):
-            error(f"image {file} is missing key {str(key)}")
+            raise Exception(f"image {file} is missing key {str(key)}")
 
             return False
 
@@ -129,7 +126,7 @@ class Images(object):
                 return _exception(key)
 
         if image["uid"] != image["uid"].lower():
-            error(f"image {file} uid must be lowercase")
+            raise Exception(f"image {file} uid must be lowercase")
 
             return False
 
@@ -194,15 +191,14 @@ class Images(object):
                         try:
                             _image = json.loads(f.read())
                         except Exception as e:
-                            error(
+                            raise Exception(
                                 f"unable to parse {file} with error {click.style(str(e), bold=True)}",
-                                exit_code=1,
                             )
 
                         try:
                             if _image["meta"]["api_version"] != API_VERSION:
                                 if not silent:
-                                    warning(
+                                    warnings.warn(
                                         " ".join(
                                             (
                                                 f"{file} image has API level {_image['meta']['api_version']},",
@@ -213,7 +209,7 @@ class Images(object):
                                 return False
                         except Exception as e:
                             if not silent:
-                                error(
+                                raise Exception(
                                     " ".join(
                                         (
                                             f"could not parse config for image {file},",

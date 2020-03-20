@@ -27,7 +27,7 @@ from wilfred.version import version, commit_hash, commit_date
 from wilfred.config_parser import Config
 from wilfred.database import session, database_path, Server, EnvironmentVariable
 from wilfred.servers import Servers
-from wilfred.images import Images
+from wilfred.api.images import Images
 from wilfred.message_handler import warning, error
 from wilfred.core import is_integer, random_string, check_for_new_releases
 from wilfred.migrate import Migrate
