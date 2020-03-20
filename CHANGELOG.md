@@ -2,7 +2,7 @@
 
 Please refer to the [official documentation](https://docs.wilfredproject.org/en/latest/development/) for more information about the CHANGELOG and releases.
 
-## next-release
+## v0.5.0 (released on 2020-03-20)
 
 * **Added** [#12](https://github.com/wilfred-dev/wilfred/issues/12) Added support for Windows.
 * **Added** Added new unit tests.
