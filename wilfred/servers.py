@@ -225,7 +225,7 @@ class Servers(object):
                 exit_code=1,
             )
 
-        with open(f"{path}/install.sh", "w") as f:
+        with open(f"{path}/install.sh", "w", newline="\n") as f:
             f.write("cd /server\n" + "\n".join(image["installation"]["script"]))
 
         if spinner:
