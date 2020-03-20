@@ -285,6 +285,8 @@ class Servers(object):
         self.command(server, payload)
 
     def command(self, server, command):
+        _cmd = f"{command}\n".encode("utf-8")
+
         try:
             container = self._docker_client.containers.get(f"wilfred_{server.id}")
         except docker.errors.NotFound:
@@ -292,7 +294,8 @@ class Servers(object):
 
         try:
             s = container.attach_socket(params={"stdin": 1, "stream": 1})
-            s._sock.send(f"{command}\n".encode("utf-8"))
+
+            s.send(_cmd) if platform.startswith("win") else s._sock.send()
             s.close()
         except Exception as e:
             error(

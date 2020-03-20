@@ -370,9 +370,6 @@ def stop(name):
     servers.sync()
 
     with yaspin(text="Stopping server", color="yellow") as spinner:
-        if sys.platform.startswith("win"):
-            error("currently broken on Windows", exit_code=1)
-
         if not config.configuration:
             spinner.fail("💥 Wilfred has not been configured")
             sys.exit(1)
@@ -485,9 +482,6 @@ def server_console(name):
     """
     Attach to server console, view log and run commands.
     """
-
-    if sys.platform.startswith("win"):
-        error("currently broken on Windows", exit_code=1)
 
     if not config.configuration:
         error("Wilfred has not been configured", exit_code=1)
