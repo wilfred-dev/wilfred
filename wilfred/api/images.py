@@ -104,8 +104,6 @@ class Images(object):
         def _exception(key):
             raise Exception(f"image {file} is missing key {str(key)}")
 
-            return False
-
         for key in (
             "meta",
             "uid",
@@ -127,8 +125,6 @@ class Images(object):
 
         if image["uid"] != image["uid"].lower():
             raise Exception(f"image {file} uid must be lowercase")
-
-            return False
 
         for key in ["api_version"]:
             try:
