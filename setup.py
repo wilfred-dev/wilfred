@@ -50,7 +50,7 @@ setup(
         "appdirs",
         "requests",
         "tabulate",
-        "yaspin",
+        "halo",
         "sqlalchemy",
         "pyyaml",
         "pypiwin32 ; platform_system=='Windows'",

@@ -17,9 +17,9 @@ colorama = "*"
 appdirs = "*"
 requests = "*"
 tabulate = "*"
-yaspin = "*"
 sqlalchemy = "*"
 pyyaml = "*"
+halo = "*"
 
 [requires]
 python_version = "3.6"

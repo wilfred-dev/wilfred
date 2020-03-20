@@ -236,9 +236,10 @@ class Servers(object):
             f.write("cd /server\n" + "\n".join(image["installation"]["script"]))
 
         if spinner:
-            spinner.write(
-                "> Pulling Docker image and creating installation container, do not exit"
+            spinner.info(
+                "Pulling Docker image and creating installation container, do not exit"
             )
+            spinner.start()
 
         try:
             self._docker_client.containers.run(
@@ -251,7 +252,6 @@ class Servers(object):
                 ).get_env_vars(),
                 remove=True,
                 detach=True,
-                privileged=True if platform.startswith("win") else False,
             )
         except Exception as e:
             session.delete(server)
@@ -262,21 +262,23 @@ class Servers(object):
             )
 
         if skip_wait and spinner:
-            spinner.write(
-                "> Installation will continue in background, use `wilfred servers` to see if process has finished."
+            spinner.info(
+                "Installation will continue in background, use `wilfred servers` to see if process has finished."
             )
+            spinner.start()
 
         if not skip_wait:
             if spinner:
-                spinner.write(
-                    "> You can safely press CTRL+C, the installation will continue in the background."
+                spinner.info(
+                    "You can safely press CTRL+C, the installation will continue in the background."
                 )
-                spinner.write(
-                    "> Run `wilfred servers` too see when the status changes from `installing` to `stopped`."
+                spinner.info(
+                    "Run `wilfred servers` too see when the status changes from `installing` to `stopped`."
                 )
-                spinner.write(
-                    f"> You can also follow the installation log using `wilfred console {server.name}`"
+                spinner.info(
+                    f"You can also follow the installation log using `wilfred console {server.name}`"
                 )
+                spinner.start()
             while self._container_alive(server):
                 sleep(1)
 
@@ -357,7 +359,6 @@ class Servers(object):
                 stdin_open=True,
                 environment=ContainerVariables(server, image).get_env_vars(),
                 user=image["user"] if image["user"] else "root",
-                privileged=True if platform.startswith("win") else False,
             )
         except Exception as e:
             error(
