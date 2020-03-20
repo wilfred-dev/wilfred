@@ -205,9 +205,11 @@ class Servers(object):
             error("server is not running", exit_code=1)
 
         if not disable_user_input:
-            KeyboardThread(self._console_input_callback, params=server)
+            _thread = KeyboardThread(self._console_input_callback, params=server)
 
         for line in container.logs(stream=True, tail=200):
+            if not _thread._running:
+                exit(0)
             click.echo(line.strip())
 
     def install(self, server, skip_wait=False, spinner=None):
@@ -294,8 +296,7 @@ class Servers(object):
 
         try:
             s = container.attach_socket(params={"stdin": 1, "stream": 1})
-
-            s.send(_cmd) if platform.startswith("win") else s._sock.send()
+            s.send(_cmd) if platform.startswith("win") else s._sock.send(_cmd)
             s.close()
         except Exception as e:
             error(
