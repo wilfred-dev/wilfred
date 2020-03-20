@@ -39,6 +39,7 @@ setup(
         "Operating System :: MacOS :: MacOS X",
         "Operating System :: POSIX :: Linux",
         "Operating System :: Unix",
+        "Operating System :: Microsoft :: Windows",
         "Natural Language :: English",
     ],
     python_requires=">=3.6",
