@@ -41,6 +41,8 @@ servers = Servers(docker_client(), config.configuration, images)
 # check
 Migrate()
 
+ENABLE_EMOJIS = False if sys.platform.startswith("win") else True
+
 
 def print_version(ctx, param, value):
     """
@@ -59,7 +61,7 @@ def print_version(ctx, param, value):
 
     if str(version) == "0.0.0.dev0":
         click.echo(
-            f"✨ wilfred version {_commit_hash}/edge (development build) built {commit_date}{_snap}"
+            f"{'✨ ' if ENABLE_EMOJIS else ''}wilfred version {_commit_hash}/edge (development build) built {commit_date}{_snap}"
         )
     else:
         check_for_new_releases()
@@ -114,12 +116,7 @@ def main():
 )
 def cli():
     """
-    Wilfred
-
-    🐿️  A CLI for managing game servers using Docker.
-
-    ⚠️  Wilfred is currently under development and should not be considered stable.
-    Features may break or may not be implemented yet. Use with caution.
+    Wilfred - A CLI for managing game servers using Docker.
 
     Website - https://wilfredproject.org
 
