@@ -619,9 +619,11 @@ def edit(name):
 )
 def top():
     while True:
-        click.clear()
-
+        # retrieve data (this can take a split moment)
         data = servers.pretty_data(cpu_load=True, memory_usage=True)
+
+        # clear the screen
+        click.clear()
 
         headers = {
             "id": click.style("ID", bold=True),
@@ -635,8 +637,10 @@ def top():
             "memory_usage": click.style("RAM usage", bold=True),
         }
 
+        # display table
         click.echo(tabulate(data, headers=headers, tablefmt="plain",))
 
+        # cooldown before repeating
         sleep(1)
 
 
