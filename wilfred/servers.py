@@ -244,6 +244,7 @@ class Servers(object):
                 ).get_env_vars(),
                 remove=True,
                 detach=True,
+                privileged=True if platform.startswith("win") else False,
             )
         except Exception as e:
             session.delete(server)
@@ -347,6 +348,7 @@ class Servers(object):
                 stdin_open=True,
                 environment=ContainerVariables(server, image).get_env_vars(),
                 user=image["user"] if image["user"] else "root",
+                privileged=True if platform.startswith("win") else False,
             )
         except Exception as e:
             error(
