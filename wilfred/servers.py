@@ -17,6 +17,7 @@ from shutil import rmtree, get_terminal_size
 from os import remove as remove_file
 from time import sleep
 from sys import platform
+from subprocess import call
 
 from wilfred.database import session, Server, EnvironmentVariable
 from wilfred.message_handler import error
@@ -204,13 +205,17 @@ class Servers(object):
         except docker.errors.NotFound:
             error("server is not running", exit_code=1)
 
-        if not disable_user_input:
-            _thread = KeyboardThread(self._console_input_callback, params=server)
+        if platform.startswith("win"):
+            click.echo(container.logs())
+            call(["docker", "attach", container.id])
+        else:
+            if not disable_user_input:
+                _thread = KeyboardThread(self._console_input_callback, params=server)
 
-        for line in container.logs(stream=True, tail=200):
-            if not _thread._running:
-                exit(0)
-            click.echo(line.strip())
+            for line in container.logs(stream=True, tail=200):
+                if not _thread._running:
+                    exit(0)
+                click.echo(line.strip())
 
     def install(self, server, skip_wait=False, spinner=None):
         path = f"{self._configuration['data_path']}/{server.id}"
