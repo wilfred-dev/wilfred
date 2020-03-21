@@ -61,12 +61,22 @@ def print_version(ctx, param, value):
 
     if str(version) == "0.0.0.dev0":
         click.echo(
-            f"{'✨ ' if ENABLE_EMOJIS else ''}wilfred version {_commit_hash}/edge (development build) built {commit_date}{_snap}"
+            "".join(
+                (
+                    f"{'✨ ' if ENABLE_EMOJIS else ''}wilfred version ",
+                    f"{_commit_hash}/edge (development build) built {commit_date}{_snap}",
+                )
+            )
         )
     else:
-        check_for_new_releases()
+        check_for_new_releases(enable_emojis=ENABLE_EMOJIS)
         click.echo(
-            f"✨ wilfred version v{version}/stable (commit {_commit_hash}) built {commit_date}{_snap}"
+            "".join(
+                (
+                    f"{'✨ ' if ENABLE_EMOJIS else ''}wilfred version ",
+                    f"v{version}/stable (commit {_commit_hash}) built {commit_date}{_snap}",
+                )
+            )
         )
 
     ctx.exit()
