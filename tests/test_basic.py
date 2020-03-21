@@ -19,7 +19,7 @@ def test_basic():
     assert result.exit_code == 0
 
 
-def test_verion():
+def test_version():
     runner = CliRunner()
     result = runner.invoke(cli, "--version")
 
