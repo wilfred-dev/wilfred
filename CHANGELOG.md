@@ -2,7 +2,7 @@
 
 Please refer to the [official documentation](https://docs.wilfredproject.org/en/latest/development/) for more information about the CHANGELOG and releases.
 
-## next-release
+## v0.5.1 (released on 2020-03-21)
 
 * **Added** Added project URLs to `setup.py`.
 * **Changed** Disabled terminal emojis on Windows (PowerShell and cmd have poor support for emojis).
