@@ -340,12 +340,13 @@ def start(ctx, name, console):
 
 @cli.command()
 @click.argument("name")
-def kill(name):
+@click.option("-f", "--force", is_flag=True)
+def kill(name, force):
     """
     Forcefully kill running server.
     """
 
-    if click.confirm(
+    if force or click.confirm(
         "Are you sure you want to do this? This will kill the running container without saving data."
     ):
         with Halo(text="Killing server", color="yellow", spinner="dots") as spinner:
@@ -427,12 +428,13 @@ def restart(ctx, name, console):
 
 @cli.command()
 @click.argument("name")
-def delete(name):
+@click.option("-f", "--force", is_flag=True)
+def delete(name, force):
     """
     Delete existing server.
     """
 
-    if click.confirm(
+    if force or click.confirm(
         "Are you sure you want to do this? All data will be permanently deleted."
     ):
         with Halo(text="Deleting server", color="yellow", spinner="dots") as spinner:

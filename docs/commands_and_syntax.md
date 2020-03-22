@@ -12,12 +12,14 @@ Basic commands and syntax available for Wilfred.
   - Optional option `--detach` - Skip waiting for the installation to finish (useful for games that take some time to install). Installation process continues in the background.
 - `delete` - Delete already existing server.
   - Required argument `NAME` - Name of the server.
+  - Optional option `-f`, `--force` - Force action without confirmation.
 - `edit` - Edit already existing server.
   - Required argument `NAME` - Name of the server.
 - `images` - List all images.
   - Optional option `--refresh` - Updates all default image configs from GitHub.
 - `kill` - Kill container of a running server.
   - Required argument `NAME` - Name of the server.
+  - Optional option `-f`, `--force` - Force action without confirmation.
 - `servers` - List existing servers, prints as a table.
 - `setup` - Used for initial configuration, set the path for storing server files.
 - `start` - Start the server.
