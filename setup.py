@@ -26,6 +26,11 @@ setup(
     long_description=long_description,
     long_description_content_type="text/markdown",
     url="https://wilfredproject.org",
+    project_urls={
+        "Documentation": "https://docs.wilfredproject.org",
+        "Code": "https://github.com/wilfred-dev/wilfred",
+        "Issue tracker": "https://github.com/wilfred-dev/wilfred/issues",
+    },
     packages=find_packages(),
     license="MIT",
     classifiers=[

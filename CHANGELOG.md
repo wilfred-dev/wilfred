@@ -2,6 +2,16 @@
 
 Please refer to the [official documentation](https://docs.wilfredproject.org/en/latest/development/) for more information about the CHANGELOG and releases.
 
+## next-release
+
+* **Added** [#47](https://github.com/wilfred-dev/wilfred/issues/47) Added `--force`/`-f` flags to `wilfred kill` and `wilfred delete` (forces actions without confirmation).
+
+## v0.5.1 (released on 2020-03-21)
+
+* **Added** Added project URLs to `setup.py`.
+* **Changed** Disabled terminal emojis on Windows (PowerShell and cmd have poor support for emojis).
+* **Fixed** [#46](https://github.com/wilfred-dev/wilfred/issues/46) Fixed a bug that caused Wilfred to crash if attaching to the server console during installation.
+
 ## v0.5.0 (released on 2020-03-20)
 
 * **Added** [#12](https://github.com/wilfred-dev/wilfred/issues/12) Added support for Windows.

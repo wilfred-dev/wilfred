@@ -19,10 +19,10 @@ If you're having trouble accessing the Docker CLI as a non-root user, you can [a
 
 # Pip
 
-Wilfred can be installed using `pip`. You need to use **Python 3.6** or newer to run Wilfred.
+Wilfred can be installed using `pip`. You need to use **Python 3.6** or newer to run Wilfred (if you also have `pip2` on your system, run with `pip3`).
 
 ```bash
-pip install wilfred --upgrade --user
+pip install wilfred --upgrade
 ```
 
 You can install using a specific python version, e.g. `3.8`.

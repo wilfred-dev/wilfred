@@ -210,11 +210,9 @@ class Servers(object):
             call(["docker", "attach", container.id])
         else:
             if not disable_user_input:
-                _thread = KeyboardThread(self._console_input_callback, params=server)
+                KeyboardThread(self._console_input_callback, params=server)
 
             for line in container.logs(stream=True, tail=200):
-                if not _thread._running:
-                    exit(0)
                 click.echo(line.strip())
 
     def install(self, server, skip_wait=False, spinner=None):

@@ -28,7 +28,7 @@ def random_string(length=8):
     return "".join(choice(ascii_lowercase + digits) for i in range(length))
 
 
-def check_for_new_releases():
+def check_for_new_releases(enable_emojis=True):
     """
     Checks if a new version is available on GitHub
     """
@@ -48,7 +48,14 @@ def check_for_new_releases():
         return
 
     if latest_release != f"v{version}":
-        click.echo(f"🎉 A new version of Wilfred is available! {latest_release}")
+        click.echo(
+            "".join(
+                (
+                    f"{'🎉 ' if enable_emojis else click.style('! ', fg='green')}",
+                    f"A new version of Wilfred is available! {latest_release}",
+                )
+            )
+        )
 
     return
 
