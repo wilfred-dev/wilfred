@@ -41,7 +41,7 @@ Please refer to the [official documentation](https://docs.wilfredproject.org/en/
 Make sure you have Docker installed (see official documentation for more info). Wilfred can be installed using `pip`. You need to use **Python 3.6** or newer to run Wilfred.
 
 ```bash
-pip install wilfred --upgrade --user
+pip install wilfred --upgrade
 ```
 
 A [snap](https://snapcraft.io/wilfred) package is also in the works but currently not considered stable.
