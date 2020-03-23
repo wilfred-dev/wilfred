@@ -206,14 +206,20 @@ class Servers(object):
             error("server is not running", exit_code=1)
 
         if platform.startswith("win"):
-            click.echo(container.logs())
-            call(["docker", "attach", container.id])
+            try:
+                click.echo(container.logs())
+                call(["docker", "attach", container.id])
+            except Exception as e:
+                raise Exception(f"could not attach to console, {str(e)}")
         else:
             if not disable_user_input:
                 KeyboardThread(self._console_input_callback, params=server)
 
-            for line in container.logs(stream=True, tail=200):
-                click.echo(line.strip())
+            try:
+                for line in container.logs(stream=True, tail=200):
+                    click.echo(line.strip())
+            except docker.errors.NotFound:
+                raise Exception("server not running")
 
     def install(self, server, skip_wait=False, spinner=None):
         path = f"{self._configuration['data_path']}/{server.id}"

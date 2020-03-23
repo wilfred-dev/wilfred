@@ -509,9 +509,12 @@ def server_console(name):
         bold=True,
     )
 
-    servers.console(
-        server, disable_user_input=True if server.status == "installing" else False
-    )
+    try:
+        servers.console(
+            server, disable_user_input=True if server.status == "installing" else False
+        )
+    except Exception as e:
+        error(str(e), exit_code=1)
 
 
 @cli.command(
