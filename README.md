@@ -38,20 +38,20 @@ Please refer to the [official documentation](https://docs.wilfredproject.org/en/
 
 ### Quickstart
 
-Wilfred can be installed using `pip`. You need to use **Python 3.6** or newer to run Wilfred.
+Make sure you have Docker installed (see official documentation for more info). Wilfred can be installed using `pip`. You need to use **Python 3.6** or newer to run Wilfred.
 
 ```bash
-pip install wilfred --upgrade --user
+pip install wilfred --upgrade
 ```
 
 A [snap](https://snapcraft.io/wilfred) package is also in the works but currently not considered stable.
 
 Once you got Wilfred installed, run `wilfred setup` to set a path for Wilfred to use to store server files.
 
-## Contributing
+## Helping
 
 The best places to contribute are through the issue tracker and the official Discord server. For code contributions, pull requests and patches are always welcome!
 
-## Credits
+## Contributors ✨
 
 Created, written and maintained by [Vilhelm Prytz](https://github.com/VilhelmPrytz).

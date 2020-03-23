@@ -1,6 +1,12 @@
 # Prerequisites
 
-Before installing Wilfred, make sure you already have [Docker](https://docs.docker.com/install/) installed on your system.
+Wilfred currently supports Linux (should be everywhere where Python and Docker is supported), MacOS and now Windows.
+
+Before installing, make sure you have Docker already installed and configured. You can install it from the links below.
+
+* [Docker on Linux](https://docs.docker.com/install/)
+* [Docker Desktop on MacOS](https://docs.docker.com/docker-for-mac/install/)
+* [Docker Desktop on Windows](https://docs.docker.com/docker-for-windows/install/)
 
 You can verify that Docker is installed using `docker --version` or `docker info` (`info` shows more information).
 
@@ -13,10 +19,10 @@ If you're having trouble accessing the Docker CLI as a non-root user, you can [a
 
 # Pip
 
-Wilfred can be installed using `pip`. You need to use **Python 3.6** or newer to run Wilfred.
+Wilfred can be installed using `pip`. You need to use **Python 3.6** or newer to run Wilfred (if you also have `pip2` on your system, run with `pip3`).
 
 ```bash
-pip install wilfred --upgrade --user
+pip install wilfred --upgrade
 ```
 
 You can install using a specific python version, e.g. `3.8`.

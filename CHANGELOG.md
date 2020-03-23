@@ -2,6 +2,25 @@
 
 Please refer to the [official documentation](https://docs.wilfredproject.org/en/latest/development/) for more information about the CHANGELOG and releases.
 
+## next-release
+
+* **Added** [#47](https://github.com/wilfred-dev/wilfred/issues/47) Added `--force`/`-f` flags to `wilfred kill` and `wilfred delete` (forces actions without confirmation).
+* **Fixed** [#49](https://github.com/wilfred-dev/wilfred/issues/49) Fixed a bug that caused Wilfred to crash if a container stopped running between the statement that checks if the server is running and the statement that actually retrieves the log in `wilfred console`.
+
+## v0.5.1 (released on 2020-03-21)
+
+* **Added** Added project URLs to `setup.py`.
+* **Changed** Disabled terminal emojis on Windows (PowerShell and cmd have poor support for emojis).
+* **Fixed** [#46](https://github.com/wilfred-dev/wilfred/issues/46) Fixed a bug that caused Wilfred to crash if attaching to the server console during installation.
+
+## v0.5.0 (released on 2020-03-20)
+
+* **Added** [#12](https://github.com/wilfred-dev/wilfred/issues/12) Added support for Windows.
+* **Added** Added new unit tests.
+* **Added** Print snap revision if Wilfred is installed via snap.
+* **Changed** Replaced [yaspin](https://pypi.org/project/yaspin/) with [halo](https://pypi.org/project/halo/) for terminal spinners (mostly because yaspin does not support Windows).
+* **Changed** Updated copyright headers.
+
 ## v0.4.2 (released on 2020-02-16)
 
 * **Fixed** [#41](https://github.com/wilfred-dev/wilfred/issues/41) Fixed a critical bug that caused servers with config settings linked to environment variables not to start.
