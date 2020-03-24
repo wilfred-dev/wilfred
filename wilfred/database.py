@@ -40,10 +40,6 @@ class Server(Base):
     environment_variables = relationship("EnvironmentVariable")
 
     # SQLite does not enforce string maximums
-    __table_args__ = (
-        CheckConstraint("char_length(name) <= 20", name="name_max_length"),
-    )
-
     @validates("name")
     def validate_name(self, key, name) -> str:
         if len(name) > 20:
