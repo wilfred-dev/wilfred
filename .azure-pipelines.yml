@@ -12,10 +12,13 @@ strategy:
   matrix:
     Python36:
       python.version: '3.6'
+      tox.env: py36
     Python37:
       python.version: '3.7'
+      tox.env: py37
     Python38:
       python.version: '3.8'
+      tox.env: py38
 
 steps:
 - task: UsePythonVersion@0
@@ -32,5 +35,5 @@ steps:
 
 - script: |
     pip install tox pytest-azurepipelines
-    tox
-  displayName: 'Run tests'
+    tox -e $(tox.env)
+  displayName: 'Run tox -e $(tox.env)'
