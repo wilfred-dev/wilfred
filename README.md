@@ -46,6 +46,13 @@ pip install wilfred --upgrade
 
 A [snap](https://snapcraft.io/wilfred) package is also in the works but currently not considered stable.
 
+If you're using macOS with [Homebrew](https://brew.sh) or Linux with [Linuxbrew](https://docs.brew.sh/Homebrew-on-Linux), you can install Wilfred using the official tap.
+
+```bash
+brew tap wilfred-dev/wilfred
+brew install wilfred
+```
+
 Once you got Wilfred installed, run `wilfred setup` to set a path for Wilfred to use to store server files.
 
 ## Helping

@@ -31,6 +31,15 @@ You can install using a specific python version, e.g. `3.8`.
 python3.8 -m pip install wilfred --upgrade
 ```
 
+# Homebrew
+
+If you're using macOS with [Homebrew](https://brew.sh) or Linux with [Linuxbrew](https://docs.brew.sh/Homebrew-on-Linux), you can install Wilfred using the official tap.
+
+```bash
+brew tap wilfred-dev/wilfred
+brew install wilfred
+```
+
 # Snap (experimental)
 
 !!! warning
@@ -66,12 +75,23 @@ To create a new server, you can run `wilfred create` and follow the instructions
 
 # Upgrading
 
+To check if you're running the latest version, run `wilfred --version`. If a new version is available, Wilfred will print a message.
+
 If you installed Wilfred using `pip`, then you can upgrade by running the same command as for installing (note the `--upgrade` flag).
 
-If you installed Wilfred using `snap`, you can use `refresh` to download the latest version.
+```bash
+pip install wilfred --upgrade
+```
+
+If you installed Wilfred using `snap`, you can use `refresh` to download the latest version (snap should automatically update).
 
 ```bash
 sudo snap refresh wilfred
 ```
 
-(snap should automatically update)
+If you installed Wilfred using `brew`, you can use Homebrew to upgrade Wilfred as you would do with any formula.
+
+```bash
+brew update
+brew upgrade
+```
