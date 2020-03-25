@@ -9,7 +9,6 @@
 ####################################################################
 
 from sqlalchemy import create_engine, Column, Integer, String, ForeignKey
-from sqlalchemy.schema import CheckConstraint
 from sqlalchemy.orm import relationship, sessionmaker, validates
 from sqlalchemy.ext.declarative import declarative_base
 
