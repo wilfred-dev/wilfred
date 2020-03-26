@@ -9,7 +9,7 @@
 ####################################################################
 
 from sqlalchemy import create_engine, Column, Integer, String, ForeignKey
-from sqlalchemy.orm import relationship, sessionmaker
+from sqlalchemy.orm import relationship, sessionmaker, validates
 from sqlalchemy.ext.declarative import declarative_base
 
 from appdirs import user_data_dir
@@ -29,7 +29,7 @@ class Server(Base):
     __tablename__ = "servers"
 
     id = Column(String, primary_key=True, unique=True)
-    name = Column(String, unique=True)
+    name = Column(String(20), unique=True)
     image_uid = Column(String)
     memory = Column(Integer)
     port = Column(Integer, unique=True)
@@ -37,6 +37,13 @@ class Server(Base):
     status = Column(String)
 
     environment_variables = relationship("EnvironmentVariable")
+
+    # SQLite does not enforce string maximums
+    @validates("name")
+    def validate_name(self, key, name) -> str:
+        if len(name) > 20:
+            raise ValueError("name is too long (max 20 characters)")
+        return name
 
     def __repr__(self):
         return f"<Server(id='{self.id}', name='{self.name}', image_uid='{self.image_uid}', port='{self.port}')>"

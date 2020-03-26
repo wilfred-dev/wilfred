@@ -212,24 +212,28 @@ def create(ctx, console, detach):
     port = click.prompt("Port", default=25565)
     memory = click.prompt("Memory", default=1024)
 
-    click.secho("Environment Variables", bold=True)
-
     # create
-    server = Server(
-        id=random_string(),
-        name=name,
-        image_uid=image_uid,
-        memory=memory,
-        port=port,
-        custom_startup=None,
-        status="installing",
-    )
+    server = Server(id=random_string())
+
+    try:
+        server.name = name
+    except ValueError as e:
+        error(str(e), exit_code=1)
+
+    server.image_uid = image_uid
+    server.memory = memory
+    server.port = port
+    server.custom_startup = None
+    server.status = "installing"
+
     session.add(server)
 
     try:
         session.commit()
     except IntegrityError as e:
         error(f"unable to create server {click.style(str(e), bold=True)}", exit_code=1)
+
+    click.secho("Environment Variables", bold=True)
 
     # environment variables available for the container
     for v in images.get_image(image_uid)["variables"]:
@@ -592,17 +596,24 @@ def edit(name):
 
     if server.custom_startup is not None:
         custom_startup = click.prompt(
-            "Custom startup command", default=server.custom_startup
+            "Custom startup command (use 'None' to reset to default)",
+            default=server.custom_startup,
         )
 
     if server.custom_startup is None:
         if click.confirm("Would you like to set a custom startup command?"):
             custom_startup = click.prompt(
-                "Custom startup command",
+                "Custom startup command (use 'None' to reset to default)",
                 default=images.get_image(server.image_uid)["command"],
             )
 
-    server.name = name
+            custom_startup = None if custom_startup == "None" else custom_startup
+
+    try:
+        server.name = name
+    except ValueError as e:
+        error(str(e), exit_code=1)
+
     server.port = port
     server.memory = memory
 
