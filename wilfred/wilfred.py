@@ -596,15 +596,18 @@ def edit(name):
 
     if server.custom_startup is not None:
         custom_startup = click.prompt(
-            "Custom startup command", default=server.custom_startup
+            "Custom startup command (use 'None' to reset to default)",
+            default=server.custom_startup,
         )
 
     if server.custom_startup is None:
         if click.confirm("Would you like to set a custom startup command?"):
             custom_startup = click.prompt(
-                "Custom startup command",
+                "Custom startup command (use 'None' to reset to default)",
                 default=images.get_image(server.image_uid)["command"],
             )
+
+            custom_startup = None if custom_startup == "None" else custom_startup
 
     try:
         server.name = name

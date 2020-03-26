@@ -5,6 +5,7 @@ Please refer to the [official documentation](https://docs.wilfredproject.org/en/
 ## next-release
 
 * **Added** [#47](https://github.com/wilfred-dev/wilfred/issues/47) Added `--force`/`-f` flags to `wilfred kill` and `wilfred delete` (forces actions without confirmation).
+* **Added** [#50](https://github.com/wilfred-dev/wilfred/issues/50) Added ability to reset back to default startup command (remove custom startup command).
 * **Changed** Enforce 20 character length limit on server names.
 * **Fixed** [#49](https://github.com/wilfred-dev/wilfred/issues/49) Fixed a bug that caused Wilfred to crash if a container stopped running between the statement that checks if the server is running and the statement that actually retrieves the log in `wilfred console`.
 
