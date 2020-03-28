@@ -24,7 +24,7 @@ from tabulate import tabulate
 
 from wilfred.docker_conn import docker_client
 from wilfred.version import version, commit_hash, commit_date
-from wilfred.config_parser import Config
+from wilfred.api.config_parser import Config, NoConfiguration
 from wilfred.database import session, database_path, Server, EnvironmentVariable
 from wilfred.servers import Servers
 from wilfred.api.images import Images, ImageAPIMismatch
@@ -35,6 +35,15 @@ from wilfred.server_config import ServerConfig
 
 
 config = Config()
+
+try:
+    config.read()
+except NoConfiguration:
+    warning("Wilfred is not yet configured. Run `wilfred setup` to configure Wilfred.")
+except Exception as e:
+    ui_exception(e)
+
+
 images = Images()
 servers = Servers(docker_client(), config.configuration, images)
 

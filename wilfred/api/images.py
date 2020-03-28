@@ -19,37 +19,21 @@ from zipfile import ZipFile
 from shutil import move, rmtree
 from copy import deepcopy
 
+from wilfred.errors import WilfredException, ReadError, ParseError
+
 API_VERSION = 2
 
 
-class ImagesNotPresent(Exception):
+class ImagesNotPresent(WilfredException):
     """Default images not present on host"""
 
-    pass
 
-
-class ImagesNotRead(Exception):
+class ImagesNotRead(WilfredException):
     """Images are not read yet"""
 
-    pass
 
-
-class ReadError(Exception):
-    """Unable to read certain files"""
-
-    pass
-
-
-class ParseError(Exception):
-    """Image format is incorrect"""
-
-    pass
-
-
-class ImageAPIMismatch(Exception):
+class ImageAPIMismatch(WilfredException):
     """API level of image and API level of Wilfred mismatch"""
-
-    pass
 
 
 class Images(object):
