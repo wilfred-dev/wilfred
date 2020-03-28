@@ -27,8 +27,8 @@ from wilfred.version import version, commit_hash, commit_date
 from wilfred.config_parser import Config
 from wilfred.database import session, database_path, Server, EnvironmentVariable
 from wilfred.servers import Servers
-from wilfred.api.images import Images
-from wilfred.message_handler import warning, error
+from wilfred.api.images import Images, ImageAPIMismatch
+from wilfred.message_handler import warning, error, ui_exception
 from wilfred.core import is_integer, random_string, check_for_new_releases
 from wilfred.migrate import Migrate
 from wilfred.server_config import ServerConfig
@@ -47,9 +47,18 @@ if not images.check_if_present():
 
 try:
     images.read_images()
+except ImageAPIMismatch:
+    with Halo(
+        text="Downloading default images", color="yellow", spinner="dots"
+    ) as spinner:
+        images.download()
+        spinner.succeed("Images downloaded")
+    try:
+        images.read_images()
+    except Exception as e:
+        ui_exception(e)
 except Exception as e:
-    _exception_name = click.style(f"images.{type(e).__name__}", bold=True)
-    error(f"{_exception_name} {str(e)}", exit_code=1)
+    ui_exception(e)
 
 # check
 Migrate()
@@ -187,12 +196,22 @@ def list_images(refresh):
                 images.download()
                 images.read_images()
             except Exception as e:
-                _exception_name = click.style(f"images.{type(e).__name__}", bold=True)
-                error(f"{_exception_name} {str(e)}", exit_code=1)
+                ui_exception(e)
 
             spinner.succeed("Images refreshed")
 
-    click.echo(images.pretty())
+    click.echo(
+        tabulate(
+            images.data_strip_non_ui(),
+            headers={
+                "uid": click.style("UID", bold=True),
+                "name": click.style("Image Name", bold=True),
+                "author": click.style("Author", bold=True),
+                "default_image": click.style("Default Image", bold=True),
+            },
+            tablefmt="fancy_grid",
+        )
+    )
 
 
 @cli.command()
@@ -217,7 +236,18 @@ def create(ctx, console, detach):
         error("space not allowed in name", exit_code=1)
 
     click.secho("Available Images", bold=True)
-    click.echo(images.pretty())
+    click.echo(
+        tabulate(
+            images.data_strip_non_ui(),
+            headers={
+                "uid": click.style("UID", bold=True),
+                "name": click.style("Image Name", bold=True),
+                "author": click.style("Author", bold=True),
+                "default_image": click.style("Default Image", bold=True),
+            },
+            tablefmt="fancy_grid",
+        )
+    )
 
     image_uid = click.prompt("Image UID", default="minecraft-vanilla")
 

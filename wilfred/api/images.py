@@ -9,9 +9,7 @@
 ####################################################################
 
 import json
-import click
 
-from tabulate import tabulate
 from appdirs import user_config_dir
 from pathlib import Path
 from os.path import isdir, join
@@ -55,6 +53,8 @@ class ImageAPIMismatch(Exception):
 
 
 class Images(object):
+    """Manage Wilfred images"""
+
     def __init__(self):
         self.config_dir = f"{user_config_dir()}/wilfred"
         self.image_dir = f"{self.config_dir}/images"
@@ -64,6 +64,8 @@ class Images(object):
             Path(self.image_dir).mkdir(parents=True, exist_ok=True)
 
     def download(self):
+        """Downloads default Wilfred images from GitHub"""
+
         rmtree(f"{self.image_dir}/default", ignore_errors=True)
 
         with open(f"{self.config_dir}/img.zip", "wb") as f:
@@ -83,7 +85,9 @@ class Images(object):
         remove(f"{self.config_dir}/img.zip")
         rmtree(f"{self.config_dir}/temp_images")
 
-    def pretty(self):
+    def data_strip_non_ui(self):
+        """Returns a list of all images with only the variables important to the user shown"""
+
         if not self._check_if_read():
             raise ImagesNotRead("Read images before trying to get images")
 
@@ -105,22 +109,19 @@ class Images(object):
                 except Exception:
                     pass
 
-        headers = {
-            "uid": click.style("UID", bold=True),
-            "name": click.style("Image Name", bold=True),
-            "author": click.style("Author", bold=True),
-            "default_image": click.style("Default Image", bold=True),
-        }
+        return _images
 
-        return tabulate(_images, headers=headers, tablefmt="fancy_grid")
+    def get_image(self, uid: str):
+        """Retrieves image configuration for specific image"""
 
-    def get_image(self, uid):
         if not self._check_if_read():
             raise ImagesNotRead("Read images before trying to get image")
 
         return next(filter(lambda img: img["uid"] == uid, self.images), None)
 
     def read_images(self):
+        """Reads and parses all images on system"""
+
         if not self.check_if_present():
             raise ImagesNotPresent("Default images not present")
 
@@ -156,12 +157,14 @@ class Images(object):
         return True
 
     def check_if_present(self):
+        """Checks if default images are present"""
+
         if not isdir(f"{self.image_dir}/default"):
             return False
 
         return True
 
-    def _verify(self, image, file):
+    def _verify(self, image: dict, file: str):
         def _exception(key):
             raise ParseError(f"image {file} is missing key {str(key)}")
 
