@@ -38,6 +38,19 @@ config = Config()
 images = Images()
 servers = Servers(docker_client(), config.configuration, images)
 
+if not images.check_if_present():
+    with Halo(
+        text="Downloading default images", color="yellow", spinner="dots"
+    ) as spinner:
+        images.download()
+        spinner.succeed("Images downloaded")
+
+try:
+    images.read_images()
+except Exception as e:
+    _exception_name = click.style(f"images.{type(e).__name__}", bold=True)
+    error(f"{_exception_name} {str(e)}", exit_code=1)
+
 # check
 Migrate()
 
@@ -170,7 +183,12 @@ def list_images(refresh):
 
     if refresh:
         with Halo(text="Refreshing images", color="yellow", spinner="dots") as spinner:
-            images.download_default(read=True)
+            try:
+                images.download()
+                images.read_images()
+            except Exception as e:
+                _exception_name = click.style(f"images.{type(e).__name__}", bold=True)
+                error(f"{_exception_name} {str(e)}", exit_code=1)
 
             spinner.succeed("Images refreshed")
 
