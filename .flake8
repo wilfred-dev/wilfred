@@ -3,3 +3,4 @@ max-line-length = 127
 extend-ignore = E203
 count=True
 statistics=True
+show_source = True
