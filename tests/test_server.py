@@ -17,6 +17,12 @@ from wilfred.database import Server, EnvironmentVariable, session
 
 configuration = {"data_path": "/tmp/wilred/servers"}
 images = Images()
+
+if not images.check_if_present():
+    images.download()
+
+images.read_images()
+
 servers = Servers(docker_client(), configuration, images)
 
 
