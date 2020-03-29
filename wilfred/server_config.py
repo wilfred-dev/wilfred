@@ -26,7 +26,7 @@ class ServerConfig:
         Read, edit and update configurations for servers. Exposes server specific configs to Wilfred.
 
         :param configuration: JSON dict for Wilfred config
-        :param object servers: wilfred.servers object
+        :param object servers: wilfred.api.servers object
         :param str server: SQLAlchemy server object
         :param dictionary image: Image dict object
         """

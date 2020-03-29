@@ -26,7 +26,7 @@ from wilfred.docker_conn import docker_client
 from wilfred.version import version, commit_hash, commit_date
 from wilfred.api.config_parser import Config, NoConfiguration
 from wilfred.database import session, database_path, Server, EnvironmentVariable
-from wilfred.servers import Servers
+from wilfred.api.servers import Servers
 from wilfred.api.images import Images, ImageAPIMismatch
 from wilfred.message_handler import warning, error, ui_exception
 from wilfred.core import is_integer, random_string, check_for_new_releases

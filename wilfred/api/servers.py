@@ -18,15 +18,19 @@ from os import remove as remove_file
 from time import sleep
 from sys import platform
 from subprocess import call
+from docker import DockerClient
 
 from wilfred.database import session, Server, EnvironmentVariable
 from wilfred.message_handler import error
 from wilfred.keyboard import KeyboardThread
 from wilfred.container_variables import ContainerVariables
+from wilfred.api.images import Images
 
 
 class Servers(object):
-    def __init__(self, docker_client, configuration, images):
+    def __init__(
+        self, docker_client: DockerClient, configuration: dict, images: Images
+    ):
         self._images = images
         self._configuration = configuration
         self._docker_client = docker_client

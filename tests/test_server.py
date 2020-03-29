@@ -9,7 +9,7 @@
 ####################################################################
 
 from wilfred.api.images import Images
-from wilfred.servers import Servers
+from wilfred.api.servers import Servers
 from wilfred.docker_conn import docker_client
 from wilfred.server_config import ServerConfig
 from wilfred.database import Server, EnvironmentVariable, session
