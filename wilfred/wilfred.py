@@ -32,6 +32,7 @@ from wilfred.message_handler import warning, error, ui_exception
 from wilfred.core import is_integer, random_string, check_for_new_releases
 from wilfred.migrate import Migrate
 from wilfred.server_config import ServerConfig
+from wilfred.decorators import configuration_present
 
 
 config = Config()
@@ -233,11 +234,9 @@ def list_images(refresh):
     "--detach", help="Immediately detach during install.", is_flag=True,
 )
 @click.pass_context
+@configuration_present(config)
 def create(ctx, console, detach):
     """Create a new server."""
-
-    if not config.configuration:
-        error("Wilfred has not been configured", exit_code=1)
 
     name = click.prompt("Server Name").lower()
 
@@ -339,15 +338,13 @@ def create(ctx, console, detach):
 
 
 @cli.command("sync")
+@configuration_present(config)
 def sync_cmd():
     """
     Sync all servers on file with Docker (start/stop/kill).
     """
 
     with Halo(text="Docker sync", color="yellow", spinner="dots") as spinner:
-        if not config.configuration:
-            spinner.fail("Wilfred has not been configured")
-
         servers.sync()
         spinner.succeed("Servers synced")
 
@@ -358,6 +355,7 @@ def sync_cmd():
     "--console", help="Attach to server console immediately after start.", is_flag=True
 )
 @click.pass_context
+@configuration_present(config)
 def start(ctx, name, console):
     """
     Start server by specifiying the
@@ -367,10 +365,6 @@ def start(ctx, name, console):
     servers.sync()
 
     with Halo(text="Starting server", color="yellow", spinner="dots") as spinner:
-        if not config.configuration:
-            spinner.fail("Wilfred has not been configured")
-            sys.exit(1)
-
         server = session.query(Server).filter_by(name=name.lower()).first()
 
         if not server:
@@ -402,6 +396,7 @@ def start(ctx, name, console):
 @cli.command()
 @click.argument("name")
 @click.option("-f", "--force", is_flag=True)
+@configuration_present(config)
 def kill(name, force):
     """
     Forcefully kill running server.
@@ -411,10 +406,6 @@ def kill(name, force):
         "Are you sure you want to do this? This will kill the running container without saving data."
     ):
         with Halo(text="Killing server", color="yellow", spinner="dots") as spinner:
-            if not config.configuration:
-                spinner.fail("Wilfred has not been configured")
-                sys.exit(1)
-
             server = session.query(Server).filter_by(name=name.lower()).first()
 
             if not server:
@@ -430,6 +421,7 @@ def kill(name, force):
 
 @cli.command()
 @click.argument("name")
+@configuration_present(config)
 def stop(name):
     """
     Stop server gracefully.
@@ -438,10 +430,6 @@ def stop(name):
     servers.sync()
 
     with Halo(text="Stopping server", color="yellow", spinner="dots") as spinner:
-        if not config.configuration:
-            spinner.fail("Wilfred has not been configured")
-            sys.exit(1)
-
         server = session.query(Server).filter_by(name=name.lower()).first()
 
         if not server:
@@ -471,14 +459,12 @@ def stop(name):
     "--console", help="Attach to server console immediately after start.", is_flag=True
 )
 @click.pass_context
+@configuration_present(config)
 def restart(ctx, name, console):
     """
     Restart server by specifiying the
     name of the server as argument.
     """
-
-    if not config.configuration:
-        error("Wilfred has not been configured", exit_code=1)
 
     ctx.invoke(stop, name=name)
     ctx.invoke(start, name=name)
@@ -490,6 +476,7 @@ def restart(ctx, name, console):
 @cli.command()
 @click.argument("name")
 @click.option("-f", "--force", is_flag=True)
+@configuration_present(config)
 def delete(name, force):
     """
     Delete existing server.
@@ -499,10 +486,6 @@ def delete(name, force):
         "Are you sure you want to do this? All data will be permanently deleted."
     ):
         with Halo(text="Deleting server", color="yellow", spinner="dots") as spinner:
-            if not config.configuration:
-                spinner.fail("Wilfred has not been configured")
-                sys.exit(1)
-
             server = session.query(Server).filter_by(name=name.lower()).first()
 
             if not server:
@@ -516,13 +499,11 @@ def delete(name, force):
 @cli.command("command")
 @click.argument("name")
 @click.argument("command")
+@configuration_present(config)
 def run_command(name, command):
     """
     Send command to STDIN of server
     """
-
-    if not config.configuration:
-        error("Wilfred has not been configured", exit_code=1)
 
     server = session.query(Server).filter_by(name=name.lower()).first()
 
@@ -547,13 +528,11 @@ def run_command(name, command):
     ),
 )
 @click.argument("name")
+@configuration_present(config)
 def server_console(name):
     """
     Attach to server console, view log and run commands.
     """
-
-    if not config.configuration:
-        error("Wilfred has not been configured", exit_code=1)
 
     server = session.query(Server).filter_by(name=name.lower()).first()
 
@@ -587,13 +566,11 @@ def server_console(name):
     )
 )
 @click.argument("name")
+@configuration_present(config)
 def edit(name):
     """
     Edit server (name, memory, port, environment variables)
     """
-
-    if not config.configuration:
-        error("Wilfred has not been configured", exit_code=1)
 
     server = session.query(Server).filter_by(name=name.lower()).first()
 
