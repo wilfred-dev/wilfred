@@ -233,11 +233,11 @@
         },
         "importlib-metadata": {
             "hashes": [
-                "sha256:298a914c82144c6b3b06c568a8973b89ad2176685f43cd1ea9ba968307300fa9",
-                "sha256:dfc83688553a91a786c6c91eeb5f3b1d31f24d71877bbd94ecbf5484e57690a2"
+                "sha256:2a688cbaa90e0cc587f1df48bdc97a6eadccdcd9c35fb3f976a09e3b5016d90f",
+                "sha256:34513a8a0c4962bc66d35b359558fd8a5e10cd472d37aec5f66858addef32c1e"
             ],
             "markers": "python_version < '3.8'",
-            "version": "==1.5.2"
+            "version": "==1.6.0"
         },
         "importlib-resources": {
             "hashes": [
@@ -501,10 +501,10 @@
         },
         "virtualenv": {
             "hashes": [
-                "sha256:6f4c2882a943d20714076679f8dcc5675e953d6c29bfea3bc5d08bb6cdea5d36",
-                "sha256:cb1dab893f9e39b3e68d9118c555dcd86526d531c128c3f72e1551939723b72f"
+                "sha256:4e399f48c6b71228bf79f5febd27e3bbb753d9d5905776a86667bc61ab628a25",
+                "sha256:9e81279f4a9d16d1c0654a127c2c86e5bca2073585341691882c1e66e31ef8a5"
             ],
-            "version": "==20.0.14"
+            "version": "==20.0.15"
         },
         "zipp": {
             "hashes": [
