@@ -161,28 +161,23 @@ class Servers(object):
         session.commit()
 
     def sync(self):
-        with click.progressbar(
-            session.query(Server).all(),
-            label="Syncing servers",
-            length=len(session.query(Server).all()),
-        ) as servers:
-            for server in servers:
-                if server.status == "installing":
-                    try:
-                        self._docker_client.containers.get(f"wilfred_{server.id}")
-                    except docker.errors.NotFound:
-                        self.set_status(server, "stopped")
+        for server in session.query(Server).all():
+            if server.status == "installing":
+                try:
+                    self._docker_client.containers.get(f"wilfred_{server.id}")
+                except docker.errors.NotFound:
+                    self.set_status(server, "stopped")
 
-                # stopped
-                if server.status == "stopped":
-                    self._stop(server)
+            # stopped
+            if server.status == "stopped":
+                self._stop(server)
 
-                # start
-                if server.status == "running":
-                    try:
-                        self._docker_client.containers.get(f"wilfred_{server.id}")
-                    except docker.errors.NotFound:
-                        self._start(server)
+            # start
+            if server.status == "running":
+                try:
+                    self._docker_client.containers.get(f"wilfred_{server.id}")
+                except docker.errors.NotFound:
+                    self._start(server)
 
     def remove(self, server):
         path = f"{self._configuration['data_path']}/{server.id}"

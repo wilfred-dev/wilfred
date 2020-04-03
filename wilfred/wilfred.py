@@ -234,7 +234,7 @@ def list_images(refresh):
     "--detach", help="Immediately detach during install.", is_flag=True,
 )
 @click.pass_context
-@configuration_present(config)
+@configuration_present
 def create(ctx, console, detach):
     """Create a new server."""
 
@@ -338,7 +338,7 @@ def create(ctx, console, detach):
 
 
 @cli.command("sync")
-@configuration_present(config)
+@configuration_present
 def sync_cmd():
     """
     Sync all servers on file with Docker (start/stop/kill).
@@ -355,7 +355,7 @@ def sync_cmd():
     "--console", help="Attach to server console immediately after start.", is_flag=True
 )
 @click.pass_context
-@configuration_present(config)
+@configuration_present
 def start(ctx, name, console):
     """
     Start server by specifiying the
@@ -396,7 +396,7 @@ def start(ctx, name, console):
 @cli.command()
 @click.argument("name")
 @click.option("-f", "--force", is_flag=True)
-@configuration_present(config)
+@configuration_present
 def kill(name, force):
     """
     Forcefully kill running server.
@@ -421,7 +421,7 @@ def kill(name, force):
 
 @cli.command()
 @click.argument("name")
-@configuration_present(config)
+@configuration_present
 def stop(name):
     """
     Stop server gracefully.
@@ -459,7 +459,7 @@ def stop(name):
     "--console", help="Attach to server console immediately after start.", is_flag=True
 )
 @click.pass_context
-@configuration_present(config)
+@configuration_present
 def restart(ctx, name, console):
     """
     Restart server by specifiying the
@@ -476,7 +476,7 @@ def restart(ctx, name, console):
 @cli.command()
 @click.argument("name")
 @click.option("-f", "--force", is_flag=True)
-@configuration_present(config)
+@configuration_present
 def delete(name, force):
     """
     Delete existing server.
@@ -499,7 +499,7 @@ def delete(name, force):
 @cli.command("command")
 @click.argument("name")
 @click.argument("command")
-@configuration_present(config)
+@configuration_present
 def run_command(name, command):
     """
     Send command to STDIN of server
@@ -528,7 +528,7 @@ def run_command(name, command):
     ),
 )
 @click.argument("name")
-@configuration_present(config)
+@configuration_present
 def server_console(name):
     """
     Attach to server console, view log and run commands.
@@ -566,7 +566,7 @@ def server_console(name):
     )
 )
 @click.argument("name")
-@configuration_present(config)
+@configuration_present
 def edit(name):
     """
     Edit server (name, memory, port, environment variables)
