@@ -330,7 +330,9 @@ def create(ctx, console, detach):
 
     with Halo(text="Creating server", color="yellow", spinner="dots") as spinner:
         try:
-            servers.install(server, skip_wait=True if detach else False, spinner=spinner)
+            servers.install(
+                server, skip_wait=True if detach else False, spinner=spinner
+            )
         except Exception as e:
             ui_exception(e)
         spinner.succeed("Server created")
