@@ -329,7 +329,10 @@ def create(ctx, console, detach):
             )
 
     with Halo(text="Creating server", color="yellow", spinner="dots") as spinner:
-        servers.install(server, skip_wait=True if detach else False, spinner=spinner)
+        try:
+            servers.install(server, skip_wait=True if detach else False, spinner=spinner)
+        except Exception as e:
+            ui_exception(e)
         spinner.succeed("Server created")
 
     if console:
@@ -412,9 +415,12 @@ def kill(name, force):
                 spinner.fail("Server does not exit")
                 sys.exit(1)
 
-            servers.kill(server)
-            servers.set_status(server, "stopped")
-            servers.sync()
+            try:
+                servers.kill(server)
+                servers.set_status(server, "stopped")
+                servers.sync()
+            except Exception as e:
+                ui_exception(e)
 
             spinner.succeed("Server killed")
 
@@ -492,8 +498,11 @@ def delete(name, force):
                 spinner.fail("Server does not exit")
                 sys.exit(1)
 
-            servers.remove(server)
-            spinner.succeed("Server removed")
+            try:
+                servers.remove(server)
+                spinner.succeed("Server removed")
+            except Exception as e:
+                ui_exception(e)
 
 
 @cli.command("command")
@@ -510,7 +519,10 @@ def run_command(name, command):
     if not server:
         error("Server does not exit", exit_code=1)
 
-    servers.command(server, command)
+    try:
+        servers.command(server, command)
+    except Exception as e:
+        ui_exception(e)
 
 
 @cli.command(
@@ -554,7 +566,7 @@ def server_console(name):
             server, disable_user_input=True if server.status == "installing" else False
         )
     except Exception as e:
-        error(str(e), exit_code=1)
+        ui_exception(e)
 
 
 @cli.command(

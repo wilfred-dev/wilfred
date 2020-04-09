@@ -18,18 +18,21 @@ from os import remove as remove_file
 from time import sleep
 from sys import platform
 from subprocess import call
-from docker import DockerClient
 
 from wilfred.database import session, Server, EnvironmentVariable
-from wilfred.message_handler import error
 from wilfred.keyboard import KeyboardThread
 from wilfred.container_variables import ContainerVariables
 from wilfred.api.images import Images
+from wilfred.errors import WilfredException, WriteError
+
+
+class ServerNotRunning(WilfredException):
+    """Server is not running"""
 
 
 class Servers(object):
     def __init__(
-        self, docker_client: DockerClient, configuration: dict, images: Images
+        self, docker_client: docker.DockerClient, configuration: dict, images: Images
     ):
         self._images = images
         self._configuration = configuration
@@ -202,14 +205,11 @@ class Servers(object):
         try:
             container = self._docker_client.containers.get(f"wilfred_{server.id}")
         except docker.errors.NotFound:
-            error("server is not running", exit_code=1)
+            raise ServerNotRunning(f"server {server.id} is not running")
 
         if platform.startswith("win"):
-            try:
-                click.echo(container.logs())
-                call(["docker", "attach", container.id])
-            except Exception as e:
-                raise Exception(f"could not attach to console, {str(e)}")
+            click.echo(container.logs())
+            call(["docker", "attach", container.id])
         else:
             if not disable_user_input:
                 KeyboardThread(self._console_input_callback, params=server)
@@ -218,7 +218,7 @@ class Servers(object):
                 for line in container.logs(stream=True, tail=200):
                     click.echo(line.strip())
             except docker.errors.NotFound:
-                raise Exception("server not running")
+                raise ServerNotRunning(f"server {server.id} is not running")
 
     def install(self, server, skip_wait=False, spinner=None):
         path = f"{self._configuration['data_path']}/{server.id}"
@@ -230,10 +230,7 @@ class Servers(object):
         try:
             Path(path).mkdir(parents=True, exist_ok=True)
         except Exception as e:
-            error(
-                f"unable to create server data directory, {click.style(str(e), bold=True)}",
-                exit_code=1,
-            )
+            raise WriteError(f"could not create server data directory, {str(e)}")
 
         with open(f"{path}/install.sh", "w", newline="\n") as f:
             f.write("cd /server\n" + "\n".join(image["installation"]["script"]))
@@ -259,10 +256,7 @@ class Servers(object):
         except Exception as e:
             session.delete(server)
             session.commit()
-            error(
-                f"unable to create installation Docker container, server removed {click.style(str(e), bold=True)}",
-                exit_code=1,
-            )
+            raise Exception(f"installation failed, server removed") from e
 
         if skip_wait and spinner:
             spinner.info(
@@ -302,17 +296,11 @@ class Servers(object):
         try:
             container = self._docker_client.containers.get(f"wilfred_{server.id}")
         except docker.errors.NotFound:
-            error("server is not running", exit_code=1)
+            raise ServerNotRunning(f"server {server.id} is not running")
 
-        try:
-            s = container.attach_socket(params={"stdin": 1, "stream": 1})
-            s.send(_cmd) if platform.startswith("win") else s._sock.send(_cmd)
-            s.close()
-        except Exception as e:
-            error(
-                f"unable to send command '{command}' on server {server.id}, err {click.style(str(e), bold=True)}",
-                exit_code=1,
-            )
+        s = container.attach_socket(params={"stdin": 1, "stream": 1})
+        s.send(_cmd) if platform.startswith("win") else s._sock.send(_cmd)
+        s.close()
 
     def _running_docker_sync(self):
         for server in session.query(Server).all():
@@ -345,29 +333,23 @@ class Servers(object):
         except Exception:
             pass
 
-        try:
-            self._docker_client.containers.run(
-                image["docker_image"],
-                self._parse_startup_command(server.custom_startup, server, image)
-                if server.custom_startup is not None
-                else f"{self._parse_startup_command(image['command'], server, image)}",
-                volumes={path: {"bind": "/server", "mode": "rw"}},
-                name=f"wilfred_{server.id}",
-                remove=True,
-                ports={f"{server.port}/tcp": server.port},
-                detach=True,
-                working_dir="/server",
-                mem_limit=f"{server.memory}m",
-                oom_kill_disable=True,
-                stdin_open=True,
-                environment=ContainerVariables(server, image).get_env_vars(),
-                user=image["user"] if image["user"] else "root",
-            )
-        except Exception as e:
-            error(
-                f"unable to start Docker container {click.style(str(e), bold=True)}",
-                exit_code=1,
-            )
+        self._docker_client.containers.run(
+            image["docker_image"],
+            self._parse_startup_command(server.custom_startup, server, image)
+            if server.custom_startup is not None
+            else f"{self._parse_startup_command(image['command'], server, image)}",
+            volumes={path: {"bind": "/server", "mode": "rw"}},
+            name=f"wilfred_{server.id}",
+            remove=True,
+            ports={f"{server.port}/tcp": server.port},
+            detach=True,
+            working_dir="/server",
+            mem_limit=f"{server.memory}m",
+            oom_kill_disable=True,
+            stdin_open=True,
+            environment=ContainerVariables(server, image).get_env_vars(),
+            user=image["user"] if image["user"] else "root",
+        )
 
     def _stop(self, server):
         image = self._images.get_image(server.image_uid)
@@ -378,13 +360,7 @@ class Servers(object):
             return
 
         if not image["stop_command"]:
-            try:
-                container.stop()
-            except Exception as e:
-                exit(
-                    f"could not stop container {click.style(str(e), bold=True)}",
-                    exit_code=1,
-                )
+            container.stop()
 
             return
 
