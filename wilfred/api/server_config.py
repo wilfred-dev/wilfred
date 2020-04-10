@@ -13,11 +13,15 @@ import click
 from tabulate import tabulate
 
 from wilfred.container_variables import ContainerVariables
-from wilfred.message_handler import error
+from wilfred.errors import WilfredException, ParseError, WriteError
 
 from wilfred.api.parser.properties import properties_read, properties_write
 from wilfred.api.parser.yaml import yaml_read, yaml_write
 from wilfred.api.parser.json import json_read, json_write
+
+
+class UnsupportedFiletype(WilfredException):
+    """File type is not supported by parser"""
 
 
 class ServerConfig:
@@ -45,10 +49,7 @@ class ServerConfig:
         """iterates configuration files for the specific server and parses the files"""
 
         def _err(e):
-            error(
-                f"unable to parse config {file['filename']}, err {click.style(str(e), bold=True)}",
-                exit_code=1,
-            )
+            raise ParseError(f"failed to parse {file['filename']}, err {str(e)}")
 
         for file in self._image["config"]["files"]:
             path = f"{self._configuration['data_path']}/{self._server.id}/{file['filename']}"
@@ -86,10 +87,7 @@ class ServerConfig:
 
                 continue
 
-            error(
-                f"no available parser for this type of file ({file['parser']})",
-                exit_code=1,
-            )
+            raise UnsupportedFiletype(file["parser"])
         return True
 
     def pretty(self):
@@ -143,34 +141,18 @@ class ServerConfig:
                             x["config_variable"] == variable
                             and not override_linking_check
                         ):
-                            error(
-                                "This setting is linked to an environment variable and is therefore not editable directly",
-                                exit_code=1,
+                            raise WriteError(
+                                "This setting is linked to an environment variable and is therefore not editable directly"
                             )
 
                 if file["parser"] == "properties":
-                    try:
-                        properties_write(f"{path}/{file['filename']}", variable, value)
-                    except Exception as e:
-                        error(
-                            f"unable to edit config {file['filename']}, err {click.style(str(e), bold=True)}"
-                        )
+                    properties_write(f"{path}/{file['filename']}", variable, value)
 
                 if file["parser"] == "yaml":
-                    try:
-                        yaml_write(f"{path}/{file['filename']}", variable, value)
-                    except Exception as e:
-                        error(
-                            f"unable to edit config {file['filename']}, err {click.style(str(e), bold=True)}"
-                        )
+                    yaml_write(f"{path}/{file['filename']}", variable, value)
 
                 if file["parser"] == "json":
-                    try:
-                        json_write(f"{path}/{file['filename']}", variable, value)
-                    except Exception as e:
-                        error(
-                            f"unable to edit config {file['filename']}, err {click.style(str(e), bold=True)}"
-                        )
+                    json_write(f"{path}/{file['filename']}", variable, value)
 
                 if variable in file["action"]:
                     self._servers.command(

@@ -394,9 +394,12 @@ def start(ctx, name, console):
         if not image:
             error("Image UID does not exit", exit_code=1)
 
-        ServerConfig(
-            config.configuration, servers, server, image
-        ).write_environment_variables()
+        try:
+            ServerConfig(
+                config.configuration, servers, server, image
+            ).write_environment_variables()
+        except Exception as e:
+            ui_exception(e)
 
         try:
             servers.set_status(server, "running")
@@ -807,11 +810,14 @@ def config_command(name, variable, value):
             "_wilfred_config_filename"
         ]
 
-        server_conf.edit(filename, variable, value)
-        server_conf = _get()
-        _print_all_values(
-            variable, _get_variable_occurrences(variable, server_conf.raw)
-        )
+        try:
+            server_conf.edit(filename, variable, value)
+            server_conf = _get()
+            _print_all_values(
+                variable, _get_variable_occurrences(variable, server_conf.raw)
+            )
+        except Exception as e:
+            ui_exception(e)
 
         exit(0)
 
