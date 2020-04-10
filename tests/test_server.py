@@ -15,9 +15,12 @@ from wilfred.api.servers import Servers
 from wilfred.docker_conn import docker_client
 from wilfred.api.server_config import ServerConfig
 from wilfred.database import Server, EnvironmentVariable, session
+from wilfred.api.config_parser import Config
 
+config = Config()
+config.write(f"{str(Path.home())}/wilfred-data/servers")
+config.read()
 
-configuration = {"data_path": f"{str(Path.home())}/wilfred-data/servers"}
 images = Images()
 
 if not images.check_if_present():
@@ -25,7 +28,7 @@ if not images.check_if_present():
 
 images.read_images()
 
-servers = Servers(docker_client(), configuration, images)
+servers = Servers(docker_client(), config.configuration, images)
 
 
 def test_create_server():
@@ -66,7 +69,9 @@ def test_start_server():
 
     image = images.get_image(server.image_uid)
 
-    ServerConfig(configuration, servers, server, image).write_environment_variables()
+    ServerConfig(
+        config.configuration, servers, server, image
+    ).write_environment_variables()
 
     servers.set_status(server, "running")
     servers.sync()
