@@ -67,14 +67,23 @@ def test_start_server():
     if server.status == "installing":
         raise Exception("server is installing")
 
-    image = images.get_image(server.image_uid)
-
-    ServerConfig(
-        config.configuration, servers, server, image
-    ).write_environment_variables()
-
     servers.set_status(server, "running")
     servers.sync()
+
+
+def test_pseudo_config_write():
+    server = session.query(Server).filter_by(id="test").first()
+
+    image = images.get_image(server.image_uid)
+
+    Path(f"{str(Path.home())}/temp/test").mkdir(parents=True, exist_ok=True)
+
+    with open(f"{str(Path.home())}/temp/test/server.properties", "w") as f:
+        f.write("\n".join(("query.port=25564", "server-port=25564")))
+
+    ServerConfig(
+        {"data_path": f"{str(Path.home())}/temp"}, servers, server, image
+    ).write_environment_variables()
 
 
 def test_delete_server():
