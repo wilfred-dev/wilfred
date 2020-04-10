@@ -8,16 +8,27 @@
 #                                                                  #
 ####################################################################
 
-from wilfred.images import Images
-from wilfred.servers import Servers
+from pathlib import Path
+
+from wilfred.api.images import Images
+from wilfred.api.servers import Servers
 from wilfred.docker_conn import docker_client
-from wilfred.server_config import ServerConfig
+from wilfred.api.server_config import ServerConfig
 from wilfred.database import Server, EnvironmentVariable, session
+from wilfred.api.config_parser import Config
 
+config = Config()
+config.write(f"{str(Path.home())}/wilfred-data/servers")
+config.read()
 
-configuration = {"data_path": "/tmp/wilred/servers"}
 images = Images()
-servers = Servers(docker_client(), configuration, images)
+
+if not images.check_if_present():
+    images.download()
+
+images.read_images()
+
+servers = Servers(docker_client(), config.configuration, images)
 
 
 def test_create_server():
@@ -56,12 +67,23 @@ def test_start_server():
     if server.status == "installing":
         raise Exception("server is installing")
 
-    image = images.get_image(server.image_uid)
-
-    ServerConfig(configuration, servers, server, image).write_environment_variables()
-
     servers.set_status(server, "running")
     servers.sync()
+
+
+def test_pseudo_config_write():
+    server = session.query(Server).filter_by(id="test").first()
+
+    image = images.get_image(server.image_uid)
+
+    Path(f"{str(Path.home())}/temp/test").mkdir(parents=True, exist_ok=True)
+
+    with open(f"{str(Path.home())}/temp/test/server.properties", "w") as f:
+        f.write("\n".join(("query.port=25564", "server-port=25564")))
+
+    ServerConfig(
+        {"data_path": f"{str(Path.home())}/temp"}, servers, server, image
+    ).write_environment_variables()
 
 
 def test_delete_server():
