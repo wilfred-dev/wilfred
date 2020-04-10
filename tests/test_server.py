@@ -8,6 +8,8 @@
 #                                                                  #
 ####################################################################
 
+from pathlib import Path
+
 from wilfred.api.images import Images
 from wilfred.api.servers import Servers
 from wilfred.docker_conn import docker_client
@@ -15,7 +17,7 @@ from wilfred.api.server_config import ServerConfig
 from wilfred.database import Server, EnvironmentVariable, session
 
 
-configuration = {"data_path": "/tmp/wilred/servers"}
+configuration = {"data_path": f"{str(Path.home())}/wilfred-data/servers"}
 images = Images()
 
 if not images.check_if_present():
