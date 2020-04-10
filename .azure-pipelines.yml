@@ -35,5 +35,5 @@ steps:
 
 - script: |
     pip install tox pytest-azurepipelines
-    tox -e $(tox.env)
+    sudo tox -e $(tox.env)
   displayName: 'Run tox -e $(tox.env)'
