@@ -2,7 +2,7 @@
 
 Please refer to the [official documentation](https://docs.wilfredproject.org/en/latest/development/) for more information about the CHANGELOG and releases.
 
-## next-release
+## v0.6.0 (released on 2020-04-10)
 
 * **Added** [#47](https://github.com/wilfred-dev/wilfred/issues/47) Added `--force`/`-f` flags to `wilfred kill` and `wilfred delete` (forces actions without confirmation).
 * **Added** [#50](https://github.com/wilfred-dev/wilfred/issues/50) Added ability to reset back to default startup command (remove custom startup command).
