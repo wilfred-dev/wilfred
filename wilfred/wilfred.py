@@ -31,7 +31,7 @@ from wilfred.api.images import Images, ImageAPIMismatch
 from wilfred.message_handler import warning, error, ui_exception
 from wilfred.core import is_integer, random_string, check_for_new_releases
 from wilfred.migrate import Migrate
-from wilfred.server_config import ServerConfig
+from wilfred.api.server_config import ServerConfig
 from wilfred.decorators import configuration_present
 
 
@@ -206,6 +206,7 @@ def list_images(refresh):
                 images.download()
                 images.read_images()
             except Exception as e:
+                spinner.fail()
                 ui_exception(e)
 
             spinner.succeed("Images refreshed")
@@ -334,6 +335,7 @@ def create(ctx, console, detach):
                 server, skip_wait=True if detach else False, spinner=spinner
             )
         except Exception as e:
+            spinner.fail()
             ui_exception(e)
         spinner.succeed("Server created")
 
@@ -350,7 +352,11 @@ def sync_cmd():
     """
 
     with Halo(text="Docker sync", color="yellow", spinner="dots") as spinner:
-        servers.sync()
+        try:
+            servers.sync()
+        except Exception as e:
+            spinner.fail()
+            ui_exception(e)
         spinner.succeed("Servers synced")
 
 
@@ -367,7 +373,10 @@ def start(ctx, name, console):
     name of the server as argument.
     """
 
-    servers.sync()
+    try:
+        servers.sync()
+    except Exception as e:
+        ui_exception(e)
 
     with Halo(text="Starting server", color="yellow", spinner="dots") as spinner:
         server = session.query(Server).filter_by(name=name.lower()).first()
@@ -389,8 +398,12 @@ def start(ctx, name, console):
             config.configuration, servers, server, image
         ).write_environment_variables()
 
-        servers.set_status(server, "running")
-        servers.sync()
+        try:
+            servers.set_status(server, "running")
+            servers.sync()
+        except Exception as e:
+            spinner.fail()
+            ui_exception(e)
 
         spinner.succeed("Server started")
 
@@ -422,6 +435,7 @@ def kill(name, force):
                 servers.set_status(server, "stopped")
                 servers.sync()
             except Exception as e:
+                spinner.fail()
                 ui_exception(e)
 
             spinner.succeed("Server killed")
@@ -435,7 +449,10 @@ def stop(name):
     Stop server gracefully.
     """
 
-    servers.sync()
+    try:
+        servers.sync()
+    except Exception as e:
+        ui_exception(e)
 
     with Halo(text="Stopping server", color="yellow", spinner="dots") as spinner:
         server = session.query(Server).filter_by(name=name.lower()).first()
@@ -455,8 +472,12 @@ def stop(name):
             )
             sys.exit(1)
 
-        servers.set_status(server, "stopped")
-        servers.sync()
+        try:
+            servers.set_status(server, "stopped")
+            servers.sync()
+        except Exception as e:
+            spinner.fail()
+            ui_exception(e)
 
         spinner.succeed("Server stopped")
 
@@ -504,6 +525,7 @@ def delete(name, force):
                 servers.remove(server)
                 spinner.succeed("Server removed")
             except Exception as e:
+                spinner.fail()
                 ui_exception(e)
 
 

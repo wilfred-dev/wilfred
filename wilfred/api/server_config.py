@@ -15,9 +15,9 @@ from tabulate import tabulate
 from wilfred.container_variables import ContainerVariables
 from wilfred.message_handler import error
 
-from wilfred.parser.properties import properties_read, properties_write
-from wilfred.parser.yaml import yaml_read, yaml_write
-from wilfred.parser.json import json_read, json_write
+from wilfred.api.parser.properties import properties_read, properties_write
+from wilfred.api.parser.yaml import yaml_read, yaml_write
+from wilfred.api.parser.json import json_read, json_write
 
 
 class ServerConfig:
