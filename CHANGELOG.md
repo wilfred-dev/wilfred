@@ -2,11 +2,12 @@
 
 Please refer to the [official documentation](https://docs.wilfredproject.org/en/latest/development/) for more information about the CHANGELOG and releases.
 
-## next-release
+## v0.6.0 (released on 2020-04-10)
 
 * **Added** [#47](https://github.com/wilfred-dev/wilfred/issues/47) Added `--force`/`-f` flags to `wilfred kill` and `wilfred delete` (forces actions without confirmation).
 * **Added** [#50](https://github.com/wilfred-dev/wilfred/issues/50) Added ability to reset back to default startup command (remove custom startup command).
 * **Changed** Enforce 20 character length limit on server names.
+* **Changed** [#42](https://github.com/wilfred-dev/wilfred/issues/42) Major refactor, separate the CLI from the core API and rewrite some of the core methods to be more consistent. With this, the Wilfred API now has it's own set of exceptions that it raise. The exceptions are no longer caught within the methods themselves and instead within the UI (a lot more predictable and makes a lot more sense).
 * **Fixed** [#49](https://github.com/wilfred-dev/wilfred/issues/49) Fixed a bug that caused Wilfred to crash if a container stopped running between the statement that checks if the server is running and the statement that actually retrieves the log in `wilfred console`.
 
 ## v0.5.1 (released on 2020-03-21)

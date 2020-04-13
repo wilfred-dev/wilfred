@@ -16,6 +16,11 @@ def _message(prefix, msg):
     click.echo(f"{prefix} {msg}")
 
 
+def ui_exception(e):
+    _exception_name = click.style(f"{type(e).__name__}", bold=True)
+    error(f"{_exception_name} {str(e)}", exit_code=1)
+
+
 def error(message, exit_code=None):
     _message(prefix=click.style("💥 Error", fg="red"), msg=message)
 

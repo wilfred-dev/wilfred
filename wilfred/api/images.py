@@ -9,9 +9,7 @@
 ####################################################################
 
 import json
-import click
 
-from tabulate import tabulate
 from appdirs import user_config_dir
 from pathlib import Path
 from os.path import isdir, join
@@ -19,35 +17,39 @@ from os import walk, remove
 from requests import get
 from zipfile import ZipFile
 from shutil import move, rmtree
+from copy import deepcopy
 
-from wilfred.message_handler import warning, error
+from wilfred.errors import WilfredException, ReadError, ParseError
 
 API_VERSION = 2
 
 
+class ImagesNotPresent(WilfredException):
+    """Default images not present on host"""
+
+
+class ImagesNotRead(WilfredException):
+    """Images are not read yet"""
+
+
+class ImageAPIMismatch(WilfredException):
+    """API level of image and API level of Wilfred mismatch"""
+
+
 class Images(object):
+    """Manage Wilfred images"""
+
     def __init__(self):
         self.config_dir = f"{user_config_dir()}/wilfred"
         self.image_dir = f"{self.config_dir}/images"
+        self.images = []
 
         if not isdir(self.image_dir):
             Path(self.image_dir).mkdir(parents=True, exist_ok=True)
 
-        if not isdir(f"{self.image_dir}/default"):
-            warning(
-                "default image directory does not exist, downloading default images"
-            )
-            self.download_default()
+    def download(self):
+        """Downloads default Wilfred images from GitHub"""
 
-        if not self._read_images():
-            self.download_default()
-            if not self._read_images(silent=True):
-                error(
-                    "Image still has incorrect API version after refresh", exit_code=1
-                )
-            click.echo("✅ Solved after default images refresh")
-
-    def download_default(self, read=False):
         rmtree(f"{self.image_dir}/default", ignore_errors=True)
 
         with open(f"{self.config_dir}/img.zip", "wb") as f:
@@ -67,11 +69,13 @@ class Images(object):
         remove(f"{self.config_dir}/img.zip")
         rmtree(f"{self.config_dir}/temp_images")
 
-        if read:
-            self._read_images()
+    def data_strip_non_ui(self):
+        """Returns a list of all images with only the variables important to the user shown"""
 
-    def pretty(self):
-        _images = self.images
+        if not self._check_if_read():
+            raise ImagesNotRead("Read images before trying to get images")
+
+        _images = deepcopy(self.images)
 
         for d in _images:
             for key in (
@@ -89,25 +93,64 @@ class Images(object):
                 except Exception:
                     pass
 
-        headers = {
-            "uid": click.style("UID", bold=True),
-            "name": click.style("Image Name", bold=True),
-            "author": click.style("Author", bold=True),
-            "default_image": click.style("Default Image", bold=True),
-        }
+        return _images
 
-        return tabulate(_images, headers=headers, tablefmt="fancy_grid")
+    def get_image(self, uid: str):
+        """Retrieves image configuration for specific image"""
 
-    def get_image(self, uid):
-        self._read_images()
+        if not self._check_if_read():
+            raise ImagesNotRead("Read images before trying to get image")
 
         return next(filter(lambda img: img["uid"] == uid, self.images), None)
 
-    def _verify(self, image, file):
-        def _exception(key):
-            error(f"image {file} is missing key {str(key)}")
+    def read_images(self):
+        """Reads and parses all images on system"""
 
+        if not self.check_if_present():
+            raise ImagesNotPresent("Default images not present")
+
+        self.images = []
+
+        for root, dirs, files in walk(self.image_dir):
+            for file in files:
+                if file.endswith(".json"):
+                    with open(join(root, file)) as f:
+                        try:
+                            _image = json.loads(f.read())
+                        except Exception as e:
+                            raise ReadError(f"{file} failed with exception {str(e)}")
+
+                        try:
+                            if _image["meta"]["api_version"] != API_VERSION:
+                                raise ImageAPIMismatch(
+                                    " ".join(
+                                        (
+                                            f"{file} API level {_image['meta']['api_version']},",
+                                            f"Wilfred API level {API_VERSION}",
+                                        )
+                                    )
+                                )
+                        except ImageAPIMismatch as e:
+                            raise ImageAPIMismatch(str(e))
+                        except Exception as e:
+                            raise ReadError(f"{file} with err {str(e)}")
+
+                        self._verify(_image, file)
+                        self.images.append(_image)
+
+        return True
+
+    def check_if_present(self):
+        """Checks if default images are present"""
+
+        if not isdir(f"{self.image_dir}/default"):
             return False
+
+        return True
+
+    def _verify(self, image: dict, file: str):
+        def _exception(key):
+            raise ParseError(f"image {file} is missing key {str(key)}")
 
         for key in (
             "meta",
@@ -129,9 +172,7 @@ class Images(object):
                 return _exception(key)
 
         if image["uid"] != image["uid"].lower():
-            error(f"image {file} uid must be lowercase")
-
-            return False
+            raise ParseError(f"image {file} uid must be lowercase")
 
         for key in ["api_version"]:
             try:
@@ -184,47 +225,8 @@ class Images(object):
 
         return True
 
-    def _read_images(self, silent=False):
-        self.images = []
-
-        for root, dirs, files in walk(self.image_dir):
-            for file in files:
-                if file.endswith(".json"):
-                    with open(join(root, file)) as f:
-                        try:
-                            _image = json.loads(f.read())
-                        except Exception as e:
-                            error(
-                                f"unable to parse {file} with error {click.style(str(e), bold=True)}",
-                                exit_code=1,
-                            )
-
-                        try:
-                            if _image["meta"]["api_version"] != API_VERSION:
-                                if not silent:
-                                    warning(
-                                        " ".join(
-                                            (
-                                                f"{file} image has API level {_image['meta']['api_version']},",
-                                                f"Wilfreds API level is {API_VERSION}",
-                                            )
-                                        )
-                                    )
-                                return False
-                        except Exception as e:
-                            if not silent:
-                                error(
-                                    " ".join(
-                                        (
-                                            f"could not parse config for image {file},",
-                                            f"has API level changed? - {click.style(str(e), bold=True)}",
-                                        )
-                                    )
-                                )
-                            return False
-
-                        if not self._verify(_image, file):
-                            return False
-                        self.images.append(_image)
+    def _check_if_read(self):
+        if len(self.images) == 0:
+            return False
 
         return True
