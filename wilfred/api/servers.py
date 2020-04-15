@@ -241,22 +241,15 @@ class Servers(object):
             )
             spinner.start()
 
-        try:
-            self._docker_client.containers.run(
-                image["installation"]["docker_image"],
-                f"{image['installation']['shell']} /server/install.sh",
-                volumes={path: {"bind": "/server", "mode": "rw"}},
-                name=f"wilfred_{server.id}",
-                environment=ContainerVariables(
-                    server, image, install=True
-                ).get_env_vars(),
-                remove=True,
-                detach=True,
-            )
-        except Exception as e:
-            session.delete(server)
-            session.commit()
-            raise Exception(f"installation failed, server removed") from e
+        self._docker_client.containers.run(
+            image["installation"]["docker_image"],
+            f"{image['installation']['shell']} /server/install.sh",
+            volumes={path: {"bind": "/server", "mode": "rw"}},
+            name=f"wilfred_{server.id}",
+            environment=ContainerVariables(server, image, install=True).get_env_vars(),
+            remove=True,
+            detach=True,
+        )
 
         if skip_wait and spinner:
             spinner.info(
@@ -283,7 +276,7 @@ class Servers(object):
         try:
             container = self._docker_client.containers.get(f"wilfred_{server.id}")
         except docker.errors.NotFound:
-            return
+            raise ServerNotRunning(f"server {server.id} is not running")
 
         container.kill()
 
