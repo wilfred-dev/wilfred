@@ -2,6 +2,10 @@
 
 Please refer to the [official documentation](https://docs.wilfredproject.org/en/latest/development/) for more information about the CHANGELOG and releases.
 
+## next-release
+
+* **Fixed** [#55](https://github.com/wilfred-dev/wilfred/issues/55) Fixed so that Docker exceptions reveal more info when installing by raising the Docker exceptions directly to the CLI.
+
 ## v0.6.0 (released on 2020-04-10)
 
 * **Added** [#47](https://github.com/wilfred-dev/wilfred/issues/47) Added `--force`/`-f` flags to `wilfred kill` and `wilfred delete` (forces actions without confirmation).
