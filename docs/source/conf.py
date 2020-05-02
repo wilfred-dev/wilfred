@@ -17,6 +17,7 @@
 
 # -- Project information -----------------------------------------------------
 
+master_doc = "index"
 project = "Wilfred"
 copyright = "2020, Vilhelm Prytz"
 author = "Vilhelm Prytz"
