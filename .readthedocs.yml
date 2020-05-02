@@ -9,5 +9,7 @@ python:
   install:
     - requirements: docs/requirements.txt
 
-mkdocs:
-  configuration: mkdocs.yml
+sphinx:
+  builder: html
+  configuration: docs/conf.py
+  fail_on_warning: true
