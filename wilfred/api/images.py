@@ -48,7 +48,9 @@ class Images(object):
             Path(self.image_dir).mkdir(parents=True, exist_ok=True)
 
     def download(self):
-        """Downloads default Wilfred images from GitHub"""
+        """
+        Downloads default Wilfred Images from GitHub
+        """
 
         rmtree(f"{self.image_dir}/default", ignore_errors=True)
 
@@ -70,7 +72,15 @@ class Images(object):
         rmtree(f"{self.config_dir}/temp_images")
 
     def data_strip_non_ui(self):
-        """Returns a list of all images with only the variables important to the user shown"""
+        """
+        Returns a list of all images with only the variables important to the user shown
+
+        Returns:
+            Returns ``list`` of images.
+
+        Raises:
+            :py:class:`wilfred.api.images.ImagesNotRead`
+        """
 
         if not self._check_if_read():
             raise ImagesNotRead("Read images before trying to get images")
@@ -96,7 +106,15 @@ class Images(object):
         return _images
 
     def get_image(self, uid: str):
-        """Retrieves image configuration for specific image"""
+        """
+        Retrieves image configuration for specific image
+
+        Returns:
+            Returns ``dict`` of image configuration.
+
+        Raises:
+            :py:class:`wilfred.api.images.ImagesNotRead`
+        """
 
         if not self._check_if_read():
             raise ImagesNotRead("Read images before trying to get image")
@@ -104,7 +122,17 @@ class Images(object):
         return next(filter(lambda img: img["uid"] == uid, self.images), None)
 
     def read_images(self):
-        """Reads and parses all images on system"""
+        """
+        Reads and parses all images on system
+
+        Returns:
+            Returns ``True`` if success.
+
+        Raises:
+            :py:class:`wilfred.api.images.ImagesNotPresent`
+            :py:class:`wilfred.api.errors.ReadError`
+            :py:class:`wilfred.api.images.ImageAPIMismatch`
+        """
 
         if not self.check_if_present():
             raise ImagesNotPresent("Default images not present")

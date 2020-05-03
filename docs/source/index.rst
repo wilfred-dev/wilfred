@@ -27,7 +27,7 @@ Before installing, make sure you have Docker already installed and configured. Y
 * `Docker Desktop on MacOS <https://docs.docker.com/docker-for-mac/install/>`__
 * `Docker Desktop on Windows <https://docs.docker.com/docker-for-windows/install/>`__
 
-You can verify that Docker is installed using `docker --version` or `docker info` (`info` shows more information).
+You can verify that Docker is installed using ``docker --version`` or ``docker info`` (``info`` shows more information).
 
 .. code-block:: bash
 
@@ -39,7 +39,7 @@ If you're having trouble accessing the Docker CLI as a non-root user, you can `a
 Pip
 ^^^
 
-Wilfred can be installed using `pip`. You need to use **Python 3.6** or newer to run Wilfred (if you also have `pip2` on your system, run with `pip3`).
+Wilfred can be installed using ``pip``. You need to use **Python 3.6** or newer to run Wilfred (if you also have ``pip2`` on your system, run with ``pip3``).
 
 .. code-block:: bash
 
@@ -78,7 +78,7 @@ Snapcraft is configured to automatically build the latest commit and push it to 
 
    snap install wilfred --beta --devmode
 
-Again, the `--beta` channel and `--devmode` should **not** be used in a production environment.
+Again, the ``--beta`` channel and ``--devmode`` should **not** be used in a production environment.
 
 Basic Configuration
 -------------------
@@ -95,28 +95,28 @@ Currently, the only config option required is the path for soring data.
 
    Path for storing server data [/home/{{ username }}/wilfred-data/servers]:
 
-By default, this is `/home/{{ username }}/wilfred-data/servers`. You can use any path as long as you have permissions to access it as the current user.
+By default, this is ``/home/{{ username }}/wilfred-data/servers``. You can use any path as long as you have permissions to access it as the current user.
 
-To create a new server, you can run `wilfred create` and follow the instructions.
+To create a new server, you can run ``wilfred create`` and follow the instructions.
 
 Upgrading
 ---------
 
-To check if you're running the latest version, run `wilfred --version`. If a new version is available, Wilfred will print a message.
+To check if you're running the latest version, run ``wilfred --version``. If a new version is available, Wilfred will print a message.
 
-If you installed Wilfred using `pip`, then you can upgrade by running the same command as for installing (note the `--upgrade` flag).
+If you installed Wilfred using ``pip``, then you can upgrade by running the same command as for installing (note the ``--upgrade`` flag).
 
 .. code-block:: bash
 
    pip install wilfred --upgrade
 
-If you installed Wilfred using `snap`, you can use `refresh` to download the latest version (snap should automatically update).
+If you installed Wilfred using ``snap``, you can use ``refresh`` to download the latest version (snap should automatically update).
 
 .. code-block:: bash
 
    snap refresh wilfred
 
-If you installed Wilfred using `brew`, you can use Homebrew to upgrade Wilfred as you would do with any formula.
+If you installed Wilfred using ``brew``, you can use Homebrew to upgrade Wilfred as you would do with any formula.
 
 .. code-block:: bash
 
@@ -129,6 +129,7 @@ If you installed Wilfred using `brew`, you can use Homebrew to upgrade Wilfred a
 
    commands
    images
+   api
    development
 
 Indices and tables
