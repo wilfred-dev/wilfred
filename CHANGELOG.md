@@ -4,7 +4,9 @@ Please refer to the [official documentation](https://docs.wilfredproject.org/en/
 
 ## next-release
 
+* **Fixed** [#54](https://github.com/wilfred-dev/wilfred/issues/54) Hopefully fixed broken PyPI deployment with Travis CI.
 * **Fixed** [#55](https://github.com/wilfred-dev/wilfred/issues/55) Fixed so that Docker exceptions reveal more info when installing by raising the Docker exceptions directly to the CLI.
+* **Changed** Replaced mkdocs documentation with Sphinx (and initial API autodoc).
 
 ## v0.6.0 (released on 2020-04-10)
 
