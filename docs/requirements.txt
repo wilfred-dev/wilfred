@@ -1,1 +1,10 @@
-mdx-truly-sane-lists
+Sphinx==3.0.3
+docker
+click
+colorama
+appdirs
+requests
+tabulate
+sqlalchemy
+pyyaml
+halo

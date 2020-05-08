@@ -34,7 +34,7 @@ As long as your server can run in Docker, it can probably run using Wilfred (aft
 
 ## Installation
 
-Please refer to the [official documentation](https://docs.wilfredproject.org/en/latest/installation/) for further installation instructions and documentation.
+Please refer to the [official documentation](https://docs.wilfredproject.org/en/latest/#installation) for further installation instructions and documentation.
 
 ### Quickstart
 
