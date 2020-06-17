@@ -682,10 +682,11 @@ def edit(name):
 
             custom_startup = None if custom_startup == "None" else custom_startup
 
-    try:
-        server.name = name
-    except ValueError as e:
-        error(str(e), exit_code=1)
+    if name != server.name:
+        try:
+            servers.rename(server, name)
+        except Exception as e:
+            ui_exception(e)
 
     server.port = port
     server.memory = memory

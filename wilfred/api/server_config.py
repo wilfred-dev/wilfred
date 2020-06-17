@@ -52,7 +52,7 @@ class ServerConfig:
             raise ParseError(f"failed to parse {file['filename']}, err {str(e)}")
 
         for file in self._image["config"]["files"]:
-            path = f"{self._configuration['data_path']}/{self._server.id}/{file['filename']}"
+            path = f"{self._configuration['data_path']}/{self._server.name}_{self._server.id}/{file['filename']}"
 
             if file["parser"] == "properties":
                 try:
@@ -133,7 +133,7 @@ class ServerConfig:
 
         for file in self._image["config"]["files"]:
             if file["filename"] == filename:
-                path = f"{self._configuration['data_path']}/{self._server.id}"
+                path = f"{self._configuration['data_path']}/{self._server.name}_{self._server.id}"
 
                 for _image_config_file in self._image["config"]["files"]:
                     for x in _image_config_file["environment"]:

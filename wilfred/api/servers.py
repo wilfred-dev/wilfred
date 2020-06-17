@@ -15,6 +15,7 @@ from tabulate import tabulate
 from pathlib import Path
 from shutil import rmtree, get_terminal_size
 from os import remove as remove_file
+from os import rename
 from time import sleep
 from sys import platform
 from subprocess import call
@@ -183,7 +184,7 @@ class Servers(object):
                     self._start(server)
 
     def remove(self, server):
-        path = f"{self._configuration['data_path']}/{server.id}"
+        path = f"{self._configuration['data_path']}/{server.name}_{server.id}"
 
         for x in (
             session.query(EnvironmentVariable).filter_by(server_id=server.id).all()
@@ -221,7 +222,7 @@ class Servers(object):
                 raise ServerNotRunning(f"server {server.id} is not running")
 
     def install(self, server, skip_wait=False, spinner=None):
-        path = f"{self._configuration['data_path']}/{server.id}"
+        path = f"{self._configuration['data_path']}/{server.name}_{server.id}"
         image = self._images.get_image(server.image_uid)
 
         if platform.startswith("win"):
@@ -280,6 +281,21 @@ class Servers(object):
 
         container.kill()
 
+    def rename(self, server, name):
+        if self._container_alive(server):
+            raise WilfredException("You cannot rename the server while it is running")
+
+        try:
+            rename(
+                f"{self._configuration['data_path']}/{server.name}_{server.id}",
+                f"{self._configuration['data_path']}/{name}_{server.id}",
+            )
+        except Exception as e:
+            raise WriteError(f"could not rename folder, {str(e)}")
+
+        server.name = name
+        session.commit()
+
     def _console_input_callback(self, payload, server):
         self.command(server, payload)
 
@@ -318,7 +334,7 @@ class Servers(object):
         return True
 
     def _start(self, server):
-        path = f"{self._configuration['data_path']}/{server.id}"
+        path = f"{self._configuration['data_path']}/{server.name}_{server.id}"
         image = self._images.get_image(server.image_uid)
 
         try:
