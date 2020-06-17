@@ -35,6 +35,15 @@ class Servers(object):
     def __init__(
         self, docker_client: docker.DockerClient, configuration: dict, images: Images
     ):
+        """
+        Inititates wilfred.api.Servers, method for controlling servers
+
+        Args:
+            docker_client (docker.DockerClient): DockerClient object from Docker module
+            configuration (dict): Dictionary of Wilfred config
+            images (Images): wilfred.api.Images object
+        """
+
         self._images = images
         self._configuration = configuration
         self._docker_client = docker_client
@@ -165,6 +174,10 @@ class Servers(object):
         session.commit()
 
     def sync(self):
+        """
+        Performs sync, checks for state of containers
+        """
+
         for server in session.query(Server).all():
             if server.status == "installing":
                 try:
@@ -183,7 +196,14 @@ class Servers(object):
                 except docker.errors.NotFound:
                     self._start(server)
 
-    def remove(self, server):
+    def remove(self, server: Server):
+        """
+        Removes specified server
+
+        Args:
+            server (wilfred.database.Server): Server database object
+        """
+
         path = f"{self._configuration['data_path']}/{server.name}_{server.id}"
 
         for x in (
@@ -202,7 +222,19 @@ class Servers(object):
 
         rmtree(path, ignore_errors=True)
 
-    def console(self, server, disable_user_input=False):
+    def console(self, server: Server, disable_user_input=False):
+        """
+        Enters server console
+
+        Args:
+            server (wilfred.database.Server): Server database object
+            disable_user_input (bool): Blocks user input if `True`. By default this is `False`.
+
+        Raises:
+            :py:class:`ServerNotRunning`
+                If server is not running
+        """
+
         try:
             container = self._docker_client.containers.get(f"wilfred_{server.id}")
         except docker.errors.NotFound:
@@ -221,7 +253,20 @@ class Servers(object):
             except docker.errors.NotFound:
                 raise ServerNotRunning(f"server {server.id} is not running")
 
-    def install(self, server, skip_wait=False, spinner=None):
+    def install(self, server: Server, skip_wait=False, spinner=None):
+        """
+        Performs installation
+
+        Args:
+            server (wilfred.database.Server): Server database object
+            skip_wait (bool): Doesn't stall while waiting for server installation to complete if `True`.
+            spinner (Halo): If `Halo` spinner object is defined, will then write and perform actions to it.
+
+        Raises:
+            :py:class:`WriteError`
+                If not able to create directory or write to it
+        """
+
         path = f"{self._configuration['data_path']}/{server.name}_{server.id}"
         image = self._images.get_image(server.image_uid)
 
@@ -274,6 +319,17 @@ class Servers(object):
                 sleep(1)
 
     def kill(self, server):
+        """
+        Kills server container
+
+        Args:
+            server (wilfred.database.Server): Server database object
+
+        Raises:
+            :py:class:`ServerNotRunning`
+                If server is not running
+        """
+
         try:
             container = self._docker_client.containers.get(f"wilfred_{server.id}")
         except docker.errors.NotFound:
@@ -282,6 +338,20 @@ class Servers(object):
         container.kill()
 
     def rename(self, server, name):
+        """
+        Renames server and moves server folder
+
+        Args:
+            server (wilfred.database.Server): Server database object
+            name (str): New name of the server
+
+        Raises:
+            :py:class:`WilfredException`
+                If server is running
+            :py:class:`WriteError`
+                If not able to move folder
+        """
+
         if self._container_alive(server):
             raise WilfredException("You cannot rename the server while it is running")
 
@@ -300,6 +370,18 @@ class Servers(object):
         self.command(server, payload)
 
     def command(self, server, command):
+        """
+        Sends command to server console
+
+        Args:
+            server (wilfred.database.Server): Server database object
+            command (str): The command to send to the stdin of the server
+
+        Raises:
+            :py:class:`ServerNotRunning`
+                If server is not running
+        """
+
         _cmd = f"{command}\n".encode("utf-8")
 
         try:

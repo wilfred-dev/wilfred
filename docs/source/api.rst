@@ -12,12 +12,14 @@ Wilfred API
 
 .. py:class:: Servers
 
+  .. automethod:: __init__
   .. automethod:: remove
   .. automethod:: console
   .. automethod:: install
   .. automethod:: kill
   .. automethod:: command
   .. automethod:: sync
+  .. automethod:: rename
 
 .. py:module:: wilfred.api.images
 
