@@ -13,6 +13,7 @@ Wilfred API
 .. py:class:: Servers
 
   .. automethod:: __init__
+  .. automethod:: all
   .. automethod:: remove
   .. automethod:: console
   .. automethod:: install
