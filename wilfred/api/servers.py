@@ -36,7 +36,7 @@ class Servers(object):
         self, docker_client: docker.DockerClient, configuration: dict, images: Images
     ):
         """
-        Inititates wilfred.api.Servers, method for controlling servers
+        Initiates wilfred.api.Servers, method for controlling servers
 
         Args:
             docker_client (docker.DockerClient): DockerClient object from Docker module
