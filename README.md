@@ -55,7 +55,7 @@ brew install wilfred
 
 Once you got Wilfred installed, run `wilfred setup` to set a path for Wilfred to use to store server files.
 
-![Creating a server in Wilfred](docs/quickstart.gif)
+![Creating a server in Wilfred](https://raw.githubusercontent.com/wilfred-dev/wilfred/master/docs/quickstart.gif)
 
 To create your first server, use `wilfred create`. Most values have a default value, where you can just press return to use them.
 
