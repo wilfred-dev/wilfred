@@ -11,13 +11,14 @@
 import click
 import docker
 
-from tabulate import tabulate
 from pathlib import Path
-from shutil import rmtree, get_terminal_size
+from shutil import rmtree
 from os import remove as remove_file
+from os import rename
 from time import sleep
 from sys import platform
 from subprocess import call
+from sqlalchemy import inspect
 
 from wilfred.database import session, Server, EnvironmentVariable
 from wilfred.keyboard import KeyboardThread
@@ -34,136 +35,84 @@ class Servers(object):
     def __init__(
         self, docker_client: docker.DockerClient, configuration: dict, images: Images
     ):
+        """
+        Initiates wilfred.api.Servers, method for controlling servers
+
+        Args:
+            docker_client (docker.DockerClient): DockerClient object from Docker module
+            configuration (dict): Dictionary of Wilfred config
+            images (Images): wilfred.api.Images object
+        """
+
         self._images = images
         self._configuration = configuration
         self._docker_client = docker_client
 
-    def pretty_data(self, server=None, cpu_load=False, memory_usage=False):
-        """reformats data in preperation for printing to user"""
+    def all(self, cpu_load=False, memory_usage=False):
+        """
+        Returns data of all servers
 
-        self._running_docker_sync()
+        Args:
+            cpu_load (bool): Include the CPU load of the container. Defaults to `None` if server is not running.
+            memory_usage (bool): Include RAM usage of the container. Defaults to `None` if server is not running.
+        """
 
-        servers = (
-            [
-                dict(
-                    (col, getattr(server, col))
-                    for col in server.__table__.columns.keys()
-                )
-            ]
-            if server
-            else [u.__dict__ for u in session.query(Server).all()]
-        )
-
-        for server in servers:
-            try:
-                del server["_sa_instance_state"]
-            except Exception:
-                pass
-
-            server.update(
-                (
-                    k,
-                    str(v)
-                    .replace("running", click.style("running", fg="green"))
-                    .replace("stopped", click.style("stopped", fg="red"))
-                    .replace("installing", click.style("installing", fg="yellow")),
-                )
-                for k, v in server.items()
-            )
-
-            _term_diff = get_terminal_size((80, 20))[0] - 75
-
-            if len(str(server["custom_startup"])) > _term_diff:
-                server.update(
-                    {
-                        "custom_startup": f"{str(server['custom_startup'])[:_term_diff]}..."
-                    }
-                )
-
-        # reorder variables for a more print-friendly format
         servers = [
-            {
-                k: _server[k]
-                for k in [
-                    "id",
-                    "name",
-                    "image_uid",
-                    "port",
-                    "memory",
-                    "status",
-                    "custom_startup",
-                ]
-            }
-            for _server in servers
+            {c.key: getattr(u, c.key) for c in inspect(u).mapper.column_attrs}
+            for u in session.query(Server).all()
         ]
 
-        if cpu_load or memory_usage:
-            for server in servers:
-                _running = True
+        for server in servers:
+            if cpu_load or memory_usage:
+                for server in servers:
+                    _running = True
 
-                try:
-                    container = self._docker_client.containers.get(
-                        f"wilfred_{server['id']}"
-                    )
-                    d = container.stats(stream=False)
-                except docker.errors.NotFound:
-                    server.update({"cpu_load": "-"})
-                    server.update({"memory_usage": "-"})
-                    _running = False
-                except Exception:
-                    server.update({"cpu_load": "error"})
-                    server.update({"memory_usage": "error"})
-                    _running = False
+                    try:
+                        container = self._docker_client.containers.get(
+                            f"wilfred_{server['id']}"
+                        )
+                        d = container.stats(stream=False)
+                    except docker.errors.NotFound:
+                        server.update({"cpu_load": "-"})
+                        server.update({"memory_usage": "-"})
+                        _running = False
+                    except Exception:
+                        server.update({"cpu_load": "error"})
+                        server.update({"memory_usage": "error"})
+                        _running = False
 
-                if cpu_load and _running:
-                    cpu_count = len(d["cpu_stats"]["cpu_usage"]["percpu_usage"])
-                    cpu_percent = 0.0
-                    cpu_delta = float(
-                        d["cpu_stats"]["cpu_usage"]["total_usage"]
-                    ) - float(d["precpu_stats"]["cpu_usage"]["total_usage"])
-                    system_delta = float(d["cpu_stats"]["system_cpu_usage"]) - float(
-                        d["precpu_stats"]["system_cpu_usage"]
-                    )
-                    if system_delta > 0.0:
-                        cpu_percent = (
-                            f"{round(cpu_delta / system_delta * 100.0 * cpu_count)}%"
+                    if cpu_load and _running:
+                        cpu_count = len(d["cpu_stats"]["cpu_usage"]["percpu_usage"])
+                        cpu_percent = 0.0
+                        cpu_delta = float(
+                            d["cpu_stats"]["cpu_usage"]["total_usage"]
+                        ) - float(d["precpu_stats"]["cpu_usage"]["total_usage"])
+                        system_delta = float(
+                            d["cpu_stats"]["system_cpu_usage"]
+                        ) - float(d["precpu_stats"]["system_cpu_usage"])
+                        if system_delta > 0.0:
+                            cpu_percent = f"{round(cpu_delta / system_delta * 100.0 * cpu_count)}%"
+
+                        server.update({"cpu_load": cpu_percent if cpu_percent else "-"})
+
+                    if memory_usage and _running:
+                        server.update(
+                            {
+                                "memory_usage": f"{round(d['memory_stats']['usage'] / 10**6)} MB"
+                            }
                         )
 
-                    server.update({"cpu_load": cpu_percent if cpu_percent else "-"})
-
-                if memory_usage and _running:
-                    server.update(
-                        {
-                            "memory_usage": f"{round(d['memory_stats']['usage'] / 10**6)} MB"
-                        }
-                    )
-
         return servers
-
-    def pretty(self, server=None, *args, **kwargs):
-        servers = self.pretty_data(server=server, *args, **kwargs)
-
-        headers = {
-            "id": click.style("ID", bold=True),
-            "name": click.style("Name", bold=True),
-            "image_uid": click.style("Image UID", bold=True),
-            "memory": click.style("RAM", bold=True),
-            "port": click.style("Port", bold=True),
-            "status": click.style("Status", bold=True),
-            "custom_startup": click.style("Custom startup", bold=True),
-        }
-
-        return tabulate(
-            servers,
-            headers=headers,
-            tablefmt="plain" if get_terminal_size((80, 20))[0] < 96 else "fancy_grid",
-        )
 
     def set_status(self, server, status):
         server.status = status
         session.commit()
 
     def sync(self):
+        """
+        Performs sync, checks for state of containers
+        """
+
         for server in session.query(Server).all():
             if server.status == "installing":
                 try:
@@ -182,8 +131,15 @@ class Servers(object):
                 except docker.errors.NotFound:
                     self._start(server)
 
-    def remove(self, server):
-        path = f"{self._configuration['data_path']}/{server.id}"
+    def remove(self, server: Server):
+        """
+        Removes specified server
+
+        Args:
+            server (wilfred.database.Server): Server database object
+        """
+
+        path = f"{self._configuration['data_path']}/{server.name}_{server.id}"
 
         for x in (
             session.query(EnvironmentVariable).filter_by(server_id=server.id).all()
@@ -201,7 +157,19 @@ class Servers(object):
 
         rmtree(path, ignore_errors=True)
 
-    def console(self, server, disable_user_input=False):
+    def console(self, server: Server, disable_user_input=False):
+        """
+        Enters server console
+
+        Args:
+            server (wilfred.database.Server): Server database object
+            disable_user_input (bool): Blocks user input if `True`. By default this is `False`.
+
+        Raises:
+            :py:class:`ServerNotRunning`
+                If server is not running
+        """
+
         try:
             container = self._docker_client.containers.get(f"wilfred_{server.id}")
         except docker.errors.NotFound:
@@ -220,8 +188,21 @@ class Servers(object):
             except docker.errors.NotFound:
                 raise ServerNotRunning(f"server {server.id} is not running")
 
-    def install(self, server, skip_wait=False, spinner=None):
-        path = f"{self._configuration['data_path']}/{server.id}"
+    def install(self, server: Server, skip_wait=False, spinner=None):
+        """
+        Performs installation
+
+        Args:
+            server (wilfred.database.Server): Server database object
+            skip_wait (bool): Doesn't stall while waiting for server installation to complete if `True`.
+            spinner (Halo): If `Halo` spinner object is defined, will then write and perform actions to it.
+
+        Raises:
+            :py:class:`WriteError`
+                If not able to create directory or write to it
+        """
+
+        path = f"{self._configuration['data_path']}/{server.name}_{server.id}"
         image = self._images.get_image(server.image_uid)
 
         if platform.startswith("win"):
@@ -273,6 +254,17 @@ class Servers(object):
                 sleep(1)
 
     def kill(self, server):
+        """
+        Kills server container
+
+        Args:
+            server (wilfred.database.Server): Server database object
+
+        Raises:
+            :py:class:`ServerNotRunning`
+                If server is not running
+        """
+
         try:
             container = self._docker_client.containers.get(f"wilfred_{server.id}")
         except docker.errors.NotFound:
@@ -280,10 +272,51 @@ class Servers(object):
 
         container.kill()
 
+    def rename(self, server, name):
+        """
+        Renames server and moves server folder
+
+        Args:
+            server (wilfred.database.Server): Server database object
+            name (str): New name of the server
+
+        Raises:
+            :py:class:`WilfredException`
+                If server is running
+            :py:class:`WriteError`
+                If not able to move folder
+        """
+
+        if self._container_alive(server):
+            raise WilfredException("You cannot rename the server while it is running")
+
+        try:
+            rename(
+                f"{self._configuration['data_path']}/{server.name}_{server.id}",
+                f"{self._configuration['data_path']}/{name}_{server.id}",
+            )
+        except Exception as e:
+            raise WriteError(f"could not rename folder, {str(e)}")
+
+        server.name = name
+        session.commit()
+
     def _console_input_callback(self, payload, server):
         self.command(server, payload)
 
     def command(self, server, command):
+        """
+        Sends command to server console
+
+        Args:
+            server (wilfred.database.Server): Server database object
+            command (str): The command to send to the stdin of the server
+
+        Raises:
+            :py:class:`ServerNotRunning`
+                If server is not running
+        """
+
         _cmd = f"{command}\n".encode("utf-8")
 
         try:
@@ -318,7 +351,7 @@ class Servers(object):
         return True
 
     def _start(self, server):
-        path = f"{self._configuration['data_path']}/{server.id}"
+        path = f"{self._configuration['data_path']}/{server.name}_{server.id}"
         image = self._images.get_image(server.image_uid)
 
         try:

@@ -19,8 +19,10 @@ import sys
 from halo import Halo
 from pathlib import Path
 from sqlalchemy.exc import IntegrityError
+from sqlalchemy import inspect
 from time import sleep
 from tabulate import tabulate
+from shutil import get_terminal_size
 
 from wilfred.docker_conn import docker_client
 from wilfred.version import version, commit_hash, commit_date
@@ -137,6 +139,32 @@ def print_path(ctx, param, value):
     ctx.exit()
 
 
+def pretty_list(data, tablefmt):
+    for server in data:
+        server.update(
+            (
+                k,
+                str(v)
+                .replace("running", click.style("running", fg="green"))
+                .replace("stopped", click.style("stopped", fg="red"))
+                .replace("installing", click.style("installing", fg="yellow")),
+            )
+            for k, v in server.items()
+        )
+
+    headers = {
+        "id": click.style("ID", bold=True),
+        "name": click.style("Name", bold=True),
+        "image_uid": click.style("Image UID", bold=True),
+        "memory": click.style("RAM", bold=True),
+        "port": click.style("Port", bold=True),
+        "status": click.style("Status", bold=True),
+        "custom_startup": click.style("Custom startup", bold=True),
+    }
+
+    return tabulate(data, headers=headers, tablefmt=tablefmt,)
+
+
 def main():
     # snap packages raise some weird ASCII codec errors, so we just force C.UTF-8
     if (
@@ -192,7 +220,17 @@ def setup():
 def servers_list():
     """List all existing servers."""
 
-    click.echo(servers.pretty())
+    # run sync to refresh server state
+    servers.sync()
+
+    data = servers.all()
+
+    click.echo(
+        pretty_list(
+            data,
+            tablefmt="plain" if get_terminal_size((80, 20))[0] < 96 else "fancy_grid",
+        )
+    )
 
 
 @cli.command("images")
@@ -616,7 +654,17 @@ def edit(name):
     if not server:
         error("Server does not exist", exit_code=1)
 
-    click.echo(servers.pretty(server=server))
+    click.echo(
+        pretty_list(
+            [
+                {
+                    c.key: getattr(server, c.key)
+                    for c in inspect(server).mapper.column_attrs
+                }
+            ],
+            tablefmt="plain" if get_terminal_size((80, 20))[0] < 96 else "fancy_grid",
+        )
+    )
     click.echo("Leave values empty to use existing value")
 
     name = click.prompt("Name", default=server.name).lower()
@@ -682,10 +730,11 @@ def edit(name):
 
             custom_startup = None if custom_startup == "None" else custom_startup
 
-    try:
-        server.name = name
-    except ValueError as e:
-        error(str(e), exit_code=1)
+    if name != server.name:
+        try:
+            servers.rename(server, name)
+        except Exception as e:
+            ui_exception(e)
 
     server.port = port
     server.memory = memory
@@ -709,7 +758,19 @@ def edit(name):
 def top():
     while True:
         # retrieve data (this can take a split moment)
-        data = servers.pretty_data(cpu_load=True, memory_usage=True)
+        data = servers.all(cpu_load=True, memory_usage=True)
+
+        for server in data:
+            server.update(
+                (
+                    k,
+                    str(v)
+                    .replace("running", click.style("running", fg="green"))
+                    .replace("stopped", click.style("stopped", fg="red"))
+                    .replace("installing", click.style("installing", fg="yellow")),
+                )
+                for k, v in server.items()
+            )
 
         # clear the screen
         click.clear()

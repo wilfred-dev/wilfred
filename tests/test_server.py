@@ -76,9 +76,9 @@ def test_pseudo_config_write():
 
     image = images.get_image(server.image_uid)
 
-    Path(f"{str(Path.home())}/temp/test").mkdir(parents=True, exist_ok=True)
+    Path(f"{str(Path.home())}/temp/test_test").mkdir(parents=True, exist_ok=True)
 
-    with open(f"{str(Path.home())}/temp/test/server.properties", "w") as f:
+    with open(f"{str(Path.home())}/temp/test_test/server.properties", "w") as f:
         f.write("\n".join(("query.port=25564", "server-port=25564")))
 
     ServerConfig(

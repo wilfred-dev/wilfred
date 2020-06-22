@@ -2,6 +2,15 @@
 
 Please refer to the [official documentation](https://docs.wilfredproject.org/en/latest/development.html) for more information about the CHANGELOG and releases.
 
+## v0.7.1 (released on 2020-06-19)
+
+* **Fixed** [#57](https://github.com/wilfred-dev/wilfred/issues/57) Fixed a bug that caused `wilfred top` to crash when the installation finishes and the server starts (refactored underlying API).
+* **Fixed** [#58](https://github.com/wilfred-dev/wilfred/issues/58) Fixed a bug that caused all server statuses to show up as `stoppped`. `running`, `installing` and `stopped` are now properly displayed and detected (refactored underlying API, related to [#57]((https://github.com/wilfred-dev/wilfred/issues/57))).
+
+## v0.7.0 (released on 2020-06-17)
+
+* **Changed** [#56](https://github.com/wilfred-dev/wilfred/issues/56)/[#43](https://github.com/wilfred-dev/wilfred/issues/43) Name of server folders now include both the unique ID and the name of the server (easier to find the server folder).
+
 ## v0.6.1 (released on 2020-05-03)
 
 * **Fixed** [#54](https://github.com/wilfred-dev/wilfred/issues/54) Hopefully fixed broken PyPI deployment with Travis CI.
