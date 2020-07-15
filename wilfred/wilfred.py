@@ -27,11 +27,11 @@ from shutil import get_terminal_size
 from wilfred.docker_conn import docker_client
 from wilfred.version import version, commit_hash, commit_date
 from wilfred.api.config_parser import Config, NoConfiguration
-from wilfred.database import session, database_path, Server, EnvironmentVariable
+from wilfred.api.database import session, database_path, Server, EnvironmentVariable
 from wilfred.api.servers import Servers
 from wilfred.api.images import Images, ImageAPIMismatch
 from wilfred.message_handler import warning, error, ui_exception
-from wilfred.core import is_integer, random_string, check_for_new_releases
+from wilfred.core import is_integer, check_for_new_releases
 from wilfred.migrate import Migrate
 from wilfred.api.server_config import ServerConfig
 from wilfred.decorators import configuration_present
@@ -307,21 +307,7 @@ def create(ctx, console, detach):
     port = click.prompt("Port", default=25565)
     memory = click.prompt("Memory", default=1024)
 
-    # create
-    server = Server(id=random_string())
-
-    try:
-        server.name = name
-    except ValueError as e:
-        error(str(e), exit_code=1)
-
-    server.image_uid = image_uid
-    server.memory = memory
-    server.port = port
-    server.custom_startup = None
-    server.status = "installing"
-
-    session.add(server)
+    # SHOULD CALL wilfred.api.servers.create (todo)
 
     try:
         session.commit()

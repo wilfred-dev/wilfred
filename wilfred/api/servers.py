@@ -19,8 +19,10 @@ from time import sleep
 from sys import platform
 from subprocess import call
 from sqlalchemy import inspect
+from random import choice
+from string import ascii_lowercase, digits
 
-from wilfred.database import session, Server, EnvironmentVariable
+from wilfred.api.database import session, Server, EnvironmentVariable
 from wilfred.keyboard import KeyboardThread
 from wilfred.container_variables import ContainerVariables
 from wilfred.api.images import Images
@@ -131,12 +133,38 @@ class Servers(object):
                 except docker.errors.NotFound:
                     self._start(server)
 
+    def create(self, name : str, image_uid : str, memory : int, port : int, custom_startup=None, id=None):
+        """
+        Creates a new server
+
+        Args:
+            id (str): Usually random ID of server, can be undefined if this should be randomly generated
+
+        Raises:
+            `ValueError`
+                One of the variables are not unique (usually)
+        """
+
+        id = "".join(choice(ascii_lowercase + digits) for i in range(8)) if id == None else id
+
+        server = Server(id=id)
+
+        server.name = name
+        server.image_uid = image_uid
+        server.memory = memory
+        server.port = port
+        server.custom_startup = None
+        server.status = "installing"
+
+        session.add(server)
+        session.commit()
+
     def remove(self, server: Server):
         """
         Removes specified server
 
         Args:
-            server (wilfred.database.Server): Server database object
+            server (wilfred.api.database.Server): Server database object
         """
 
         path = f"{self._configuration['data_path']}/{server.name}_{server.id}"
@@ -162,7 +190,7 @@ class Servers(object):
         Enters server console
 
         Args:
-            server (wilfred.database.Server): Server database object
+            server (wilfred.api.database.Server): Server database object
             disable_user_input (bool): Blocks user input if `True`. By default this is `False`.
 
         Raises:
@@ -193,7 +221,7 @@ class Servers(object):
         Performs installation
 
         Args:
-            server (wilfred.database.Server): Server database object
+            server (wilfred.api.database.Server): Server database object
             skip_wait (bool): Doesn't stall while waiting for server installation to complete if `True`.
             spinner (Halo): If `Halo` spinner object is defined, will then write and perform actions to it.
 
@@ -258,7 +286,7 @@ class Servers(object):
         Kills server container
 
         Args:
-            server (wilfred.database.Server): Server database object
+            server (wilfred.api.database.Server): Server database object
 
         Raises:
             :py:class:`ServerNotRunning`
@@ -277,7 +305,7 @@ class Servers(object):
         Renames server and moves server folder
 
         Args:
-            server (wilfred.database.Server): Server database object
+            server (wilfred.api.database.Server): Server database object
             name (str): New name of the server
 
         Raises:
@@ -309,7 +337,7 @@ class Servers(object):
         Sends command to server console
 
         Args:
-            server (wilfred.database.Server): Server database object
+            server (wilfred.api.database.Server): Server database object
             command (str): The command to send to the stdin of the server
 
         Raises:

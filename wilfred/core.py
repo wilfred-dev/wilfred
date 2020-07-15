@@ -11,21 +11,8 @@
 import requests
 import click
 
-from random import choice
-from string import ascii_lowercase, digits
-
 from wilfred.version import version
 from wilfred.message_handler import warning
-
-
-def random_string(length=8):
-    """
-    Generate a random string of fixed length
-
-    :param int length: length of string to generate
-    """
-
-    return "".join(choice(ascii_lowercase + digits) for i in range(length))
 
 
 def check_for_new_releases(enable_emojis=True):
