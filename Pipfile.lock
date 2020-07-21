@@ -597,11 +597,11 @@
         },
         "tox": {
             "hashes": [
-                "sha256:1abf2ff7add9fabe95848af14cfe3c412361bef1ce52f7ceb4ff88d289e306ac",
-                "sha256:df4e418bee73acf258dcba1b1d9c6af0caea5d9105005ecf1b10a9a45c91dbdc"
+                "sha256:5968c07b3aeea715ac2fe723a912e0b6a0c53bebad24fc37eb559b7497f217fa",
+                "sha256:cf130909a224515f6c894023150ccc860c4cf5ecad64f583b9d43ed1aa7e5da8"
             ],
             "index": "pypi",
-            "version": "==3.17.0"
+            "version": "==3.17.1"
         },
         "typed-ast": {
             "hashes": [
