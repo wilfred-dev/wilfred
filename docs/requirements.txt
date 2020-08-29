@@ -3,7 +3,7 @@ docker
 click
 colorama
 appdirs
-requests
+requests==2.24.0
 tabulate
 sqlalchemy
 pyyaml
