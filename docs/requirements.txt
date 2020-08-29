@@ -1,4 +1,4 @@
-Sphinx==3.1.2
+Sphinx==3.2.1
 docker
 click
 colorama
