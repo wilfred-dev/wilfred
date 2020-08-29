@@ -2,7 +2,7 @@ Sphinx==3.2.1
 docker
 click
 colorama
-appdirs
+appdirs==1.4.4
 requests
 tabulate
 sqlalchemy
