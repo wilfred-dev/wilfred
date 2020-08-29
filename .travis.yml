@@ -6,19 +6,16 @@ python:
   - "3.6"
   - "3.7"
   - "3.8"
-before_install:
-  - python -m pip install --upgrade pip
-  - jq -r '.default | to_entries[] | .key + .value.version' Pipfile.lock > requirements.txt
-  - jq -r '.develop | to_entries[] | .key + .value.version' Pipfile.lock > requirements.txt
 install:
-  - pip install tox
+  - python -m pip install --upgrade pip
+  - sudo apt update && sudo apt install -y pipenv
+  - pipenv --python "$TRAVIS_PYTHON_VERSION"
+  - pipenv install --dev
 script:
   - if [[ $TRAVIS_PYTHON_VERSION == 3.6 ]]; then export TOXENV=py36; fi
   - if [[ $TRAVIS_PYTHON_VERSION == 3.7 ]]; then export TOXENV=py37; fi
   - if [[ $TRAVIS_PYTHON_VERSION == 3.8 ]]; then export TOXENV=py38; fi
-  - tox
-after_script:
-  - rm -rf requirements.txt
+  - pipenv run tox
 
 jobs:
   include:
@@ -27,9 +24,11 @@ jobs:
     before_install:
       - python -m pip install --upgrade pip
     install:
-      - pip install tox
+      - sudo apt update && sudo apt install -y pipenv
+      - pipenv --python "$TRAVIS_PYTHON_VERSION"
+      - pipenv install --dev
     script:
-      - tox
+      - pipenv run tox
 
   - stage: Lint documentation
     install:
