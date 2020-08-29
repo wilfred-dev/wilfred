@@ -6,5 +6,5 @@ appdirs
 requests
 tabulate
 sqlalchemy
-pyyaml
+pyyaml==5.3.1
 halo
