@@ -4,7 +4,7 @@ click
 colorama
 appdirs
 requests
-tabulate
+tabulate==0.8.7
 sqlalchemy
 pyyaml
 halo
