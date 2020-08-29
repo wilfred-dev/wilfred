@@ -1,7 +1,7 @@
 Sphinx==3.2.1
 docker
 click
-colorama
+colorama==0.4.3
 appdirs
 requests
 tabulate
