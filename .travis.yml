@@ -8,7 +8,7 @@ python:
   - "3.8"
 install:
   - python -m pip install --upgrade pip
-  - sudo apt update && sudo apt install -y pipenv
+  - pip install pipenv --upgrade
   - pipenv --python "$TRAVIS_PYTHON_VERSION"
   - pipenv install --dev
 script:
@@ -24,7 +24,7 @@ jobs:
     before_install:
       - python -m pip install --upgrade pip
     install:
-      - sudo apt update && sudo apt install -y pipenv
+      - pip install pipenv --upgrade
       - pipenv --python "$TRAVIS_PYTHON_VERSION"
       - pipenv install --dev
     script:

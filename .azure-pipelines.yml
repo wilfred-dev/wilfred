@@ -28,7 +28,7 @@ steps:
 
 - script: |
     python -m pip install --upgrade pip
-    sudo apt update -y && sudo apt install -y pipenv
+    pip install pipenv --upgrade
     pipenv --python $(python.version)
     pipenv install --dev
   displayName: 'Install dependencies'
