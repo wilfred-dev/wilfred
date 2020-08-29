@@ -1,6 +1,6 @@
 Sphinx==3.2.1
 docker
-click
+click==7.1.2
 colorama
 appdirs
 requests
