@@ -56,7 +56,8 @@ class Images(object):
 
         with open(f"{self.config_dir}/img.zip", "wb") as f:
             response = get(
-                "https://github.com/wilfred-dev/images/archive/master.zip", stream=True,
+                "https://github.com/wilfred-dev/images/archive/master.zip",
+                stream=True,
             )
             f.write(response.content)
 

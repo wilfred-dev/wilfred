@@ -115,7 +115,11 @@ class ServerConfig:
                     {"file": file["_wilfred_config_filename"], "setting": k, "value": v}
                 ) if k != "_wilfred_config_filename" else None
 
-        return tabulate(data, headers=headers, tablefmt="fancy_grid",)
+        return tabulate(
+            data,
+            headers=headers,
+            tablefmt="fancy_grid",
+        )
 
     def edit(self, filename, variable, value, override_linking_check=False):
         """modifies value of specified variable"""

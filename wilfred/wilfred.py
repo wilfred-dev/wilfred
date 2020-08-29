@@ -162,7 +162,11 @@ def pretty_list(data, tablefmt):
         "custom_startup": click.style("Custom startup", bold=True),
     }
 
-    return tabulate(data, headers=headers, tablefmt=tablefmt,)
+    return tabulate(
+        data,
+        headers=headers,
+        tablefmt=tablefmt,
+    )
 
 
 def main():
@@ -270,7 +274,9 @@ def list_images(refresh):
     is_flag=True,
 )
 @click.option(
-    "--detach", help="Immediately detach during install.", is_flag=True,
+    "--detach",
+    help="Immediately detach during install.",
+    is_flag=True,
 )
 @click.pass_context
 @configuration_present
@@ -788,7 +794,13 @@ def top():
         }
 
         # display table
-        click.echo(tabulate(data, headers=headers, tablefmt="plain",))
+        click.echo(
+            tabulate(
+                data,
+                headers=headers,
+                tablefmt="plain",
+            )
+        )
 
         # cooldown before repeating
         sleep(1)
