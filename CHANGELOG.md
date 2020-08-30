@@ -2,6 +2,10 @@
 
 Please refer to the [official documentation](https://docs.wilfredproject.org/en/latest/development.html) for more information about the CHANGELOG and releases.
 
+## next-release
+
+* **Added** [#74](https://github.com/wilfred-dev/wilfred/issues/74) Added the ability for Wilfred to automatically refresh the default images periodically. Wilfred will currently initiate refresh if images on file are older than 1 week or if the running version of Wilfred changes.
+
 ## v0.7.1 (released on 2020-06-19)
 
 * **Fixed** [#57](https://github.com/wilfred-dev/wilfred/issues/57) Fixed a bug that caused `wilfred top` to crash when the installation finishes and the server starts (refactored underlying API).
