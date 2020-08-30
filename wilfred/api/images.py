@@ -12,14 +12,16 @@ import json
 
 from appdirs import user_config_dir
 from pathlib import Path
-from os.path import isdir, join
+from os.path import isdir, join, isfile
 from os import walk, remove
 from requests import get
 from zipfile import ZipFile
 from shutil import move, rmtree
 from copy import deepcopy
+from datetime import datetime, timedelta
 
 from wilfred.errors import WilfredException, ReadError, ParseError
+from wilfred.version import version
 
 API_VERSION = 2
 
@@ -34,6 +36,10 @@ class ImagesNotRead(WilfredException):
 
 class ImageAPIMismatch(WilfredException):
     """API level of image and API level of Wilfred mismatch"""
+
+
+class ImagesOutdated(WilfredException):
+    """Wilfred images are outdated and require refresh"""
 
 
 class Images(object):
@@ -71,6 +77,12 @@ class Images(object):
 
         remove(f"{self.config_dir}/img.zip")
         rmtree(f"{self.config_dir}/temp_images")
+
+        # write to cache info that images have been updated
+        data = {"time": str(datetime.now()), "version": version}
+
+        with open(f"{self.config_dir}/image_cache.json", "w") as f:
+            json.dump(data, f)
 
     def data_strip_non_ui(self):
         """
@@ -138,6 +150,27 @@ class Images(object):
         if not self.check_if_present():
             raise ImagesNotPresent("Default images not present")
 
+        if self.is_outdated():
+            raise ImagesOutdated("Images are outdated, refresh required")
+
+        self.image_fetch_date = "N/A"
+        self.image_fetch_version = "N/A"
+        self.image_time_to_refresh = "N/A"
+
+        try:
+            with open(f"{self.config_dir}/image_cache.json") as f:
+                data = json.load(f)
+
+                self.image_fetch_date = datetime.strptime(
+                    data["time"], "%Y-%m-%d %H:%M:%S.%f"
+                )
+                self.image_fetch_version = data["version"]
+                self.image_time_to_refresh = timedelta(days=7) - (
+                    datetime.now() - self.image_fetch_date
+                )
+        except Exception:
+            pass
+
         self.images = []
 
         for root, dirs, files in walk(self.image_dir):
@@ -176,6 +209,29 @@ class Images(object):
             return False
 
         return True
+
+    def is_outdated(self):
+        """Checks if default images are outdated"""
+
+        if not isfile(f"{self.config_dir}/image_cache.json"):
+            return True
+
+        try:
+            with open(f"{self.config_dir}/image_cache.json") as f:
+                data = json.load(f)
+
+                if (
+                    datetime.now()
+                    - datetime.strptime(data["time"], "%Y-%m-%d %H:%M:%S.%f")
+                ) > timedelta(days=7):
+                    return True
+
+                if data["version"] != version:
+                    return True
+
+                return False
+        except Exception:
+            return True
 
     def _verify(self, image: dict, file: str):
         def _exception(key):
