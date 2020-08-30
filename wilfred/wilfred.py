@@ -278,8 +278,15 @@ def list_images(refresh):
         )
     )
 
+    updated_at = click.style(
+        images.image_fetch_date.strftime("%Y-%m-%d %H:%M:%S"), bold=True
+    )
+    will_refresh_in = click.style(
+        str(images.image_time_to_refresh).split(".")[0], bold=True
+    )
+
     click.echo(
-        f"Default images last updated at {str(images.image_fetch_date)} with Wilfred version {images.image_fetch_version}"
+        f"Default images last updated at {updated_at}, will refresh in {will_refresh_in}"
     )
 
 

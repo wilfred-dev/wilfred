@@ -155,6 +155,7 @@ class Images(object):
 
         self.image_fetch_date = "N/A"
         self.image_fetch_version = "N/A"
+        self.image_time_to_refresh = "N/A"
 
         try:
             with open(f"{self.config_dir}/image_cache.json") as f:
@@ -164,6 +165,9 @@ class Images(object):
                     data["time"], "%Y-%m-%d %H:%M:%S.%f"
                 )
                 self.image_fetch_version = data["version"]
+                self.image_time_to_refresh = timedelta(days=7) - (
+                    datetime.now() - self.image_fetch_date
+                )
         except Exception:
             pass
 
