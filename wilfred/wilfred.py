@@ -29,7 +29,7 @@ from wilfred.version import version, commit_hash, commit_date
 from wilfred.api.config_parser import Config, NoConfiguration
 from wilfred.database import session, database_path, Server, EnvironmentVariable
 from wilfred.api.servers import Servers
-from wilfred.api.images import Images, ImageAPIMismatch
+from wilfred.api.images import Images, ImageAPIMismatch, ImagesOutdated
 from wilfred.message_handler import warning, error, ui_exception
 from wilfred.core import is_integer, random_string, check_for_new_releases
 from wilfred.migrate import Migrate
@@ -65,6 +65,18 @@ except ImageAPIMismatch:
     ) as spinner:
         images.download()
         spinner.succeed("Images downloaded")
+    try:
+        images.read_images()
+    except Exception as e:
+        ui_exception(e)
+except ImagesOutdated:
+    with Halo(
+        text="Images outdated, refreshing default images",
+        color="yellow",
+        spinner="dots",
+    ) as spinner:
+        images.download()
+        spinner.succeed("Images refreshed")
     try:
         images.read_images()
     except Exception as e:
@@ -264,6 +276,10 @@ def list_images(refresh):
             },
             tablefmt="fancy_grid",
         )
+    )
+
+    click.echo(
+        f"Default images last updated at {str(images.image_fetch_date)} with Wilfred version {images.image_fetch_version}"
     )
 
 
