@@ -14,7 +14,7 @@ from wilfred.api.images import Images
 from wilfred.api.servers import Servers
 from wilfred.docker_conn import docker_client
 from wilfred.api.server_config import ServerConfig
-from wilfred.database import Server, EnvironmentVariable, session
+from wilfred.api.database import Server, EnvironmentVariable, session
 from wilfred.api.config_parser import Config
 
 config = Config()

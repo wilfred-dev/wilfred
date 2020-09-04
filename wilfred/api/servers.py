@@ -20,11 +20,11 @@ from sys import platform
 from subprocess import call
 from sqlalchemy import inspect
 
-from wilfred.database import session, Server, EnvironmentVariable
+from wilfred.api.database import session, Server, EnvironmentVariable
 from wilfred.keyboard import KeyboardThread
 from wilfred.container_variables import ContainerVariables
 from wilfred.api.images import Images
-from wilfred.errors import WilfredException, WriteError
+from wilfred.api.errors import WilfredException, WriteError
 
 
 class ServerNotRunning(WilfredException):
@@ -136,7 +136,7 @@ class Servers(object):
         Removes specified server
 
         Args:
-            server (wilfred.database.Server): Server database object
+            server (wilfred.api.database.Server): Server database object
         """
 
         path = f"{self._configuration['data_path']}/{server.name}_{server.id}"
@@ -162,7 +162,7 @@ class Servers(object):
         Enters server console
 
         Args:
-            server (wilfred.database.Server): Server database object
+            server (wilfred.api.database.Server): Server database object
             disable_user_input (bool): Blocks user input if `True`. By default this is `False`.
 
         Raises:
@@ -193,7 +193,7 @@ class Servers(object):
         Performs installation
 
         Args:
-            server (wilfred.database.Server): Server database object
+            server (wilfred.api.database.Server): Server database object
             skip_wait (bool): Doesn't stall while waiting for server installation to complete if `True`.
             spinner (Halo): If `Halo` spinner object is defined, will then write and perform actions to it.
 
@@ -258,7 +258,7 @@ class Servers(object):
         Kills server container
 
         Args:
-            server (wilfred.database.Server): Server database object
+            server (wilfred.api.database.Server): Server database object
 
         Raises:
             :py:class:`ServerNotRunning`
@@ -277,7 +277,7 @@ class Servers(object):
         Renames server and moves server folder
 
         Args:
-            server (wilfred.database.Server): Server database object
+            server (wilfred.api.database.Server): Server database object
             name (str): New name of the server
 
         Raises:
@@ -309,7 +309,7 @@ class Servers(object):
         Sends command to server console
 
         Args:
-            server (wilfred.database.Server): Server database object
+            server (wilfred.api.database.Server): Server database object
             command (str): The command to send to the stdin of the server
 
         Raises:
