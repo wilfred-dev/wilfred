@@ -3,7 +3,7 @@ Sphinx==3.2.1
 # From Wilfred dependencies (used for autodoc)
 docker==4.3.1
 click==7.1.2
-colorama==0.4.3
+colorama==0.4.4
 appdirs==1.4.4
 requests==2.24.0
 tabulate==0.8.7
