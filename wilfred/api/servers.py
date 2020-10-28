@@ -13,7 +13,7 @@ import docker
 
 from pathlib import Path
 from shutil import rmtree
-from os import remove as remove_file
+from os import environ, remove as remove_file
 from os import rename
 from time import sleep
 from sys import platform
@@ -25,10 +25,15 @@ from wilfred.keyboard import KeyboardThread
 from wilfred.container_variables import ContainerVariables
 from wilfred.api.images import Images
 from wilfred.api.errors import WilfredException, WriteError
+from wilfred.core import random_string
 
 
 class ServerNotRunning(WilfredException):
     """Server is not running"""
+
+
+class ServerNotFound(WilfredException):
+    """Specified server was not found"""
 
 
 class Servers(object):
@@ -187,6 +192,74 @@ class Servers(object):
                     click.echo(line.strip())
             except docker.errors.NotFound:
                 raise ServerNotRunning(f"server {server.id} is not running")
+
+    def create(
+        self,
+        name,
+        image_uid,
+        memory,
+        port,
+        custom_startup=None,
+        environment_variables=[],
+    ):
+        """
+        Creates a new server
+
+        Args:
+            name (str): Name of new server
+            image_uid (str): UID of server image to use
+            memory (int): Memory to configure server with (in megabytes, i.e. 1024)
+            port (int): Port server should listen to
+            custom_startup (str, optional): Optional custom startup command (by default uses image command)
+            environment_variables (:obj:`list` of :obj:`dict`, optional): Optional list of environment variables
+
+        Returns:
+            wilfred.api.database.Server: Server database object of newly created server
+        """
+
+        server = Server(id=random_string())
+
+        server.name = name
+        server.image_uid = image_uid
+        server.memory = memory
+        server.port = port
+        server.custom_startup = custom_startup
+        server.status = "installing"
+
+        # commit changes to database
+        session.add(server)
+        session.commit()
+
+        for environment_variable in environment_variables:
+            session.add(
+                EnvironmentVariable(
+                    server_id=server.id,
+                    variable=environment_variable["variable"],
+                    value=environment_variable["value"],
+                )
+            )
+
+        session.commit()
+
+        return server
+
+    def query(self, name):
+        """
+        Returns :class:`wilfred.api.database.Server` object of specified server
+
+        Args:
+            name (str): Name of server to query for
+
+        Returns:
+            wilfred.api.database.Server: Server database object of specified server
+        """
+
+        server = session.query(Server).filter_by(name.lower()).first()
+
+        if not server:
+            raise ServerNotFound(f"Could not find server by name {name}")
+
+        return server
 
     def install(self, server: Server, skip_wait=False, spinner=None):
         """
