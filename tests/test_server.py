@@ -33,6 +33,7 @@ servers = Servers(docker_client(), config.configuration, images)
 def test_create_server():
     # create
     server = servers.create(
+        id="test",
         name="test",
         image_uid="minecraft-paper",
         memory="1024",
