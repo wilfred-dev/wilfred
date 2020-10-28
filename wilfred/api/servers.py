@@ -13,7 +13,7 @@ import docker
 
 from pathlib import Path
 from shutil import rmtree
-from os import environ, remove as remove_file
+from os import remove as remove_file
 from os import rename
 from time import sleep
 from sys import platform
@@ -201,6 +201,7 @@ class Servers(object):
         port,
         custom_startup=None,
         environment_variables=[],
+        id=None,
     ):
         """
         Creates a new server
@@ -212,12 +213,13 @@ class Servers(object):
             port (int): Port server should listen to
             custom_startup (str, optional): Optional custom startup command (by default uses image command)
             environment_variables (:obj:`list` of :obj:`dict`, optional): Optional list of environment variables
+            id (str, optional): Override generating random string as id by specifying it here
 
         Returns:
             wilfred.api.database.Server: Server database object of newly created server
         """
 
-        server = Server(id=random_string())
+        server = Server(id=random_string() if not id else id)
 
         server.name = name
         server.image_uid = image_uid
