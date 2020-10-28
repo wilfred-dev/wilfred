@@ -14,7 +14,6 @@ from wilfred.api.images import Images
 from wilfred.api.servers import Servers
 from wilfred.docker_conn import docker_client
 from wilfred.api.server_config import ServerConfig
-from wilfred.api.database import Server, session
 from wilfred.api.config_parser import Config
 
 config = Config()
@@ -49,7 +48,7 @@ def test_create_server():
 
 
 def test_start_server():
-    server = session.query(Server).filter_by(id="test").first()
+    server = servers.query(name="test")
 
     if server.status == "installing":
         raise Exception("server is installing")
@@ -59,7 +58,7 @@ def test_start_server():
 
 
 def test_pseudo_config_write():
-    server = session.query(Server).filter_by(id="test").first()
+    server = servers.query(name="test")
 
     image = images.get_image(server.image_uid)
 
@@ -74,5 +73,5 @@ def test_pseudo_config_write():
 
 
 def test_delete_server():
-    server = session.query(Server).filter_by(id="test").first()
+    server = servers.query(name="test")
     servers.remove(server)
