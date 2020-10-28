@@ -14,7 +14,7 @@ from wilfred.api.images import Images
 from wilfred.api.servers import Servers
 from wilfred.docker_conn import docker_client
 from wilfred.api.server_config import ServerConfig
-from wilfred.api.database import Server, EnvironmentVariable, session
+from wilfred.api.database import Server, session
 from wilfred.api.config_parser import Config
 
 config = Config()
@@ -33,29 +33,16 @@ servers = Servers(docker_client(), config.configuration, images)
 
 def test_create_server():
     # create
-    server = Server(
-        id="test",
+    server = servers.create(
         name="test",
         image_uid="minecraft-paper",
         memory="1024",
         port="25565",
-        custom_startup=None,
-        status="installing",
+        environment_variables=[
+            {"variable": "MINECRAFT_VERSION", "value": "latest"},
+            {"variable": "EULA_ACCEPTANCE", "value": "true"},
+        ],
     )
-    session.add(server)
-    session.commit()
-
-    minecraft_version = EnvironmentVariable(
-        server_id=server.id, variable="MINECRAFT_VERSION", value="latest"
-    )
-
-    eula_acceptance = EnvironmentVariable(
-        server_id=server.id, variable="EULA_ACCEPTANCE", value="true"
-    )
-
-    session.add(minecraft_version)
-    session.add(eula_acceptance)
-    session.commit()
 
     servers.install(server, skip_wait=False)
     servers.sync()
