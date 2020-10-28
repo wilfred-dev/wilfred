@@ -256,7 +256,7 @@ class Servers(object):
             wilfred.api.database.Server: Server database object of specified server
         """
 
-        server = session.query(Server).filter_by(name.lower()).first()
+        server = session.query(Server).filter_by(name=name.lower()).first()
 
         if not server:
             raise ServerNotFound(f"Could not find server by name {name}")
