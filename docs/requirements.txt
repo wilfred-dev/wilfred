@@ -1,4 +1,4 @@
-Sphinx==3.3.0
+Sphinx==3.3.1
 
 # From Wilfred dependencies (used for autodoc)
 docker==4.3.1
