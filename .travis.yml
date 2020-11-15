@@ -6,6 +6,7 @@ python:
   - "3.6"
   - "3.7"
   - "3.8"
+  - "3.9"
 install:
   - python -m pip install --upgrade pip
   - pip install pipenv --upgrade
@@ -15,6 +16,7 @@ script:
   - if [[ $TRAVIS_PYTHON_VERSION == 3.6 ]]; then export TOXENV=py36; fi
   - if [[ $TRAVIS_PYTHON_VERSION == 3.7 ]]; then export TOXENV=py37; fi
   - if [[ $TRAVIS_PYTHON_VERSION == 3.8 ]]; then export TOXENV=py38; fi
+  - if [[ $TRAVIS_PYTHON_VERSION == 3.9 ]]; then export TOXENV=py39; fi
   - pipenv run tox
 
 jobs:

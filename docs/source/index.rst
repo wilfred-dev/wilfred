@@ -54,7 +54,7 @@ You can install using a specific python version, e.g. `3.8`.
 Homebrew
 ^^^^^^^^
 
-If you're using macOS with `Homebrew <https://brew.sh>`__ or Linux with `Linuxbrew <https://docs.brew.sh/Homebrew-on-Linux>`__, you can install Wilfred using the official tap.
+Wilfred can also be installed via `Homebrew <https://brew.sh>`__ (works on macOS and Linux). Once Homebrew is installed, use the two commands below to install Wilfred via the offical tap.
 
 .. code-block:: bash
 
