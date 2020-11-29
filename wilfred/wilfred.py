@@ -48,7 +48,11 @@ except Exception as e:
 
 
 images = Images()
-servers = Servers(docker_client(), config.configuration, images)
+
+try:
+    servers = Servers(docker_client(), config.configuration, images)
+except Exception as e:
+    ui_exception(e)
 
 if not images.check_if_present():
     with Halo(
