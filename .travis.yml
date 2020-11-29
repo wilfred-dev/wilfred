@@ -32,12 +32,6 @@ jobs:
     script:
       - pipenv run tox
 
-  - stage: Lint documentation
-    install:
-    - gem install mdl
-    script:
-    - mdl docs --rules "~MD013,~MD025"
-
   - stage: Deploy
     script:
       - jq -r '.default | to_entries[] | .key + .value.version' Pipfile.lock > requirements.txt
