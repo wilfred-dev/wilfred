@@ -71,4 +71,4 @@ The best places to contribute are through the issue tracker and the official Dis
 
 ## Contributors ✨
 
-Created, written and maintained by [Vilhelm Prytz](https://github.com/VilhelmPrytz).
+Created, written and maintained by [Vilhelm Prytz](https://github.com/vilhelmprytz).
