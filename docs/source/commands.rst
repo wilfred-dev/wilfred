@@ -17,6 +17,8 @@ Basic commands and syntax available for Wilfred.
     - Required argument ``NAME`` - Name of the server.
 - ``images`` - List all images.
     - Optional option ``--refresh`` - Updates all default image configs from GitHub.
+    - Optional option ``--repo`` - Repo to fetch images from during refresh. By default this is `wilfred-dev/images`.
+    - Optional option ``--branch`` - Branch to fetch images from during refresh. By default this is `master`. 
 - ``kill`` - Kill container of a running server.
     - Required argument ``NAME`` - Name of the server.
     - Optional option ``-f``, ``--force`` - Force action without confirmation.

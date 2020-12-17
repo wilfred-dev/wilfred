@@ -5,6 +5,7 @@ Please refer to the [official documentation](https://docs.wilfredproject.org/en/
 ## next-release
 
 * **Added** [#74](https://github.com/wilfred-dev/wilfred/issues/74) Added the ability for Wilfred to automatically refresh the default images periodically. Wilfred will currently initiate refresh if images on file are older than 1 week or if the running version of Wilfred changes.
+* **Added** [#86](https://github.com/wilfred-dev/wilfred/issues/86) Added the ability to specify repo and branch as image source when running `wilfred images --refresh`. The new options are `--repo` (which by default has the value `wilfred-dev/images` and `--branch` (which by default has the value `master`).
 * **Fixed** [#84](https://github.com/wilfred-dev/wilfred/issues/84) Fixed a bug that would cause Wilfred to display a long traceback when `docker_client()` function raised exception (such as `DockerException` which is raised when Docker is not installed/broken)
 
 ## v0.7.1 (released on 2020-06-19)
