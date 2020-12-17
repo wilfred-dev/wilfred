@@ -49,10 +49,11 @@ except Exception as e:
 
 images = Images()
 
-try:
-    servers = Servers(docker_client(), config.configuration, images)
-except Exception as e:
-    ui_exception(e)
+if not os.environ.get("WILFRED_SKIP_DOCKER", False):
+    try:
+        servers = Servers(docker_client(), config.configuration, images)
+    except Exception as e:
+        ui_exception(e)
 
 if not images.check_if_present():
     with Halo(
