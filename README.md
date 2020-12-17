@@ -26,6 +26,7 @@ As long as your server can run in Docker, it can probably run using Wilfred (aft
   - Vanilla Minecraft
   - BungeeCord
   - Paper
+  - Spigot
   - Waterfall
   - Bedrock
 - Multi Theft Auto
