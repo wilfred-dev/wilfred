@@ -199,10 +199,20 @@ def main():
 
 @click.group()
 @click.option(
-    "--version", is_flag=True, callback=print_version, expose_value=False, is_eager=True
+    "--version",
+    is_flag=True,
+    callback=print_version,
+    expose_value=False,
+    is_eager=True,
+    help="Print version and exit",
 )
 @click.option(
-    "--path", is_flag=True, callback=print_path, expose_value=False, is_eager=True
+    "--path",
+    is_flag=True,
+    callback=print_path,
+    expose_value=False,
+    is_eager=True,
+    help="Print paths for configurations and server data",
 )
 def cli():
     """
@@ -445,7 +455,7 @@ def sync_cmd():
         spinner.succeed("Servers synced")
 
 
-@cli.command()
+@cli.command(short_help="Start server")
 @click.argument("name")
 @click.option(
     "--console", help="Attach to server console immediately after start.", is_flag=True
@@ -454,8 +464,9 @@ def sync_cmd():
 @configuration_present
 def start(ctx, name, console):
     """
-    Start server by specifiying the
-    name of the server as argument.
+    Start server
+
+    NAME is the name of the server
     """
 
     try:
@@ -499,13 +510,15 @@ def start(ctx, name, console):
             ctx.invoke(server_console, name=name)
 
 
-@cli.command()
+@cli.command(short_help="Forcefully kill running server")
 @click.argument("name")
-@click.option("-f", "--force", is_flag=True)
+@click.option("-f", "--force", is_flag=True, help="Force action without confirmation")
 @configuration_present
 def kill(name, force):
     """
-    Forcefully kill running server.
+    Forcefully kill running server
+
+    NAME is the name of the server
     """
 
     if force or click.confirm(
@@ -529,12 +542,14 @@ def kill(name, force):
             spinner.succeed("Server killed")
 
 
-@cli.command()
+@cli.command(short_help="Stop server gracefully")
 @click.argument("name")
 @configuration_present
 def stop(name):
     """
     Stop server gracefully.
+
+    NAME is the name of the server
     """
 
     try:
@@ -570,7 +585,7 @@ def stop(name):
         spinner.succeed("Server stopped")
 
 
-@cli.command()
+@cli.command(short_help="Restart server")
 @click.argument("name")
 @click.option(
     "--console", help="Attach to server console immediately after start.", is_flag=True
@@ -579,8 +594,9 @@ def stop(name):
 @configuration_present
 def restart(ctx, name, console):
     """
-    Restart server by specifiying the
-    name of the server as argument.
+    Restart server
+
+    NAME is the name of the server
     """
 
     ctx.invoke(stop, name=name)
@@ -592,11 +608,13 @@ def restart(ctx, name, console):
 
 @cli.command()
 @click.argument("name")
-@click.option("-f", "--force", is_flag=True)
+@click.option("-f", "--force", is_flag=True, help="Force action without confirmation")
 @configuration_present
 def delete(name, force):
     """
     Delete existing server.
+
+    NAME is the name of the server
     """
 
     if force or click.confirm(
@@ -617,13 +635,17 @@ def delete(name, force):
                 ui_exception(e)
 
 
-@cli.command("command")
+@cli.command("command", short_help="Send command to STDIN of server")
 @click.argument("name")
 @click.argument("command")
 @configuration_present
 def run_command(name, command):
     """
     Send command to STDIN of server
+
+    \b
+    NAME is the name of the server
+    COMMAND is the command to send, can be put in \" for commands with whitespaces
     """
 
     server = session.query(Server).filter_by(name=name.lower()).first()
@@ -655,7 +677,9 @@ def run_command(name, command):
 @configuration_present
 def server_console(name):
     """
-    Attach to server console, view log and run commands.
+    Attach to server console, view log and run commands
+
+    NAME is the name of the server
     """
 
     server = session.query(Server).filter_by(name=name.lower()).first()
@@ -694,6 +718,8 @@ def server_console(name):
 def edit(name):
     """
     Edit server (name, memory, port, environment variables)
+
+    NAME is the name of the server
     """
 
     server = session.query(Server).filter_by(name=name.lower()).first()
@@ -859,6 +885,15 @@ def top():
 @click.argument("variable", required=False)
 @click.argument("value", required=False)
 def config_command(name, variable, value):
+    """
+    Manage server configuration (for supported filetypes)
+
+    \b
+    NAME is the name of the server
+    VARIABLE is the name of an available setting
+    VALUE is the new value for the variable setting
+    """
+
     def _get():
         return ServerConfig(config.configuration, servers, server, image)
 
