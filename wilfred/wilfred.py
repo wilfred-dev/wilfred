@@ -255,19 +255,33 @@ def servers_list():
 
 @cli.command("images")
 @click.option("--refresh", help="Download the default images from GitHub", is_flag=True)
-def list_images(refresh):
+@click.option(
+    "--repo",
+    help="Specify repo to fetch images from during image refresh",
+    default="wilfred-dev/images",
+    show_default=True,
+)
+@click.option(
+    "--branch",
+    help="Specify branch to fetch images from during image refresh",
+    default="master",
+    show_default=True,
+)
+def list_images(refresh, repo, branch):
     """List images available on file."""
 
     if refresh:
-        with Halo(text="Refreshing images", color="yellow", spinner="dots") as spinner:
+        with Halo(
+            text=f"Refreshing images [{repo}/{branch}]", color="yellow", spinner="dots"
+        ) as spinner:
             try:
-                images.download()
+                images.download(repo=repo, branch=branch)
                 images.read_images()
             except Exception as e:
                 spinner.fail()
                 ui_exception(e)
 
-            spinner.succeed("Images refreshed")
+            spinner.succeed(f"Images refreshed [{repo}/{branch}]")
 
     click.echo(
         tabulate(
