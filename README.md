@@ -39,20 +39,27 @@ Please refer to the [official documentation](https://docs.wilfredproject.org/en/
 
 ### Quickstart
 
-Make sure you have Docker installed (see the official documentation for more info). Wilfred can be installed using `pip`. You need to use **Python 3.6** or newer to run Wilfred.
+Make sure you have Docker installed (see the official documentation for more info). The recommended way of installing Wilfred is via [Homebrew](https://brew.sh). Once brew is installed, Wilfred can easily be installed from the official tap.
+
+```bash
+brew tap wilfred-dev/wilfred
+brew install wilfred
+```
+
+Want the bleeding edge? You can install the latest commit using ``--HEAD`` (bugs are to be expected, don't use in production environments!).
+
+```bash
+brew tap wilfred-dev/wilfred
+brew install --HEAD wilfred
+```
+
+Wilfred can also be installed using `pip`. You need to use **Python 3.6** or newer to run Wilfred.
 
 ```bash
 pip install wilfred --upgrade
 ```
 
 A [snap](https://snapcraft.io/wilfred) package is also in the works but is currently not considered stable.
-
-If you're using macOS with [Homebrew](https://brew.sh) or Linux with [Linuxbrew](https://docs.brew.sh/Homebrew-on-Linux), you can install Wilfred using the official tap.
-
-```bash
-brew tap wilfred-dev/wilfred
-brew install wilfred
-```
 
 Once you got Wilfred installed, run `wilfred setup` to set a path for Wilfred to use to store server files.
 

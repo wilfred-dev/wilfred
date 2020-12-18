@@ -36,6 +36,23 @@ You can verify that Docker is installed using ``docker --version`` or ``docker i
 
 If you're having trouble accessing the Docker CLI as a non-root user, you can `add yourself to the Docker group <https://docs.docker.com/install/linux/linux-postinstall/#manage-docker-as-a-non-root-user>`__.
 
+Homebrew
+^^^^^^^^
+
+The recommended way of installing Wilfred is via `Homebrew <https://brew.sh>`__ (works on macOS and Linux). Make sure you have it installed on your system. Once Homebrew is installed, use the two commands below to install Wilfred via the offical tap.
+
+.. code-block:: bash
+
+   brew tap wilfred-dev/wilfred
+   brew install wilfred
+
+Want the bleeding edge? You can install the latest commit using ``--HEAD`` (bugs are to be expected, don't use in production environments!).
+
+.. code-block:: bash
+
+   brew tap wilfred-dev/wilfred
+   brew install --HEAD wilfred
+
 Pip
 ^^^
 
@@ -50,16 +67,6 @@ You can install using a specific python version, e.g. `3.8`.
 .. code-block:: bash
 
    python3.8 -m pip install wilfred --upgrade
-
-Homebrew
-^^^^^^^^
-
-Wilfred can also be installed via `Homebrew <https://brew.sh>`__ (works on macOS and Linux). Once Homebrew is installed, use the two commands below to install Wilfred via the offical tap.
-
-.. code-block:: bash
-
-   brew tap wilfred-dev/wilfred
-   brew install wilfred
 
 Snap (experimental)
 ^^^^^^^^^^^^^^^^^^^
