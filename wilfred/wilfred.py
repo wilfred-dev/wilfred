@@ -110,6 +110,7 @@ def print_version(ctx, param, value):
         else ""
     )
 
+    check_for_new_releases(enable_emojis=ENABLE_EMOJIS)
     if str(version) == "0.0.0.dev0":
         click.echo(
             "".join(
@@ -120,7 +121,6 @@ def print_version(ctx, param, value):
             )
         )
     else:
-        check_for_new_releases(enable_emojis=ENABLE_EMOJIS)
         click.echo(
             "".join(
                 (
