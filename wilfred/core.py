@@ -50,18 +50,20 @@ def check_for_new_releases(enable_emojis=True):
         return
 
     try:
-        latest_release = r.json()[0][key]
+        latest = r.json()[0][key]
     except Exception:
         warning("unable to parse release data")
 
         return
 
-    if latest_release != f"v{version}":
+    compare = commit_hash if version == "0.0.0.dev0" else f"v{version}"
+
+    if latest != compare:
         click.echo(
             "".join(
                 (
                     f"{'🎉 ' if enable_emojis else click.style('! ', fg='green')}",
-                    f"A new {version_type} of Wilfred is available! {latest_release}",
+                    f"A new {version_type} of Wilfred is available! {latest}",
                 )
             )
         )
