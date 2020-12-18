@@ -14,6 +14,7 @@ import os
 import sys
 
 sys.path.insert(0, os.path.abspath("../.."))
+os.environ["WILFRED_SKIP_DOCKER"] = "true"
 
 
 # -- Project information -----------------------------------------------------
@@ -32,7 +33,7 @@ release = "v0.7.1"
 # Add any Sphinx extension module names here, as strings. They can be
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
 # ones.
-extensions = ["sphinx.ext.autodoc", "sphinx.ext.napoleon"]
+extensions = ["sphinx.ext.autodoc", "sphinx.ext.napoleon", "sphinx_click"]
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ["_templates"]

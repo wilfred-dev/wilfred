@@ -53,7 +53,7 @@ class Images(object):
         if not isdir(self.image_dir):
             Path(self.image_dir).mkdir(parents=True, exist_ok=True)
 
-    def download(self):
+    def download(self, branch="master", repo="wilfred-dev/images"):
         """
         Downloads default Wilfred Images from GitHub
         """
@@ -62,7 +62,7 @@ class Images(object):
 
         with open(f"{self.config_dir}/img.zip", "wb") as f:
             response = get(
-                "https://github.com/wilfred-dev/images/archive/master.zip",
+                f"https://github.com/{repo}/archive/{branch}.zip",
                 stream=True,
             )
             f.write(response.content)
@@ -71,7 +71,7 @@ class Images(object):
             obj.extractall(f"{self.config_dir}/temp_images")
 
         move(
-            f"{self.config_dir}/temp_images/images-master/images",
+            f"{self.config_dir}/temp_images/images-{branch}/images",
             f"{self.image_dir}/default",
         )
 

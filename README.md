@@ -26,6 +26,7 @@ As long as your server can run in Docker, it can probably run using Wilfred (aft
   - Vanilla Minecraft
   - BungeeCord
   - Paper
+  - Spigot
   - Waterfall
   - Bedrock
 - Multi Theft Auto
@@ -38,13 +39,13 @@ Please refer to the [official documentation](https://docs.wilfredproject.org/en/
 
 ### Quickstart
 
-Make sure you have Docker installed (see official documentation for more info). Wilfred can be installed using `pip`. You need to use **Python 3.6** or newer to run Wilfred.
+Make sure you have Docker installed (see the official documentation for more info). Wilfred can be installed using `pip`. You need to use **Python 3.6** or newer to run Wilfred.
 
 ```bash
 pip install wilfred --upgrade
 ```
 
-A [snap](https://snapcraft.io/wilfred) package is also in the works but currently not considered stable.
+A [snap](https://snapcraft.io/wilfred) package is also in the works but is currently not considered stable.
 
 If you're using macOS with [Homebrew](https://brew.sh) or Linux with [Linuxbrew](https://docs.brew.sh/Homebrew-on-Linux), you can install Wilfred using the official tap.
 
@@ -63,7 +64,7 @@ Wilfred will ask you which "image" to use. An image is a set of configuration fi
 
 Then, Wilfred will ask you to set any environment variables (if available for that image). The environment variables differ from game to game and most of them do have a default value.
 
-Once the server is created, you can use `wilfred servers` to list available servers. To start it, use `wilfred start <name>`. To attach to the server console, you can use `wilfred console <name>`. If you want to start the server and attach to the server console in a single command, you can use `wilfred start <name> --console` (it will start the server and then immediately attach to server console).
+Once the server is created, you can use `wilfred servers` to list available servers. To start it, use `wilfred start <name>`. To attach to the server console, you can use `wilfred console <name>`. If you want to start the server and attach to the server console in a single command, you can use `wilfred start <name> --console` (it will start the server and then immediately attach to the server console).
 
 ## Helping
 
@@ -71,4 +72,4 @@ The best places to contribute are through the issue tracker and the official Dis
 
 ## Contributors ✨
 
-Created, written and maintained by [Vilhelm Prytz](https://github.com/VilhelmPrytz).
+Created, written, and maintained by [Vilhelm Prytz](https://github.com/vilhelmprytz).
