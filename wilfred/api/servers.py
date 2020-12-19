@@ -151,7 +151,7 @@ class Servers(object):
 
         try:
             container = self._docker_client.containers.get(f"wilfred_{server.id}")
-            container.stop()
+            container.kill()
         except docker.errors.NotFound:
             pass
 
