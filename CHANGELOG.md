@@ -2,7 +2,7 @@
 
 Please refer to the [official documentation](https://docs.wilfredproject.org/en/latest/development.html) for more information about the CHANGELOG and releases.
 
-## next-release
+## v0.8.0 (released on 2020-12-19)
 
 * **Added** [#92](https://github.com/wilfred-dev/wilfred/issues/92) Added new commit check on `--version`. If running the HEAD version of the brew package or the edge channel of the snap package, `wilfred --version` will now check for new commits-
 * **Added** [#74](https://github.com/wilfred-dev/wilfred/issues/74) Added the ability for Wilfred to automatically refresh the default images periodically. Wilfred will currently initiate refresh if images on file are older than 1 week or if the running version of Wilfred changes.
