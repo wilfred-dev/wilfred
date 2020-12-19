@@ -67,9 +67,9 @@ Once you got Wilfred installed, run `wilfred setup` to set a path for Wilfred to
 
 To create your first server, use `wilfred create`. Most values have a default value, where you can just press return to use them.
 
-Wilfred will ask you which "image" to use. An image is a set of configuration files that defines a specific game within Wilfred. These images are not to be confused with Docker images, Wilfred images sort of wrapped around the Docker images. A couple of games are already built into Wilfred, but you can also create your own.
+Wilfred will ask you which "image" to use. An image is a set of configuration files that defines a specific game within Wilfred. These images are not to be confused with Docker images, Wilfred images sort of wrap around the Docker images. A couple of games are already built into Wilfred, but you can also create your own.
 
-Then, Wilfred will ask you to set any environment variables (if available for that image). The environment variables differ from game to game and most of them do have a default value.
+Then, Wilfred will ask you to set any environment variables (if available for that image). The environment variables differ from game to game and most of them have a default value.
 
 Once the server is created, you can use `wilfred servers` to list available servers. To start it, use `wilfred start <name>`. To attach to the server console, you can use `wilfred console <name>`. If you want to start the server and attach to the server console in a single command, you can use `wilfred start <name> --console` (it will start the server and then immediately attach to the server console).
 
