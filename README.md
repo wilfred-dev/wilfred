@@ -27,6 +27,7 @@ As long as your server can run in Docker, it can probably run using Wilfred (aft
   - BungeeCord
   - Paper
   - Spigot
+  - SpongeVanilla
   - Waterfall
   - Bedrock
 - Multi Theft Auto
@@ -46,7 +47,7 @@ brew tap wilfred-dev/wilfred
 brew install wilfred
 ```
 
-Want the bleeding edge? You can install the latest commit using ``--HEAD`` (bugs are to be expected, don't use in production environments!).
+Want the bleeding edge? You can install the latest commit using `--HEAD` (bugs are to be expected, don't use in production environments!).
 
 ```bash
 brew tap wilfred-dev/wilfred
