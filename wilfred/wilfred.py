@@ -27,7 +27,7 @@ from shutil import get_terminal_size
 from wilfred.docker_conn import docker_client
 from wilfred.version import version, commit_hash, commit_date
 from wilfred.api.config_parser import Config, NoConfiguration
-from wilfred.database import session, database_path, Server, EnvironmentVariable
+from wilfred.api.database import session, database_path, Server, EnvironmentVariable
 from wilfred.api.servers import Servers
 from wilfred.api.images import Images, ImageAPIMismatch, ImagesOutdated
 from wilfred.message_handler import warning, error, ui_exception
