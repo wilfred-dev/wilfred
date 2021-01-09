@@ -1,6 +1,6 @@
 language: python
 services:
-- docker
+  - docker
 os: linux
 python:
   - "3.6"
@@ -21,27 +21,27 @@ script:
 
 jobs:
   include:
-  - stage: Code style
-    env: TOXENV=style
-    before_install:
-      - python -m pip install --upgrade pip
-    install:
-      - pip install pipenv --upgrade
-      - pipenv --python "$TRAVIS_PYTHON_VERSION"
-      - pipenv install --dev
-    script:
-      - pipenv run tox
+    - stage: Code style
+      env: TOXENV=style
+      before_install:
+        - python -m pip install --upgrade pip
+      install:
+        - pip install pipenv --upgrade
+        - pipenv --python "$TRAVIS_PYTHON_VERSION"
+        - pipenv install --dev
+      script:
+        - pipenv run tox
 
-  - stage: Deploy
-    script:
-      - jq -r '.default | to_entries[] | .key + .value.version' Pipfile.lock > requirements.txt
-      - pip install -r requirements.txt
-      - sed -i "s/development/$TRAVIS_COMMIT/g" wilfred/version.py
-      - sed -i "s/YYYY-MM-DD/`git log -1 --format="%at" | xargs -I{} date -d @{} +%Y-%m-%d`/g" wilfred/version.py
-      - rm -rf requirements.txt
-    deploy:
-      provider: pypi
-      distributions: "sdist bdist_wheel"
-      edge: true # opt in to dpl v2
-      on:
-        tags: true
+    - stage: Deploy
+      script:
+        - jq -r '.default | to_entries[] | .key + .value.version' Pipfile.lock > requirements.txt
+        - pip install -r requirements.txt
+        - sed -i "s/development/$TRAVIS_COMMIT/g" wilfred/version.py
+        - sed -i "s/YYYY-MM-DD/`git log -1 --format="%at" | xargs -I{} date -d @{} +%Y-%m-%d`/g" wilfred/version.py
+        - rm -rf requirements.txt
+      deploy:
+        provider: pypi
+        distributions: "sdist bdist_wheel"
+        edge: true # opt in to dpl v2
+        on:
+          tags: true
