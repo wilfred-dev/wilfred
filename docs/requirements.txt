@@ -1,4 +1,4 @@
-Sphinx==3.4.0
+Sphinx==3.5.1
 sphinx-click==2.5.0
 
 # From Wilfred dependencies (used for autodoc)
