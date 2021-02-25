@@ -1,5 +1,5 @@
 Sphinx==3.4.0
-sphinx-click==2.5.0
+sphinx-click==2.6.0
 
 # From Wilfred dependencies (used for autodoc)
 docker==4.4.0
