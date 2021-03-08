@@ -27,7 +27,7 @@ from shutil import get_terminal_size
 from wilfred.docker_conn import docker_client
 from wilfred.version import version, commit_hash, commit_date
 from wilfred.api.config_parser import Config, NoConfiguration
-from wilfred.database import session, database_path, Server, EnvironmentVariable
+from wilfred.database import session, database_path, Server, EnvironmentVariable, Port
 from wilfred.api.servers import Servers
 from wilfred.api.images import Images, ImageAPIMismatch, ImagesOutdated
 from wilfred.message_handler import warning, error, ui_exception
@@ -972,6 +972,74 @@ def config_command(name, variable, value):
         exit(0)
 
     click.echo(server_conf.pretty())
+
+
+@cli.command(
+    "port",
+    short_help="".join(("Manage additional ports for a server.",)),
+)
+@click.argument("name")
+@click.argument("action", required=False)
+@click.argument("port", required=False)
+def port_command(name, action, port):
+    """
+    Manage additional ports for a server.
+
+    \b
+    NAME is the name of the server
+    ACTION is the action, either "remove" or "add"
+    PORT is the port to add or remove
+    """
+
+    server = session.query(Server).filter_by(name=name.lower()).first()
+
+    if not server:
+        error("Server does not exist", exit_code=1)
+
+    if action == "add":
+        if not is_integer(port):
+            error("Port must be integer", exit_code=1)
+
+        if len(session.query(Server).filter_by(port=port).all()) != 0:
+            error("Port is already occupied by a server", exit_code=1)
+
+        # create
+        additional_port = Port(server_id=server.id, port=port)
+        session.add(additional_port)
+
+        try:
+            session.commit()
+        except IntegrityError as e:
+            error(
+                f"unable to create port {click.style(str(e), bold=True)}", exit_code=1
+            )
+
+    if action == "remove":
+        additional_port = (
+            session.query(Port).filter_by(port=port, server_id=server.id).first()
+        )
+
+        if not additional_port:
+            error("Port not found", exit_code=1)
+
+        session.delete(additional_port)
+        session.commit()
+
+    # display ports
+    ports = [
+        {"port": u.port}
+        for u in session.query(Port).filter_by(server_id=server.id).all()
+    ]
+    click.echo(f"Additional ports for server {server.name}")
+    click.echo(
+        tabulate(
+            ports,
+            headers={
+                "port": click.style("Port", bold=True),
+            },
+            tablefmt="fancy_grid",
+        )
+    )
 
 
 if __name__ == "__main__":

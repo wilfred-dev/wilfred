@@ -20,7 +20,7 @@ from sys import platform
 from subprocess import call
 from sqlalchemy import inspect
 
-from wilfred.database import session, Server, EnvironmentVariable
+from wilfred.database import session, Server, EnvironmentVariable, Port
 from wilfred.keyboard import KeyboardThread
 from wilfred.container_variables import ContainerVariables
 from wilfred.api.images import Images
@@ -359,6 +359,9 @@ class Servers(object):
         except Exception:
             pass
 
+        # get additional ports
+        ports = session.query(Port).filter_by(server_id=server.id).all()
+
         self._docker_client.containers.run(
             image["docker_image"],
             self._parse_startup_command(server.custom_startup, server, image)
@@ -367,7 +370,13 @@ class Servers(object):
             volumes={path: {"bind": "/server", "mode": "rw"}},
             name=f"wilfred_{server.id}",
             remove=True,
-            ports={f"{server.port}/tcp": server.port},
+            ports={
+                **{f"{server.port}/tcp": server.port},
+                **{
+                    f"{additional_port.port}/tcp": additional_port.port
+                    for additional_port in ports
+                },
+            },
             detach=True,
             working_dir="/server",
             mem_limit=f"{server.memory}m",

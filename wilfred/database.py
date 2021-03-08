@@ -58,6 +58,14 @@ class EnvironmentVariable(Base):
     value = Column(String)
 
 
+class Port(Base):
+    __tablename__ = "ports"
+
+    id = Column(Integer, primary_key=True)
+    server_id = Column(String, ForeignKey("servers.id"), unique=False)
+    port = Column(Integer, unique=True)
+
+
 Base.metadata.create_all(engine)
 
 Session = sessionmaker()
