@@ -38,5 +38,5 @@ steps:
 
   - script: |
       pipenv run "pip install pytest-azurepipelines"
-      pipenv run "tox -e $(tox.env)"
+      pipenv run tox -e $(tox.env)
     displayName: "Run tox -e $(tox.env)"
