@@ -8,15 +8,7 @@ description: |
   Wilfred is currently under development and should not be considered stable. Features may break or may not be implemented yet. Use with caution.
 
 grade: devel # 'stable' on release ('devel' during dev)
-confinement: devmode # should be 'classic' once we have the classic confinement approved
-
-#plugs:
-#  docker:
-#    content: docker
-#    default-provider: docker
-#    interface: content
-#    target: docker-env
-#  network:
+confinement: strict
 
 parts:
   wilfred:
@@ -33,7 +25,11 @@ parts:
 apps:
   wilfred:
     command: bin/wilfred
-    # plugs: [docker, network]
+    plugs:
+      - home
+      - removable-media
+      - docker
+      - network
     environment:
       PYTHONIOENCODING: utf-8
       LC_ALL: C.UTF-8
