@@ -1,5 +1,5 @@
 # NOT YET IMPLEMENTED
 
-# on:
-#   release:
-#     types: [published]
+on:
+  release:
+    types: [published]
