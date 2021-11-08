@@ -21,5 +21,5 @@ jobs:
           pipenv install --dev
       - name: Run tests
         env:
-          TOXENV: "py${{ matrix.python-version }}"
+          TOXENV: "style"
         run: pipenv run tox
