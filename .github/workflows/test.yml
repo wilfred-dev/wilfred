@@ -19,8 +19,8 @@ jobs:
           PYTHON_VERSION: "${{ matrix.python-version }}"
         run: |
           python -m pip install --upgrade pip
-          pipenv --python "$PYTHON_VERSION"
           pip install pipenv --upgrade
+          pipenv --python "$PYTHON_VERSION"
           pipenv install --dev
       - name: Run tests
         run: pipenv run tox
