@@ -26,21 +26,3 @@ jobs:
         env:
           TOXENV: "py${{ matrix.python-version }}"
         run: pipenv run tox
-      - name: Set release info
-        run: |
-          sed -i "s/development/$GITHUB_SHA/g" wilfred/version.py
-          sed -i "s/YYYY-MM-DD/`git log -1 --format="%at" | xargs -I{} date -d @{} +%Y-%m-%d`/g" wilfred/version.py
-      - name: Install pypa/build
-        run: >-
-          python -m
-          pip install
-          build
-          --user
-      - name: Build a binary wheel and a source tarball
-        run: >-
-          python -m
-          build
-          --sdist
-          --wheel
-          --outdir dist/
-          .
