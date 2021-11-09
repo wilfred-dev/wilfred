@@ -2,7 +2,7 @@
 
 Please refer to the [official documentation](https://docs.wilfredproject.org/en/latest/development.html) for more information about the CHANGELOG and releases.
 
-## next-release
+## v0.9.0 (released on 2021-11-09)
 
 - **Added** [#112](https://github.com/wilfred-dev/wilfred/issues/112) Added the ability to add additional ports to any server using `wilfred port <name of server> <add / remove> <port to add or remove>`.
 - **Fixed** [#118](https://github.com/wilfred-dev/wilfred/issues/118) Fixed a minor spelling mistake during server creation.
