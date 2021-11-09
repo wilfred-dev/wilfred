@@ -5,7 +5,7 @@ verify_ssl = true
 
 [dev-packages]
 flake8 = "*"
-black = "==21.5b2"
+black = "==21.10b0"
 tox = "*"
 sphinx = "*"
 sphinx-autobuild = "*"
