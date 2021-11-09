@@ -13,10 +13,10 @@ jobs:
       - name: Set up Python 3.6
         uses: actions/setup-python@v1
         with:
-          python-version: 3.6 # use the oldest supported release
+          python-version: "3.6"
     - name: Set release info
       run: |
-        sed -i "s/development/$TRAVIS_COMMIT/g" wilfred/version.py
+        sed -i "s/development/$GITHUB_SHA/g" wilfred/version.py
         sed -i "s/YYYY-MM-DD/`git log -1 --format="%at" | xargs -I{} date -d @{} +%Y-%m-%d`/g" wilfred/version.py
     - name: Install pypa/build
       run: >-
