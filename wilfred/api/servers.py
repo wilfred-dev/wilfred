@@ -244,7 +244,7 @@ class Servers(object):
                     "You can safely press CTRL+C, the installation will continue in the background."
                 )
                 spinner.info(
-                    "Run `wilfred servers` too see when the status changes from `installing` to `stopped`."
+                    "Run `wilfred servers` to see when the status changes from `installing` to `stopped`."
                 )
                 spinner.info(
                     f"You can also follow the installation log using `wilfred console {server.name}`"
