@@ -141,9 +141,14 @@ class Servers(object):
 
         path = f"{self._configuration['data_path']}/{server.name}_{server.id}"
 
+        # delete all environment variables associated to this server
         for x in (
             session.query(EnvironmentVariable).filter_by(server_id=server.id).all()
         ):
+            session.delete(x)
+
+        # delete all additional ports associated to this server
+        for x in session.query(Port).filter_by(server_id=server.id).all():
             session.delete(x)
 
         session.delete(server)
