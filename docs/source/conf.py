@@ -21,7 +21,7 @@ os.environ["WILFRED_SKIP_DOCKER"] = "true"
 
 master_doc = "index"
 project = "Wilfred"
-copyright = "2020-2021, Vilhelm Prytz"
+copyright = "2020-2022, Vilhelm Prytz"
 author = "Vilhelm Prytz"
 
 # The full version, including alpha/beta/rc tags

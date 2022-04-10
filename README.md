@@ -82,4 +82,4 @@ The best places to contribute are through the issue tracker and the official Dis
 
 Created, written, and maintained by [Vilhelm Prytz](https://github.com/vilhelmprytz).
 
-Copyright (C) 2020-2021, Vilhelm Prytz, <vilhelm@prytznet.se>
+Copyright (C) 2020-2022, Vilhelm Prytz, <vilhelm@prytznet.se>
