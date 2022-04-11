@@ -56,7 +56,7 @@ Want the bleeding edge? You can install the latest commit using ``--HEAD`` (bugs
 Pip
 ^^^
 
-Wilfred can be installed using ``pip``. You need to use **Python 3.6** or newer to run Wilfred (if you also have ``pip2`` on your system, run with ``pip3``).
+Wilfred can be installed using ``pip``. You need to use **Python 3.7** or newer to run Wilfred (if you also have ``pip2`` on your system, run with ``pip3``).
 
 .. code-block:: bash
 

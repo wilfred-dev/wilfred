@@ -4,8 +4,8 @@ url = "https://pypi.org/simple"
 verify_ssl = true
 
 [dev-packages]
-flake8 = "*"
-black = "==21.10b0"
+# flake8 = "*"
+black = "*"
 tox = "*"
 sphinx = "*"
 sphinx-autobuild = "*"
@@ -22,4 +22,4 @@ pyyaml = "*"
 halo = "*"
 
 [requires]
-python_version = "3.6"
+python_version = "3.7"
