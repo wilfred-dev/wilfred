@@ -109,6 +109,9 @@ def print_version(ctx, param, value):
         if "SNAP" in os.environ and "SNAP_REVISION" in os.environ
         else ""
     )
+    _python_version = (
+        f"{sys.version_info.major}.{sys.version_info.minor}.{sys.version_info.micro}"
+    )
 
     check_for_new_releases(enable_emojis=ENABLE_EMOJIS)
     if str(version) == "0.0.0.dev0":
@@ -116,7 +119,7 @@ def print_version(ctx, param, value):
             "".join(
                 (
                     f"{'✨ ' if ENABLE_EMOJIS else ''}wilfred version ",
-                    f"{_commit_hash}/edge (development build) built {commit_date}{_snap}",
+                    f"{_commit_hash}/edge (development build) built {commit_date}{_snap} (python {_python_version})",
                 )
             )
         )
@@ -125,7 +128,7 @@ def print_version(ctx, param, value):
             "".join(
                 (
                     f"{'✨ ' if ENABLE_EMOJIS else ''}wilfred version ",
-                    f"v{version}/stable (commit {_commit_hash}) built {commit_date}{_snap}",
+                    f"v{version}/stable (commit {_commit_hash}) built {commit_date}{_snap} (python {_python_version})",
                 )
             )
         )
