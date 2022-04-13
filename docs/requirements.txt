@@ -1,13 +1,13 @@
-Sphinx==4.2.0
-sphinx-click==3.0.2
+Sphinx==4.5.0
+sphinx-click==4.0.1
 
 # From Wilfred dependencies (used for autodoc)
 docker==5.0.3
-click==8.0.3
+click==8.1.2
 colorama==0.4.4
 appdirs==1.4.4
-requests==2.26.0
+requests==2.27.1
 tabulate==0.8.9
-sqlalchemy==1.4.26
+sqlalchemy==1.4.35
 pyyaml==6.0
 halo==0.0.31
