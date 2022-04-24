@@ -1,9 +1,8 @@
 # Wilfred
 
-[![Build Status](https://travis-ci.com/wilfred-dev/wilfred.svg?branch=master)](https://travis-ci.com/wilfred-dev/wilfred)
+[![.github/workflows/check.yml](https://github.com/wilfred-dev/wilfred/actions/workflows/check.yml/badge.svg)](https://github.com/wilfred-dev/wilfred/actions/workflows/check.yml)
 [![Python Versions](https://img.shields.io/pypi/pyversions/wilfred)](https://pypi.org/project/wilfred)
 [![pypi](https://img.shields.io/pypi/v/wilfred)](https://pypi.org/project/wilfred)
-[![wilfred](https://snapcraft.io//wilfred/badge.svg)](https://snapcraft.io/wilfred)
 [![Language grade: Python](https://img.shields.io/lgtm/grade/python/g/wilfred-dev/wilfred.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/wilfred-dev/wilfred/context:python)
 [![Total alerts](https://img.shields.io/lgtm/alerts/g/wilfred-dev/wilfred.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/wilfred-dev/wilfred/alerts/)
 [![Downloads](https://pepy.tech/badge/wilfred)](https://pepy.tech/project/wilfred)
@@ -59,8 +58,6 @@ Wilfred can also be installed using `pip`. You need to use **Python 3.7** or new
 ```bash
 pip install wilfred --upgrade
 ```
-
-A [snap](https://snapcraft.io/wilfred) package is also in the works but is currently not considered stable.
 
 Once you got Wilfred installed, run `wilfred setup` to set a path for Wilfred to use to store server files.
 

@@ -68,25 +68,6 @@ You can install using a specific python version, e.g. `3.8`.
 
    python3.8 -m pip install wilfred --upgrade
 
-Snap (experimental)
-^^^^^^^^^^^^^^^^^^^
-
-.. warning::
-   The snap package is not considered stable. You can only install it using the `--devmode` which is not recommended in a production environment. For now, please use the pip package. See issue `#6 <https://github.com/wilfred-dev/wilfred/issues/6>`__ for updates regarding the snap package.
-
-|snapbadge|_
-
-.. |snapbadge| image:: https://snapcraft.io/static/images/badges/en/snap-store-black.svg
-.. _snapbadge: https://snapcraft.io/wilfred
-
-Snapcraft is configured to automatically build the latest commit and push it to the `edge` release branch. These releases can be installed using snap. Currently, the same releases pushed to Pip are also pushed to the `beta` branch.
-
-.. code-block:: bash
-
-   snap install wilfred --beta --devmode
-
-Again, the ``--beta`` channel and ``--devmode`` should **not** be used in a production environment.
-
 Basic Configuration
 -------------------
 
@@ -116,12 +97,6 @@ If you installed Wilfred using ``pip``, then you can upgrade by running the same
 .. code-block:: bash
 
    pip install wilfred --upgrade
-
-If you installed Wilfred using ``snap``, you can use ``refresh`` to download the latest version (snap should automatically update).
-
-.. code-block:: bash
-
-   snap refresh wilfred
 
 If you installed Wilfred using ``brew``, you can use Homebrew to upgrade Wilfred as you would do with any formula.
 

@@ -8,7 +8,7 @@ assignees: ""
 
 ### Environment
 
-- Installation type: <!-- snap/pip -->
+- Installation type: <!-- homebrew/pip -->
 - Python version: <!-- Example: 3.7.13 -->
 - Wilfred version: <!-- Example: 1.0, 2.0, …, master -->
 
