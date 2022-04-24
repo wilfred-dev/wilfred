@@ -54,7 +54,7 @@ class Servers(object):
 
         Args:
             cpu_load (bool): Include the CPU load of the container. Defaults to `None` if server is not running.
-            memory_usage (bool): Include RAM usage of the container. Defaults to `None` if server is not running.
+            memory_usage (bool): Include memory usage of the container. Defaults to `None` if server is not running.
         """
 
         servers = [
@@ -82,23 +82,38 @@ class Servers(object):
                         _running = False
 
                     if cpu_load and _running:
-                        cpu_count = len(d["cpu_stats"]["cpu_usage"]["percpu_usage"])
-                        cpu_percent = 0.0
+                        # calculate the change in CPU usage between current and previous reading
                         cpu_delta = float(
                             d["cpu_stats"]["cpu_usage"]["total_usage"]
                         ) - float(d["precpu_stats"]["cpu_usage"]["total_usage"])
+
+                        # calculate the change in system CPU usage between current and previous reading
                         system_delta = float(
                             d["cpu_stats"]["system_cpu_usage"]
                         ) - float(d["precpu_stats"]["system_cpu_usage"])
+
+                        # Calculate number of CPU cores
+                        cpu_count = float(d["cpu_stats"]["online_cpus"])
+                        if cpu_count == 0.0:
+                            cpu_count = len(
+                                d["precpu_stats"]["cpu_usage"]["percpu_usage"]
+                            )
+
                         if system_delta > 0.0:
-                            cpu_percent = f"{round(cpu_delta / system_delta * 100.0 * cpu_count)}%"
+                            cpu_percent = f"{round(cpu_delta / system_delta * 100.0 * cpu_count, 2)}%"
 
                         server.update({"cpu_load": cpu_percent if cpu_percent else "-"})
 
                     if memory_usage and _running:
+                        mem_used = d["memory_stats"]["usage"] / 1024 / 1024
+                        mem_percent = (
+                            d["memory_stats"]["usage"]
+                            / d["memory_stats"]["limit"]
+                            * 100
+                        )
                         server.update(
                             {
-                                "memory_usage": f"{round(d['memory_stats']['usage'] / 10**6)} MB"
+                                "memory_usage": f"{round(mem_used, 1)} MB / {round(mem_percent, 2)}%"
                             }
                         )
 

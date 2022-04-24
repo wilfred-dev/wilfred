@@ -861,7 +861,7 @@ def top():
             "status": click.style("Status", bold=True),
             "custom_startup": click.style("Custom startup", bold=True),
             "cpu_load": click.style("CPU", bold=True),
-            "memory_usage": click.style("RAM usage", bold=True),
+            "memory_usage": click.style("MEM usage / MEM %", bold=True),
         }
 
         # display table
