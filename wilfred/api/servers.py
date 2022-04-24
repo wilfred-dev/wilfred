@@ -54,7 +54,7 @@ class Servers(object):
 
         Args:
             cpu_load (bool): Include the CPU load of the container. Defaults to `None` if server is not running.
-            memory_usage (bool): Include RAM usage of the container. Defaults to `None` if server is not running.
+            memory_usage (bool): Include memory usage of the container. Defaults to `None` if server is not running.
         """
 
         servers = [
@@ -105,9 +105,15 @@ class Servers(object):
                         server.update({"cpu_load": cpu_percent if cpu_percent else "-"})
 
                     if memory_usage and _running:
+                        mem_used = d["memory_stats"]["usage"] / 1024 / 1024
+                        mem_percent = (
+                            d["memory_stats"]["usage"]
+                            / d["memory_stats"]["limit"]
+                            * 100
+                        )
                         server.update(
                             {
-                                "memory_usage": f"{round(d['memory_stats']['usage'] / 10**6)} MB"
+                                "memory_usage": f"{round(mem_used, 1)} MB / {round(mem_percent, 2)}%"
                             }
                         )
 
