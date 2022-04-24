@@ -82,16 +82,25 @@ class Servers(object):
                         _running = False
 
                     if cpu_load and _running:
-                        cpu_count = len(d["cpu_stats"]["cpu_usage"]["percpu_usage"])
-                        cpu_percent = 0.0
+                        # calculate the change in CPU usage between current and previous reading
                         cpu_delta = float(
                             d["cpu_stats"]["cpu_usage"]["total_usage"]
                         ) - float(d["precpu_stats"]["cpu_usage"]["total_usage"])
+
+                        # calculate the change in system CPU usage between current and previous reading
                         system_delta = float(
                             d["cpu_stats"]["system_cpu_usage"]
                         ) - float(d["precpu_stats"]["system_cpu_usage"])
+
+                        # Calculate number of CPU cores
+                        cpu_count = float(d["cpu_stats"]["online_cpus"])
+                        if cpu_count == 0.0:
+                            cpu_count = len(
+                                d["precpu_stats"]["cpu_usage"]["percpu_usage"]
+                            )
+
                         if system_delta > 0.0:
-                            cpu_percent = f"{round(cpu_delta / system_delta * 100.0 * cpu_count)}%"
+                            cpu_percent = f"{round(cpu_delta / system_delta * 100.0 * cpu_count, 2)}%"
 
                         server.update({"cpu_load": cpu_percent if cpu_percent else "-"})
 
