@@ -2,6 +2,14 @@
 
 Please refer to the [official documentation](https://docs.wilfredproject.org/en/latest/development.html) for more information about the CHANGELOG and releases.
 
+## next-relese
+
+- **Added** [157186c](https://github.com/wilfred-dev/wilfred/commit/157186cc588ac19272e2448f5c9dae0a398098e8) Added so that the running Python version is displayed when running `wilfred --version`.
+- **Changed** [1ff0a30](https://github.com/wilfred-dev/wilfred/commit/1ff0a30743f51d3fb25edbae283fedb7222f69d5) Added memory usage in perecent alongside in MB to `wilfred top`.
+- **Changed** [358b1dc](https://github.com/wilfred-dev/wilfred/commit/358b1dc6b57dd7fdc4190b823c5e7467f14b337a) Wilfred now requires Python 3.7 or newer to run.
+- **Fixed** [8d20053](https://github.com/wilfred-dev/wilfred/commit/8d200533157fa42e55c616f794d96e8b4d50d69d) Fixed so that associated server ports are deleted upon server removal.
+- **Fixed** [#120](https://github.com/wilfred-dev/wilfred/issues/120) Fixed broken CPU load calculation used by `wilfred top` (command no longer completely broken).
+
 ## v0.9.0 (released on 2021-11-09)
 
 - **Added** [#112](https://github.com/wilfred-dev/wilfred/issues/112) Added the ability to add additional ports to any server using `wilfred port <name of server> <add / remove> <port to add or remove>`.
