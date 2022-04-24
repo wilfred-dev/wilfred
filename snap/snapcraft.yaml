@@ -1,5 +1,5 @@
 name: wilfred
-base: core18
+base: core20
 version: git # set version on release ('v0.1.0') and use 'git' during dev
 summary: A CLI for managing game servers using Docker # 79 char long summary
 description: |
