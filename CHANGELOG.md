@@ -2,7 +2,7 @@
 
 Please refer to the [official documentation](https://docs.wilfredproject.org/en/latest/development.html) for more information about the CHANGELOG and releases.
 
-## next-relese
+## v0.10.0 (released on 2022-04-24)
 
 - **Added** [157186c](https://github.com/wilfred-dev/wilfred/commit/157186cc588ac19272e2448f5c9dae0a398098e8) Added so that the running Python version is displayed when running `wilfred --version`.
 - **Changed** [1ff0a30](https://github.com/wilfred-dev/wilfred/commit/1ff0a30743f51d3fb25edbae283fedb7222f69d5) Added memory usage in perecent alongside in MB to `wilfred top`.
