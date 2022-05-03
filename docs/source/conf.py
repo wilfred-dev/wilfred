@@ -21,11 +21,11 @@ os.environ["WILFRED_SKIP_DOCKER"] = "true"
 
 master_doc = "index"
 project = "Wilfred"
-copyright = "2020, Vilhelm Prytz"
+copyright = "2020-2022, Vilhelm Prytz"
 author = "Vilhelm Prytz"
 
 # The full version, including alpha/beta/rc tags
-release = "v0.7.1"
+release = "v0.10.0"
 
 
 # -- General configuration ---------------------------------------------------

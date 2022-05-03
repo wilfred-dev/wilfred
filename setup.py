@@ -1,18 +1,18 @@
-####################################################################
-#                                                                  #
-# Wilfred                                                          #
-# Copyright (C) 2020, Vilhelm Prytz, <vilhelm@prytznet.se>, et al. #
-#                                                                  #
-# Licensed under the terms of the MIT license, see LICENSE.        #
-# https://github.com/wilfred-dev/wilfred                           #
-#                                                                  #
-####################################################################
+#################################################################
+#                                                               #
+# Wilfred                                                       #
+# Copyright (C) 2020-2022, Vilhelm Prytz, <vilhelm@prytznet.se> #
+#                                                               #
+# Licensed under the terms of the MIT license, see LICENSE.     #
+# https://github.com/wilfred-dev/wilfred                        #
+#                                                               #
+#################################################################
 
 import sys
 from setuptools import setup, find_packages
 from wilfred.version import version
 
-assert sys.version_info >= (3, 6, 0), "Wilfred requires Python 3.6+"
+assert sys.version_info >= (3, 7, 0), "Wilfred requires Python 3.7+"
 
 with open("README.md", "r", encoding="utf-8") as f:
     long_description = f.read()
@@ -35,10 +35,10 @@ setup(
     license="MIT",
     classifiers=[
         "Programming Language :: Python",
-        "Programming Language :: Python :: 3.6",
         "Programming Language :: Python :: 3.7",
         "Programming Language :: Python :: 3.8",
         "Programming Language :: Python :: 3.9",
+        "Programming Language :: Python :: 3.10",
         "Programming Language :: Python :: 3 :: Only",
         "Environment :: Console",
         "License :: OSI Approved :: MIT License",
@@ -48,7 +48,7 @@ setup(
         "Operating System :: Microsoft :: Windows",
         "Natural Language :: English",
     ],
-    python_requires=">=3.6",
+    python_requires=">=3.7",
     install_requires=[
         "docker",
         "click",

@@ -1,12 +1,12 @@
-####################################################################
-#                                                                  #
-# Wilfred                                                          #
-# Copyright (C) 2020, Vilhelm Prytz, <vilhelm@prytznet.se>, et al. #
-#                                                                  #
-# Licensed under the terms of the MIT license, see LICENSE.        #
-# https://github.com/wilfred-dev/wilfred                           #
-#                                                                  #
-####################################################################
+#################################################################
+#                                                               #
+# Wilfred                                                       #
+# Copyright (C) 2020-2022, Vilhelm Prytz, <vilhelm@prytznet.se> #
+#                                                               #
+# Licensed under the terms of the MIT license, see LICENSE.     #
+# https://github.com/wilfred-dev/wilfred                        #
+#                                                               #
+#################################################################
 
 import requests
 import click
@@ -14,7 +14,7 @@ import click
 from random import choice
 from string import ascii_lowercase, digits
 
-from wilfred.version import version
+from wilfred.version import version, commit_hash
 from wilfred.message_handler import warning
 
 
@@ -33,7 +33,16 @@ def check_for_new_releases(enable_emojis=True):
     Checks if a new version is available on GitHub
     """
 
-    r = requests.get("https://api.github.com/repos/wilfred-dev/wilfred/tags")
+    url = "https://api.github.com/repos/wilfred-dev/wilfred/tags"
+    key = "name"
+    version_type = "version"
+
+    if version == "0.0.0.dev0":
+        url = "https://api.github.com/repos/wilfred-dev/wilfred/commits"
+        key = "sha"
+        version_type = "commit"
+
+    r = requests.get(url)
 
     if r.status_code != requests.codes.ok:
         warning("unable to retrieve latest version")
@@ -41,18 +50,20 @@ def check_for_new_releases(enable_emojis=True):
         return
 
     try:
-        latest_release = r.json()[0]["name"]
+        latest = r.json()[0][key]
     except Exception:
         warning("unable to parse release data")
 
         return
 
-    if latest_release != f"v{version}":
+    compare = commit_hash if version == "0.0.0.dev0" else f"v{version}"
+
+    if latest != compare:
         click.echo(
             "".join(
                 (
                     f"{'🎉 ' if enable_emojis else click.style('! ', fg='green')}",
-                    f"A new version of Wilfred is available! {latest_release}",
+                    f"A new {version_type} of Wilfred is available! {latest}",
                 )
             )
         )

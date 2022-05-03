@@ -1,12 +1,12 @@
-####################################################################
-#                                                                  #
-# Wilfred                                                          #
-# Copyright (C) 2020, Vilhelm Prytz, <vilhelm@prytznet.se>, et al. #
-#                                                                  #
-# Licensed under the terms of the MIT license, see LICENSE.        #
-# https://github.com/wilfred-dev/wilfred                           #
-#                                                                  #
-####################################################################
+#################################################################
+#                                                               #
+# Wilfred                                                       #
+# Copyright (C) 2020-2022, Vilhelm Prytz, <vilhelm@prytznet.se> #
+#                                                               #
+# Licensed under the terms of the MIT license, see LICENSE.     #
+# https://github.com/wilfred-dev/wilfred                        #
+#                                                               #
+#################################################################
 
 from sqlalchemy import create_engine, Column, Integer, String, ForeignKey
 from sqlalchemy.orm import relationship, sessionmaker, validates
@@ -56,6 +56,14 @@ class EnvironmentVariable(Base):
     server_id = Column(String, ForeignKey("servers.id"), unique=False)
     variable = Column(String)
     value = Column(String)
+
+
+class Port(Base):
+    __tablename__ = "ports"
+
+    id = Column(Integer, primary_key=True)
+    server_id = Column(String, ForeignKey("servers.id"), unique=False)
+    port = Column(Integer, unique=True)
 
 
 Base.metadata.create_all(engine)

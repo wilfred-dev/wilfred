@@ -1,12 +1,12 @@
-####################################################################
-#                                                                  #
-# Wilfred                                                          #
-# Copyright (C) 2020, Vilhelm Prytz, <vilhelm@prytznet.se>, et al. #
-#                                                                  #
-# Licensed under the terms of the MIT license, see LICENSE.        #
-# https://github.com/wilfred-dev/wilfred                           #
-#                                                                  #
-####################################################################
+#################################################################
+#                                                               #
+# Wilfred                                                       #
+# Copyright (C) 2020-2022, Vilhelm Prytz, <vilhelm@prytznet.se> #
+#                                                               #
+# Licensed under the terms of the MIT license, see LICENSE.     #
+# https://github.com/wilfred-dev/wilfred                        #
+#                                                               #
+#################################################################
 
 import click
 import docker
@@ -20,7 +20,7 @@ from sys import platform
 from subprocess import call
 from sqlalchemy import inspect
 
-from wilfred.api.database import session, Server, EnvironmentVariable
+from wilfred.api.database import session, Server, EnvironmentVariable, Port
 from wilfred.keyboard import KeyboardThread
 from wilfred.container_variables import ContainerVariables
 from wilfred.api.images import Images
@@ -59,7 +59,7 @@ class Servers(object):
 
         Args:
             cpu_load (bool): Include the CPU load of the container. Defaults to `None` if server is not running.
-            memory_usage (bool): Include RAM usage of the container. Defaults to `None` if server is not running.
+            memory_usage (bool): Include memory usage of the container. Defaults to `None` if server is not running.
         """
 
         servers = [
@@ -87,23 +87,38 @@ class Servers(object):
                         _running = False
 
                     if cpu_load and _running:
-                        cpu_count = len(d["cpu_stats"]["cpu_usage"]["percpu_usage"])
-                        cpu_percent = 0.0
+                        # calculate the change in CPU usage between current and previous reading
                         cpu_delta = float(
                             d["cpu_stats"]["cpu_usage"]["total_usage"]
                         ) - float(d["precpu_stats"]["cpu_usage"]["total_usage"])
+
+                        # calculate the change in system CPU usage between current and previous reading
                         system_delta = float(
                             d["cpu_stats"]["system_cpu_usage"]
                         ) - float(d["precpu_stats"]["system_cpu_usage"])
+
+                        # Calculate number of CPU cores
+                        cpu_count = float(d["cpu_stats"]["online_cpus"])
+                        if cpu_count == 0.0:
+                            cpu_count = len(
+                                d["precpu_stats"]["cpu_usage"]["percpu_usage"]
+                            )
+
                         if system_delta > 0.0:
-                            cpu_percent = f"{round(cpu_delta / system_delta * 100.0 * cpu_count)}%"
+                            cpu_percent = f"{round(cpu_delta / system_delta * 100.0 * cpu_count, 2)}%"
 
                         server.update({"cpu_load": cpu_percent if cpu_percent else "-"})
 
                     if memory_usage and _running:
+                        mem_used = d["memory_stats"]["usage"] / 1024 / 1024
+                        mem_percent = (
+                            d["memory_stats"]["usage"]
+                            / d["memory_stats"]["limit"]
+                            * 100
+                        )
                         server.update(
                             {
-                                "memory_usage": f"{round(d['memory_stats']['usage'] / 10**6)} MB"
+                                "memory_usage": f"{round(mem_used, 1)} MB / {round(mem_percent, 2)}%"
                             }
                         )
 
@@ -146,9 +161,14 @@ class Servers(object):
 
         path = f"{self._configuration['data_path']}/{server.name}_{server.id}"
 
+        # delete all environment variables associated to this server
         for x in (
             session.query(EnvironmentVariable).filter_by(server_id=server.id).all()
         ):
+            session.delete(x)
+
+        # delete all additional ports associated to this server
+        for x in session.query(Port).filter_by(server_id=server.id).all():
             session.delete(x)
 
         session.delete(server)
@@ -156,7 +176,7 @@ class Servers(object):
 
         try:
             container = self._docker_client.containers.get(f"wilfred_{server.id}")
-            container.stop()
+            container.kill()
         except docker.errors.NotFound:
             pass
 
@@ -319,7 +339,7 @@ class Servers(object):
                     "You can safely press CTRL+C, the installation will continue in the background."
                 )
                 spinner.info(
-                    "Run `wilfred servers` too see when the status changes from `installing` to `stopped`."
+                    "Run `wilfred servers` to see when the status changes from `installing` to `stopped`."
                 )
                 spinner.info(
                     f"You can also follow the installation log using `wilfred console {server.name}`"
@@ -434,6 +454,9 @@ class Servers(object):
         except Exception:
             pass
 
+        # get additional ports
+        ports = session.query(Port).filter_by(server_id=server.id).all()
+
         self._docker_client.containers.run(
             image["docker_image"],
             self._parse_startup_command(server.custom_startup, server, image)
@@ -442,7 +465,13 @@ class Servers(object):
             volumes={path: {"bind": "/server", "mode": "rw"}},
             name=f"wilfred_{server.id}",
             remove=True,
-            ports={f"{server.port}/tcp": server.port},
+            ports={
+                **{f"{server.port}/tcp": server.port},
+                **{
+                    f"{additional_port.port}/tcp": additional_port.port
+                    for additional_port in ports
+                },
+            },
             detach=True,
             working_dir="/server",
             mem_limit=f"{server.memory}m",

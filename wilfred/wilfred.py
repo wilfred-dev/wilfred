@@ -1,14 +1,14 @@
 # -*- coding: utf-8 -*-
 
-####################################################################
-#                                                                  #
-# Wilfred                                                          #
-# Copyright (C) 2020, Vilhelm Prytz, <vilhelm@prytznet.se>, et al. #
-#                                                                  #
-# Licensed under the terms of the MIT license, see LICENSE.        #
-# https://github.com/wilfred-dev/wilfred                           #
-#                                                                  #
-####################################################################
+#################################################################
+#                                                               #
+# Wilfred                                                       #
+# Copyright (C) 2020-2022, Vilhelm Prytz, <vilhelm@prytznet.se> #
+#                                                               #
+# Licensed under the terms of the MIT license, see LICENSE.     #
+# https://github.com/wilfred-dev/wilfred                        #
+#                                                               #
+#################################################################
 
 import click
 import codecs
@@ -28,6 +28,7 @@ from wilfred.docker_conn import docker_client
 from wilfred.version import version, commit_hash, commit_date
 from wilfred.api.config_parser import Config, NoConfiguration
 from wilfred.api.database import session, database_path, Server, EnvironmentVariable
+from wilfred.api.database import session, database_path, Server, EnvironmentVariable, Port
 from wilfred.api.servers import Servers
 from wilfred.api.images import Images, ImageAPIMismatch, ImagesOutdated
 from wilfred.message_handler import warning, error, ui_exception
@@ -109,23 +110,26 @@ def print_version(ctx, param, value):
         if "SNAP" in os.environ and "SNAP_REVISION" in os.environ
         else ""
     )
+    _python_version = (
+        f"{sys.version_info.major}.{sys.version_info.minor}.{sys.version_info.micro}"
+    )
 
+    check_for_new_releases(enable_emojis=ENABLE_EMOJIS)
     if str(version) == "0.0.0.dev0":
         click.echo(
             "".join(
                 (
                     f"{'✨ ' if ENABLE_EMOJIS else ''}wilfred version ",
-                    f"{_commit_hash}/edge (development build) built {commit_date}{_snap}",
+                    f"{_commit_hash}/edge (development build) built {commit_date}{_snap} (python {_python_version})",
                 )
             )
         )
     else:
-        check_for_new_releases(enable_emojis=ENABLE_EMOJIS)
         click.echo(
             "".join(
                 (
                     f"{'✨ ' if ENABLE_EMOJIS else ''}wilfred version ",
-                    f"v{version}/stable (commit {_commit_hash}) built {commit_date}{_snap}",
+                    f"v{version}/stable (commit {_commit_hash}) built {commit_date}{_snap} (python {_python_version})",
                 )
             )
         )
@@ -858,7 +862,7 @@ def top():
             "status": click.style("Status", bold=True),
             "custom_startup": click.style("Custom startup", bold=True),
             "cpu_load": click.style("CPU", bold=True),
-            "memory_usage": click.style("RAM usage", bold=True),
+            "memory_usage": click.style("MEM usage / MEM %", bold=True),
         }
 
         # display table
@@ -972,6 +976,74 @@ def config_command(name, variable, value):
         exit(0)
 
     click.echo(server_conf.pretty())
+
+
+@cli.command(
+    "port",
+    short_help="".join(("Manage additional ports for a server.",)),
+)
+@click.argument("name")
+@click.argument("action", required=False)
+@click.argument("port", required=False)
+def port_command(name, action, port):
+    """
+    Manage additional ports for a server.
+
+    \b
+    NAME is the name of the server
+    ACTION is the action, either "remove" or "add"
+    PORT is the port to add or remove
+    """
+
+    server = session.query(Server).filter_by(name=name.lower()).first()
+
+    if not server:
+        error("Server does not exist", exit_code=1)
+
+    if action == "add":
+        if not is_integer(port):
+            error("Port must be integer", exit_code=1)
+
+        if len(session.query(Server).filter_by(port=port).all()) != 0:
+            error("Port is already occupied by a server", exit_code=1)
+
+        # create
+        additional_port = Port(server_id=server.id, port=port)
+        session.add(additional_port)
+
+        try:
+            session.commit()
+        except IntegrityError as e:
+            error(
+                f"unable to create port {click.style(str(e), bold=True)}", exit_code=1
+            )
+
+    if action == "remove":
+        additional_port = (
+            session.query(Port).filter_by(port=port, server_id=server.id).first()
+        )
+
+        if not additional_port:
+            error("Port not found", exit_code=1)
+
+        session.delete(additional_port)
+        session.commit()
+
+    # display ports
+    ports = [
+        {"port": u.port}
+        for u in session.query(Port).filter_by(server_id=server.id).all()
+    ]
+    click.echo(f"Additional ports for server {server.name}")
+    click.echo(
+        tabulate(
+            ports,
+            headers={
+                "port": click.style("Port", bold=True),
+            },
+            tablefmt="fancy_grid",
+        )
+    )
 
 
 if __name__ == "__main__":
