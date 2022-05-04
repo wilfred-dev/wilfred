@@ -391,9 +391,16 @@ class Servers(object):
             name=f"wilfred_{server.id}",
             remove=True,
             ports={
-                **{f"{server.port}/tcp": server.port},
+                **{
+                    f"{server.port}/tcp": server.port,
+                    f"{server.port}/udp": server.port,
+                },
                 **{
                     f"{additional_port.port}/tcp": additional_port.port
+                    for additional_port in ports
+                },
+                **{
+                    f"{additional_port.port}/udp": additional_port.port
                     for additional_port in ports
                 },
             },
