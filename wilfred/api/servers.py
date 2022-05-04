@@ -71,6 +71,7 @@ class Servers(object):
             if cpu_load or memory_usage:
                 for server in servers:
                     _running = True
+                    _stats_avail = True
 
                     try:
                         container = self._docker_client.containers.get(
@@ -87,6 +88,15 @@ class Servers(object):
                         _running = False
 
                     if cpu_load and _running:
+                        # on some systems, statisics are not available
+                        if (
+                            "system_cpu_usage" not in d["cpu_stats"]
+                            or "system_cpu_usage" not in d["precpu_stats"]
+                        ):
+                            server.update({"cpu_load": "-"})
+                            _stats_avail = False
+
+                    if cpu_load and _running and _stats_avail:
                         # calculate the change in CPU usage between current and previous reading
                         cpu_delta = float(
                             d["cpu_stats"]["cpu_usage"]["total_usage"]
@@ -466,9 +476,16 @@ class Servers(object):
             name=f"wilfred_{server.id}",
             remove=True,
             ports={
-                **{f"{server.port}/tcp": server.port},
+                **{
+                    f"{server.port}/tcp": server.port,
+                    f"{server.port}/udp": server.port,
+                },
                 **{
                     f"{additional_port.port}/tcp": additional_port.port
+                    for additional_port in ports
+                },
+                **{
+                    f"{additional_port.port}/udp": additional_port.port
                     for additional_port in ports
                 },
             },
