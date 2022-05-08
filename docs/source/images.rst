@@ -15,9 +15,10 @@ This is the configuration file for Vanilla Minecraft.
         },
         "uid": "minecraft-vanilla",
         "name": "Vanilla Minecraft",
-        "author": "vilhelm@prytznet.se",
+        "author": "info@wilfredproject.org",
         "docker_image": "wilfreddev/java:latest",
         "command": "java -Xms128M -Xmx{{SERVER_MEMORY}}M -jar server.jar",
+        "default_port": "25565",
         "user": "container",
         "stop_command": "stop",
         "default_image": true,
@@ -44,11 +45,11 @@ This is the configuration file for Vanilla Minecraft.
             "docker_image": "wilfreddev/alpine:latest",
             "shell": "/bin/ash",
             "script": [
-                "apk add curl --no-cache --update jq",
+                "apk --no-cache --update add curl jq",
                 "if [ \"$MINECRAFT_VERSION\" == \"latest\" ]; then",
                 "   VERSION=`curl https://launchermeta.mojang.com/mc/game/version_manifest.json | jq -r '.latest.release'`",
                 "else",
-                    "VERSION=\"$MINECRAFT_VERSION\"",
+                "   VERSION=\"$MINECRAFT_VERSION\"",
                 "fi",
                 "MANIFEST_URL=$(curl -sSL https://launchermeta.mojang.com/mc/game/version_manifest.json | jq --arg VERSION $VERSION -r '.versions | .[] | select(.id== $VERSION )|.url')",
                 "DOWNLOAD_URL=$(curl ${MANIFEST_URL} | jq .downloads.server | jq -r '. | .url')",
@@ -91,6 +92,7 @@ Image syntax
 - `author` - Email of author.
 - `docker_image` - Docker image to run server in.
 - `command` - Command to be executed on start.
+- `default_port` - Default port to run server on (will be suggested by Wilfred).
 - `user` - User to run command as, leave empty for default `root`.
 - `stop_command` - Command to send to STDIN in order to stop the container.
 - `default_image` - Indicates to Wilfred that the image is an official image from the Wilfred project.
