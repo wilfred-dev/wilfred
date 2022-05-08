@@ -365,7 +365,7 @@ def create(ctx, console, detach):
     if not images.get_image(image_uid):
         error("image does not exist", exit_code=1)
 
-    port = click.prompt("Port", default=25565)
+    port = click.prompt("Port", default=images.get_image(image_uid)["default_port"])
     memory = click.prompt("Memory", default=1024)
 
     # create
