@@ -29,8 +29,10 @@ As long as your server can run in Docker, it can probably run using Wilfred (aft
   - SpongeVanilla
   - Waterfall
   - Bedrock
+- Mindustry
 - Multi Theft Auto
 - Voice Servers
+  - TeamSpeak 3
   - Mumble
 
 ## Installation
