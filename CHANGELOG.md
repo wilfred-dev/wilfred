@@ -2,6 +2,12 @@
 
 Please refer to the [official documentation](https://docs.wilfredproject.org/en/latest/development.html) for more information about the CHANGELOG and releases.
 
+## v0.10.1 (released on 2022-05-08)
+
+- **Changed** [c057239](https://github.com/wilfred-dev/wilfred/commit/c0572392c49031652e4b1607de40a1dbddcdcc6f) Removed snap package and all references to it (no longer supported, please use homebrew or pip).
+- **Changed** [#124](https://github.com/wilfred-dev/wilfred/issues/124) Changed so that Wilfred now binds to both TCP and UDP (applies to server port and any extra ports).
+- **Fixed** [df4fd00](https://github.com/wilfred-dev/wilfred/commit/df4fd00be10d24f558e268ec69ba59f09bb5ddd7) Fixed a bug that would cause `wilfred top` to crash when the Docker API does not provide enough statistics.
+
 ## v0.10.0 (released on 2022-04-24)
 
 - **Added** [157186c](https://github.com/wilfred-dev/wilfred/commit/157186cc588ac19272e2448f5c9dae0a398098e8) Added so that the running Python version is displayed when running `wilfred --version`.

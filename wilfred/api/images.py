@@ -244,6 +244,7 @@ class Images(object):
             "author",
             "docker_image",
             "command",
+            "default_port",
             "user",
             "stop_command",
             "default_image",
