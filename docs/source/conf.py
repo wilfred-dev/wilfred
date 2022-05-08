@@ -25,7 +25,7 @@ copyright = "2020-2022, Vilhelm Prytz"
 author = "Vilhelm Prytz"
 
 # The full version, including alpha/beta/rc tags
-release = "v0.10.0"
+release = "v0.10.1"
 
 
 # -- General configuration ---------------------------------------------------

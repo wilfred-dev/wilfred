@@ -2,7 +2,7 @@
 
 Please refer to the [official documentation](https://docs.wilfredproject.org/en/latest/development.html) for more information about the CHANGELOG and releases.
 
-## next-release
+## v0.10.1 (released on 2022-05-08)
 
 - **Changed** [c057239](https://github.com/wilfred-dev/wilfred/commit/c0572392c49031652e4b1607de40a1dbddcdcc6f) Removed snap package and all references to it (no longer supported, please use homebrew or pip).
 - **Changed** [#124](https://github.com/wilfred-dev/wilfred/issues/124) Changed so that Wilfred now binds to both TCP and UDP (applies to server port and any extra ports).
