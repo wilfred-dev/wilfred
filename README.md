@@ -55,7 +55,7 @@ brew tap wilfred-dev/wilfred
 brew install --HEAD wilfred
 ```
 
-Wilfred can also be installed using `pip`. You need to use **Python 3.7** or newer to run Wilfred.
+Wilfred can also be installed using `pip`. You need to use **Python 3.8** or newer to run Wilfred.
 
 ```bash
 pip install wilfred --upgrade
